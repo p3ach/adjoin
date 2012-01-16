@@ -1,6 +1,7 @@
 package com.unit4.adjoin;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -19,6 +20,10 @@ import com.unit4.cli.Argument;
 import com.unit4.cli.ArgumentDeclaration;
 import com.unit4.cli.ArgumentHandler;
 import com.unit4.cli.CLI;
+import com.unit4.tabular.U4Columns;
+import com.unit4.tabular.U4Common;
+import com.unit4.tabular.U4Row;
+import com.unit4.vocabulary.U4Convert;
 
 public class Adjoin {
 
@@ -38,22 +43,22 @@ public class Adjoin {
 	public static final String COLUMNS_URN = "Columns";
 	
     public static void main( String[] args ) {
-//		try {
+		try {
 			new Adjoin().go(args); 
-//		} catch (RuntimeException e) {
-//			logger.error("Oops! Somethings gone wrong. Please email this output to my owner dick.murray@unit4.com");
-//			for (StackTraceElement s : e.getStackTrace()) {
-//				logger.info("{}", s.toString());
-//			}
-//			if (e.getCause() != null) {
-//				logger.info("Caused by...");
-//				for (StackTraceElement s : e.getCause().getStackTrace()) {
-//					logger.info("{}", s.toString());
-//				}
-//			}
-//		} finally {
-//			logger.info("Goodbye.");
-//		}
+		} catch (RuntimeException e) {
+			logger.info("Oops! Somethings gone wrong. Please email this output to my owner dick.murray@unit4.com");
+			for (StackTraceElement s : e.getStackTrace()) {
+				logger.info("{}", s.toString());
+			}
+			if (e.getCause() != null) {
+				logger.info("Caused by...");
+				for (StackTraceElement s : e.getCause().getStackTrace()) {
+					logger.info("{}", s.toString());
+				}
+			}
+		} finally {
+			logger.info("Goodbye.");
+		}
     }
 
 //    Instance.
@@ -125,12 +130,13 @@ public class Adjoin {
 
     private Model output;
     
+    public static final String DEFAULT_TEMPLATE_URI = "http://id.unit4.com/template";
     public static final String DEFAULT_TEMPLATE = "file:Default.ttl";
     public static final String DEFAULT_GROUP = "Default";
     
-    protected U4Convert template = U4ConvertFactory.createTemplate();
+    protected U4Convert template = new U4Convert(ModelFactory.createDefaultModel().createResource(DEFAULT_TEMPLATE_URI));
     
-    protected LinkedList<U4Template> templates = new LinkedList<U4Template>();
+//    protected LinkedList<U4Template> templates = new LinkedList<U4Template>();
     protected LinkedList<String> groups = new LinkedList<String>();
     
     public Adjoin() {
@@ -138,9 +144,9 @@ public class Adjoin {
     	addGroup(DEFAULT_GROUP);
     }
     
-    public LinkedList<U4Template> templates() {
-    	return this.templates;
-    }
+//    public LinkedList<U4Template> templates() {
+//    	return this.templates;
+//    }
     
     public U4Convert getTemplate() {
     	return this.template;
@@ -148,9 +154,6 @@ public class Adjoin {
     
     protected void addTemplate(String uri) {
     	logger.debug("addTemplate(uri={})", uri);
-//    	U4Template template = new U4Template(uri);
-//    	templates().addFirst(template);
-//    	getTemplate().getTemplate().getModel().add(template.getTemplate().getModel());
     	getTemplate().readModel(uri);
     }
 
@@ -221,7 +224,8 @@ public class Adjoin {
     	try {
 			input.readHeaders();
 		} catch (IOException e) {
-			throw new Exception("Unable to read input headers.", e);
+			logger.error("Unable to read input headers due to [{}].", e);
+			return;
 		}
 
 		logger.debug("Create Columns.");
@@ -229,7 +233,8 @@ public class Adjoin {
 		try {
 			columns = new U4Columns(input.getHeaders());
 		} catch (IOException e) {
-			throw new Exception("Unable to get input headers.", e);
+			logger.error("Unable to get input headers due to [{}].", e);
+			return;
 		}
 
 		logger.debug("Match columns to templates.");
