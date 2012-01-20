@@ -31,20 +31,20 @@ public class U4Triples extends U4Vocabulary {
 		super(vocabulary);
 	}
 	
-	public Boolean hasBeforeTriples() {
-		return hasProperty(U4Convert.beforeTriples);
+	public Boolean hasBefore() {
+		return hasProperty(U4Convert.before);
 	}
 	
-	public U4Convert getBeforeTriples() {
-		return new U4Convert(getResource(U4Convert.beforeTriples));
+	public U4Convert getBefore() {
+		return new U4Convert(getResource(U4Convert.before));
 	}
 	
-	public Boolean hasAfterTriples() {
-		return hasProperty(U4Convert.afterTriples);
+	public Boolean hasAfter() {
+		return hasProperty(U4Convert.after);
 	}
 	
-	public U4Convert getAfterTriples() {
-		return new U4Convert(getResource(U4Convert.afterTriples));
+	public U4Convert getAfter() {
+		return new U4Convert(getResource(U4Convert.after));
 	}
 	
 	public List<U4Triple> read() {
@@ -70,31 +70,25 @@ public class U4Triples extends U4Vocabulary {
 		return triples;
 	}
 	
-	public List<Statement> statements(VelocityContext context) {
+	public List<Statement> getStatements(VelocityContext context) {
 		logger.debug("statement(context={})", context);
 		if (context == null) {
 			throw new Exception("context is null.");
 		}
 		List<Statement> statements = new ArrayList<Statement>();
-		if (hasBeforeTriples()) {
-			statements.addAll(getBeforeTriples().getTriples().statements(context));
+		if (hasBefore()) {
+			statements.addAll(getBefore().getTriples().getStatements(context));
 		}
-		Statement statement;
 		for (U4Triple triple : read()) {
-			if (triple.hasBefore()) {
-
-			}
-			statement = triple.read().statement(context);
-			if (statement != null) {
-				statements.add(triple.read().statement(context));
-			}
-			if (triple.hasAfter()) {
-				
-			}
+			statements.addAll(triple.read().getStatements(context));
 		}
-		if (hasAfterTriples()) {
-			statements.addAll(getAfterTriples().getTriples().statements(context));
+		if (hasAfter()) {
+			statements.addAll(getAfter().getTriples().getStatements(context));
 		}
 		return statements;
+	}
+	
+	public String toString() {
+		return String.format("U4Triples [%s, %s, %s]", getSubject(), hasBefore(), hasAfter());
 	}
 }

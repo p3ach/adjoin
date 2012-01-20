@@ -5,6 +5,7 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.FieldMethodizer;
@@ -22,6 +23,7 @@ import com.unit4.cli.ArgumentHandler;
 import com.unit4.cli.CLI;
 import com.unit4.tabular.U4Columns;
 import com.unit4.tabular.U4Common;
+import com.unit4.tabular.U4Output;
 import com.unit4.tabular.U4Row;
 import com.unit4.vocabulary.U4Convert;
 
@@ -123,12 +125,12 @@ public class Adjoin {
     
     private VelocityContext context;
     
-    protected Long maxRows = Long.valueOf(0);
+    protected Long maxRows = null;
     
     protected String configFile = null;
     protected String outputFile = null;
 
-    private Model output;
+    private U4Output output;
     
     public static final String DEFAULT_TEMPLATE_URI = "http://id.unit4.com/template";
     public static final String DEFAULT_TEMPLATE = "file:Default.ttl";
@@ -244,7 +246,7 @@ public class Adjoin {
 		logger.trace("{}", columns.toString());
 		
 		logger.debug("Create the output model.");
-		output = ModelFactory.createDefaultModel();
+		output = new U4Output();
 //		output.setNsPrefix(U4ORG.getPrefix(), U4ORG.getNS());
 //		output.setNsPrefix("payment", "http://reference.data.gov.uk/def/payment#");
 
@@ -261,11 +263,13 @@ public class Adjoin {
         Velocity.init();
         context = new VelocityContext();
 		context.put("Common", common);
+		context.put("Output", output);
         context.put("Columns", columns);
         context.put("Row", row);
         
-        context.put("String", String.class);
         context.put("Math", Math.class);
+        context.put("String", String.class);
+        context.put("UUID", UUID.class);
         
         context.put("ORG", new FieldMethodizer("com.unit4.vocabulary.U4ORG"));
         context.put("RDF", new FieldMethodizer("com.hp.hpl.jena.vocabulary.RDF"));
@@ -282,7 +286,8 @@ public class Adjoin {
 	        for (U4Convert headerTemplate : headerTemplates) {
 	        	logger.trace("headerTemplate={}", headerTemplate);
 	        	if (headerTemplate.hasTriples()) {
-	        		output.add(headerTemplate.getTriples().statements(context));
+	        		logger.trace("{}", headerTemplate.getTriples());
+	        		output.getModel().add(headerTemplate.getStatements(context));
 	        	}
 	        }
         }
@@ -309,7 +314,7 @@ public class Adjoin {
 			    if (beforeRowTemplates!= null) {
 				    for (U4Convert beforeRowtemplate : beforeRowTemplates) {
 				    	if (beforeRowtemplate.hasTriples()) {
-				    		output.add(beforeRowtemplate.getTriples().statements(context));
+				    		output.getModel().add(beforeRowtemplate.getTriples().getStatements(context));
 				    	}
 				    }
 			    }
@@ -320,11 +325,11 @@ public class Adjoin {
 						logger.trace("Value is empty string.");
 					} else {
 						if (columns.hasMatch(index)) {
-							output.add(columns.getMatch(index).getTriples().statements(context));
+							output.getModel().add(columns.getMatch(index).getStatements(context));
 						} else {
 							columns.setMatch(index, U4Convert.match(rowTemplates, row.getValue()));
 							if (columns.hasMatch(index)) {
-								output.add(columns.getMatch(index).getTriples().statements(context));
+								output.getModel().add(columns.getMatch(index).getStatements(context));
 							}
 						}
 					}
@@ -339,7 +344,7 @@ public class Adjoin {
     	//
     	logger.trace("Common \n{}", common.toString());
     	
-    	output.write(System.out, "Turtle");
+     	output.getModel().write(System.out, "Turtle");
     }
     
     protected void help() {

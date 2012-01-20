@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,6 +17,7 @@ import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
+import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.vocabulary.RDFS;
 import com.hp.hpl.jena.vocabulary.XSD;
 import com.unit4.exception.Exception;
@@ -346,6 +348,20 @@ public class U4Convert extends U4Vocabulary {
 	
 	public U4Convert getAfter() {
 		return new U4Convert(getModel().createResource(getString(U4Convert.after)));
+	}
+	
+	public List<Statement> getStatements(VelocityContext context) {
+		List<Statement> statements = new ArrayList<Statement>();
+		if (hasBefore()) {
+			statements.addAll(getBefore().getStatements(context));
+		}
+		if (hasTriples()) {
+			statements.addAll(getTriples().getStatements(context));
+		}
+		if (hasAfter()) {
+			statements.addAll(getAfter().getStatements(context));
+		}
+		return statements;
 	}
 	
 //	Match.

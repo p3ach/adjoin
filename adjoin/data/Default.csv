@@ -1,0 +1,8 @@
+"Parent","Child","Comment","Priority","Pattern","triplesBefore","triplesAfter","tripleBefore","tripleAfter","tripleValue","tripleSubject","tripleProperty","tripleObjectType","tripleObject","tripleObjectDatatype"
+,"Default","Default template.",,,,,,,,,,,,
+"Default","Header","Default header.",1024,,,,,,"$Common.setValue(\""randomUUID\"", $UUID.randomUUID().toString())",,,,,
+"Default","Header","Default header.",,,,,,,"$Common.setValue(\""baseURI\"", $String.format(\""http://id.example.org/%s\"", $Common.getValue(\""randomUUID\"")))",,,,,
+"Default","BeforeRow","Default BeforeRow.",1024,,,,,,"$Common.setValue(\""rowURI\"", $String.format(\""%s/%s\"", $Common.getValue(\""baseURI\""), $Row.getIndex()))",,,,,
+"Default","AfterRow","Default AfterRow..",1024,,,,,,,,,,,
+"Default","Row","Default row.",1024,,,,,,,,,,,
+"Default/Row","Default","Match anything.",1024,"^.*$",,,,,,"$Common.getValue(\""rowURI\"")","$String.format(\""%s%s\"", $Common.getValue(\""exampleNS\""), $Columns.getName())","$RDFS.Literal","$Row.getValue()","$XSD.xstring"

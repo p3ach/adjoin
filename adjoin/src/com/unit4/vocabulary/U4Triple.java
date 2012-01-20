@@ -143,72 +143,63 @@ public class U4Triple extends U4Vocabulary {
 	 * @param context : A VelocityContext used to provide token parsing functionality.
 	 * @return statement : A Statement.
 	 */
-	public Statement statement(VelocityContext context) {
+	public List<Statement> getStatements(VelocityContext context) {
 		if (context == null) {
 			throw new Exception("context is null.");
-		}
-
-		Model model = getModel();
-		if (model == null) {
-			throw new Exception("model is null.");
 		}
 
 		List<Statement> statements = new ArrayList<Statement>();
 		
 		if (hasBefore()) {
-			statements.addAll(new U4Triples(getBefore()).statements(context));
+			statements.addAll(new U4Triples(getBefore()).getStatements(context));
 		}
 	
 		if (value() != null) {
 			evaluate(context, value);
 		}
-		
-		if (subjectValue() == null) {
-			logger.trace("subjectValue=null");
-			return null;
-		}
-		if (propertyValue() == null) {
-			logger.trace("propertyValue=null");
-			return null;
-		}
-		if (objectType() == null) {
-			logger.trace("objectType=null");
-			return null;
-		}
-		if (objectValue() == null) {
-			logger.trace("objectValue=null");
-		}
-		
-		String evaluatedSubjectValue = evaluate(context, subjectValue());
-		Resource subject = ResourceFactory.createResource(U4Common.createURI(evaluatedSubjectValue));
 
-		String evaluatedPropertyValue = evaluate(context, propertyValue());
-		Property property = ResourceFactory.createProperty(evaluatedPropertyValue);
+		if (valid()) {
+			statements.add(getStatement(context));
+		}
 		
-		String evaluatedObjectType = evaluate(context, objectType());
-		Resource objectType = ResourceFactory.createResource(evaluatedObjectType);
+		if (hasAfter()) {
+			statements.addAll(new U4Triples(getAfter()).getStatements(context));
+		}
+		return statements;
+	}
 
-		RDFDatatype objectRDFDatatype;
-		RDFNode object;
+	public Boolean valid() {
+		return (subjectValue() != null) && (propertyValue() != null) && (objectType != null) && (objectValue() != null);
+	}
+	
+	public Statement getStatement(VelocityContext context) {
+//		String evaluatedSubjectValue = evaluate(context, subjectValue());
+		Resource subject = ResourceFactory.createResource(evaluate(context, subjectValue()));
+
+//		String evaluatedPropertyValue = evaluate(context, propertyValue());
+		Property property = ResourceFactory.createProperty(evaluate(context, propertyValue()));
+		
+//		String evaluatedObjectType = evaluate(context, objectType());
+		Resource objectType = ResourceFactory.createResource(evaluate(context, objectType()));
+
+//		RDFDatatype objectRDFDatatype;
+//		RDFNode object;
 		if (objectType.equals(RDFS.Resource)) {
-			String evaluatedObjectValue = evaluate(context, objectValue());
+//			String evaluatedObjectValue = evaluate(context, objectValue());
+//			object = ResourceFactory.createResource(U4Common.createURI(evaluate(context, objectValue())));
+			return ResourceFactory.createStatement(subject, property, ResourceFactory.createResource(evaluate(context, objectValue())));
+		}
 
-			object = ResourceFactory.createResource(U4Common.createURI(evaluatedObjectValue));
-		} else if (objectType.equals(RDFS.Literal)) {
-			if (objectDatatype() == null) {
-				return null;
-			}
-			objectRDFDatatype = TypeMapper.getInstance().getTypeByName(evaluate(context, objectDatatype()));
-			logger.trace("objectRDFDatatype={}", objectRDFDatatype);
-			object = ResourceFactory.createTypedLiteral(evaluate(context, objectValue()), objectRDFDatatype);
-		} else {
-			logger.warn("unknown objectType.");
-			return null;
+		if (objectType.equals(RDFS.Literal)) {
+//			if (objectDatatype() != null) {
+//				objectRDFDatatype = TypeMapper.getInstance().getTypeByName(evaluate(context, objectDatatype()));
+//				logger.trace("objectRDFDatatype={}", objectRDFDatatype);
+//				object = ResourceFactory.createTypedLiteral(evaluate(context, objectValue()), TypeMapper.getInstance().getTypeByName(evaluate(context, objectDatatype())));
+				return ResourceFactory.createStatement(subject, property, ResourceFactory.createTypedLiteral(evaluate(context, objectValue()), TypeMapper.getInstance().getTypeByName(evaluate(context, objectDatatype()))));
+//			}
 		}
 		
-		Statement statement = ResourceFactory.createStatement(subject, property, object); 
-		logger.trace("statement={}", statement);
-		return statement;
+		throw new Exception(String.format("Unknown objectType %s", objectType));
 	}
 	
 	protected String evaluate(VelocityContext context, String input) {
@@ -242,7 +233,7 @@ public class U4Triple extends U4Vocabulary {
 	}
 	
 	public String toString() {
-		return String.format("[%s, %s, %s, %s, %s]", subjectValue(), propertyValue(), objectValue(), objectType(), objectDatatype());
+		return String.format("U4Triple [%s, %s, %s, %s, %s]", subjectValue(), propertyValue(), objectValue(), objectType(), objectDatatype());
 	}
 }
 ;

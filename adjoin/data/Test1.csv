@@ -1,2 +1,3 @@
-string1,long1,decimal1,date1,email1
-abc,1,1.23,31/12/2011,email1@example.org
+"string1","long1","decimal1","date1","email1"
+"abc",1,1.23,"31/12/2011","email1@example.org"
+"ABC",2,2.46,01/11/2011,"email2@example.org"
