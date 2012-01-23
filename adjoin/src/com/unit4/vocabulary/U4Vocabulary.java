@@ -13,10 +13,11 @@ import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
+import com.hp.hpl.jena.rdf.model.Seq;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
-import com.hp.hpl.jena.shared.JenaException;
 import com.hp.hpl.jena.util.FileManager;
+import com.hp.hpl.jena.vocabulary.RDF;
 import com.unit4.exception.Exception;
 
 /**
@@ -62,7 +63,6 @@ public class U4Vocabulary {
 	private Resource subject = null;
 		
 	public U4Vocabulary() {
-		logger.debug("U4Vocabulary()");
 	}
 
 	public U4Vocabulary(Resource subject) {
@@ -74,11 +74,11 @@ public class U4Vocabulary {
 	}
 	
 	public U4Vocabulary readModel(String uri) {
-		try {
+//		try {
 			FileManager.get().readModel(getModel(), uri);
-		} catch (JenaException e) {
-			logger.error("Unable to read {} due to [{}]", uri, e);
-		}
+//		} catch (JenaException e) {
+//			throw new Exception(String.format("Unable to read %s.", uri), e);
+//		}
 		return this;
 	}
 	
@@ -108,6 +108,16 @@ public class U4Vocabulary {
 		return getModel().createResource(getChildURI(urn));
 	}
 	
+//	Seq/Bag/Alt
+	
+	public Boolean hasSeq() {
+		return hasProperty(RDF.type, RDF.Seq);
+	}
+	
+	public Seq getSeq() {
+		return getModel().getSeq(getSubject());
+	}
+	
 //	Create(add)Read(get)Update(?)Delete(remove) CRUD methods.
 	
 	public U4Vocabulary addProperty(Property property, RDFNode object) {
@@ -131,12 +141,13 @@ public class U4Vocabulary {
 	}
 
 	public Resource getResource(Property property) {
-		logger.debug("getResource(property={}", property);
 		RDFNode node = getProperty(property);
-		if (node == null || !node.isResource()) {
-			throw new Exception("Node is not a Resource.");
-		} else {
+		if (node == null) {
+			throw new Exception("Node is null.");
+		} else if (node.isResource()) {
 			return node.asResource();
+		} else {
+			throw new Exception("Node is not a Resource.");
 		}
 	}
 	
@@ -151,19 +162,23 @@ public class U4Vocabulary {
 
 	public Integer getInteger(Property property) {
 		RDFNode node = getProperty(property);
-		if (node == null || !node.isLiteral()) {
-			return null;
-		} else {
+		if (node == null) {
+			throw new Exception("Node is null.");
+		} else if (node.isLiteral()) {
 			return node.asLiteral().getInt();
+		} else {
+			throw new Exception("Node is not a Literal.");
 		}
 	}
 	
 	public String getString(Property property) {
 		RDFNode node = getProperty(property);
-		if (node == null || !node.isLiteral()) {
-			return null;
-		} else {
+		if (node == null) {
+			throw new Exception(String.format("Node is null for %s %s.", getSubject(), property));
+		} else if (node.isLiteral()) {
 			return node.asLiteral().getString();
+		} else {
+			throw new Exception("Node is not a Literal.");
 		}
 	}
 	
@@ -189,6 +204,7 @@ public class U4Vocabulary {
 //	Has methods.
 
 	public Boolean hasProperty(Property property) {
+//		return getModel().contains(getSubject(), property);
 		return getSubject().hasProperty(property);
 	}
 	

@@ -12,28 +12,19 @@ import org.apache.velocity.exception.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hp.hpl.jena.datatypes.RDFDatatype;
 import com.hp.hpl.jena.datatypes.TypeMapper;
-import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.vocabulary.RDFS;
 import com.unit4.exception.Exception;
-import com.unit4.tabular.U4Common;
 
 public class U4Triple extends U4Vocabulary {
 	private static Logger logger = LoggerFactory.getLogger(U4Triple.class);
 	
-	private String value;
-	private String subjectValue;
-	private String propertyValue;
-	private String objectValue;
 	private String objectType;
-	private String objectDatatype;
-	
+
 	public U4Triple() {
 	}
 	
@@ -45,59 +36,40 @@ public class U4Triple extends U4Vocabulary {
 		super(vocabulary);
 	}
 
-	public U4Triple value(String value) {
-		this.value = value;
-		return this;
+	public Boolean hasValue() {
+		return hasProperty(U4Convert.value);
 	}
 	
-	public String value() {
-		return this.value;
+	public String getValue() {
+		return getString(U4Convert.value);
 	}
 	
 	public U4Triple subjectValue(String subjectValue) {
-		this.subjectValue = subjectValue;
 		return this;
 	}
 	
-	public String subjectValue() {
-		return this.subjectValue;
+	public String getSubjectValue() {
+		return getString(U4Convert.subjectValue);
 	}
 	
 	public U4Triple propertyValue(String propertyValue) {
-		this.propertyValue = propertyValue;
 		return this;
 	}
 	
-	public String propertyValue() {
-		return this.propertyValue;
+	public String getPropertyValue() {
+		return getString(U4Convert.propertyValue);
 	}
 	
-	public U4Triple objectValue(String objectValue) {
-		this.objectValue = objectValue;
-		return this;
+	public String getObjectValue() {
+		return getString(U4Convert.objectValue);
 	}
 	
-	public String objectValue() {
-		return this.objectValue;
+	public String getObjectType() {
+		return getString(U4Convert.objectType);
 	}
 	
-	public U4Triple objectType(String objectType) {
-		this.objectType = objectType;
-		return this;
-	}
-	
-	public String objectType() {
-		return this.objectType;
-	}
-	
-	public U4Triple objectDatatype(String objectDatatype) {
-		this.objectDatatype = objectDatatype;
-		return this;
-	}
-	
-	public String objectDatatype() {
-		logger.trace("objectDatatype={}", this.objectDatatype);
-		return this.objectDatatype;
+	public String getObjectDatatype() {
+		return getString(U4Convert.objectDatatype);
 	}
 
 	/**
@@ -107,12 +79,12 @@ public class U4Triple extends U4Vocabulary {
 	 * This U4Triple.
 	 */
 	public U4Triple read() {
-		value(getString(U4Convert.value));
-		subjectValue(getString(U4Convert.subjectValue));
-		propertyValue(getString(U4Convert.propertyValue));
-		objectValue(getString(U4Convert.objectValue));
-		objectType(getString(U4Convert.objectType));
-		objectDatatype(getString(U4Convert.objectDatatype));
+//		value(getString(U4Convert.value));
+//		subjectValue(hasProperty(U4Convert.subjectValue) ? getString(U4Convert.subjectValue) : null);
+//		propertyValue(getString(U4Convert.propertyValue));
+//		objectValue(getString(U4Convert.objectValue));
+//		objectType(getString(U4Convert.objectType));
+//		objectDatatype(getString(U4Convert.objectDatatype));
 		return this;
 	}
 	
@@ -145,7 +117,7 @@ public class U4Triple extends U4Vocabulary {
 	 */
 	public List<Statement> getStatements(VelocityContext context) {
 		if (context == null) {
-			throw new Exception("context is null.");
+			throw new Exception("Context is null.");
 		}
 
 		List<Statement> statements = new ArrayList<Statement>();
@@ -154,8 +126,8 @@ public class U4Triple extends U4Vocabulary {
 			statements.addAll(new U4Triples(getBefore()).getStatements(context));
 		}
 	
-		if (value() != null) {
-			evaluate(context, value);
+		if (hasValue()) {
+			evaluate(context, getValue());
 		}
 
 		if (valid()) {
@@ -169,25 +141,25 @@ public class U4Triple extends U4Vocabulary {
 	}
 
 	public Boolean valid() {
-		return (subjectValue() != null) && (propertyValue() != null) && (objectType != null) && (objectValue() != null);
+		return (getSubjectValue() != null) && (getPropertyValue() != null) && (objectType != null) && (getObjectValue() != null);
 	}
 	
 	public Statement getStatement(VelocityContext context) {
 //		String evaluatedSubjectValue = evaluate(context, subjectValue());
-		Resource subject = ResourceFactory.createResource(evaluate(context, subjectValue()));
+		Resource subject = ResourceFactory.createResource(evaluate(context, getSubjectValue()));
 
 //		String evaluatedPropertyValue = evaluate(context, propertyValue());
-		Property property = ResourceFactory.createProperty(evaluate(context, propertyValue()));
+		Property property = ResourceFactory.createProperty(evaluate(context, getPropertyValue()));
 		
 //		String evaluatedObjectType = evaluate(context, objectType());
-		Resource objectType = ResourceFactory.createResource(evaluate(context, objectType()));
+		Resource objectType = ResourceFactory.createResource(evaluate(context, getObjectType()));
 
 //		RDFDatatype objectRDFDatatype;
 //		RDFNode object;
 		if (objectType.equals(RDFS.Resource)) {
 //			String evaluatedObjectValue = evaluate(context, objectValue());
 //			object = ResourceFactory.createResource(U4Common.createURI(evaluate(context, objectValue())));
-			return ResourceFactory.createStatement(subject, property, ResourceFactory.createResource(evaluate(context, objectValue())));
+			return ResourceFactory.createStatement(subject, property, ResourceFactory.createResource(evaluate(context, getObjectValue())));
 		}
 
 		if (objectType.equals(RDFS.Literal)) {
@@ -195,7 +167,7 @@ public class U4Triple extends U4Vocabulary {
 //				objectRDFDatatype = TypeMapper.getInstance().getTypeByName(evaluate(context, objectDatatype()));
 //				logger.trace("objectRDFDatatype={}", objectRDFDatatype);
 //				object = ResourceFactory.createTypedLiteral(evaluate(context, objectValue()), TypeMapper.getInstance().getTypeByName(evaluate(context, objectDatatype())));
-				return ResourceFactory.createStatement(subject, property, ResourceFactory.createTypedLiteral(evaluate(context, objectValue()), TypeMapper.getInstance().getTypeByName(evaluate(context, objectDatatype()))));
+				return ResourceFactory.createStatement(subject, property, ResourceFactory.createTypedLiteral(evaluate(context, getObjectValue()), TypeMapper.getInstance().getTypeByName(evaluate(context, getObjectDatatype()))));
 //			}
 		}
 		
@@ -233,7 +205,7 @@ public class U4Triple extends U4Vocabulary {
 	}
 	
 	public String toString() {
-		return String.format("U4Triple [%s, %s, %s, %s, %s]", subjectValue(), propertyValue(), objectValue(), objectType(), objectDatatype());
+		return String.format("U4Triple [%s, %s, %s, %s, %s]", getSubjectValue(), getPropertyValue(), getObjectValue(), getObjectType(), getObjectDatatype());
 	}
 }
 ;

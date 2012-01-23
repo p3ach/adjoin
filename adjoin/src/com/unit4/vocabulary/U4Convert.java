@@ -1,22 +1,29 @@
 package com.unit4.vocabulary;
 
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.Velocity;
+import org.apache.velocity.exception.MethodInvocationException;
+import org.apache.velocity.exception.ParseErrorException;
+import org.apache.velocity.exception.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.hp.hpl.jena.datatypes.TypeMapper;
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.ontology.OntResource;
+import com.hp.hpl.jena.rdf.model.NodeIterator;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
+import com.hp.hpl.jena.rdf.model.Seq;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.vocabulary.RDFS;
 import com.hp.hpl.jena.vocabulary.XSD;
@@ -36,9 +43,6 @@ public class U4Convert extends U4Vocabulary {
 	
 	public static final String DEFAULT_COLUMN_URN = "Column";
 	
-	public static final String DEFAULT_ROW_STEPS_URN = "Row/Steps/Default";
-	public static final String[] DEFAULT_ROW_STEPS = {"%uri", "%uc* ;", "."};
-	
 	public static final Resource Convert = createResource(getURI("Convert"));
 	
 	public static final Resource RegEx = createResource(getURI("RegEx"));
@@ -54,19 +58,17 @@ public class U4Convert extends U4Vocabulary {
 	
 	public static final Property pattern = createProperty(getURI("pattern"));
 	
-	public static final Property subjectValue = createProperty(getURI("subjectValue"));
-	public static final Property propertyValue = createProperty(getURI("propertyValue"));
-	public static final Property objectValue = createProperty(getURI("objectValue"));
+	public static final Property subjectURI = createProperty(getURI("subjectURI"));
+	public static final Property propertyURI = createProperty(getURI("propertyURI"));
+	public static final Property objectURI = createProperty(getURI("objectURI"));
 	public static final Property objectType = createProperty(getURI("objectType"));
 	public static final Property objectDatatype = createProperty(getURI("objectDatatype"));
 
 	public static final Property value = createProperty(getURI("value"));
 	
-	public static final Property before = createProperty("before");
-	public static final Property after = createProperty("after");
+	public static final Property before = createProperty(getURI("before"));
+	public static final Property after = createProperty(getURI("after"));
 	
-	public static final Property beforeTriples = createProperty(getURI("beforeTriples"));
-	public static final Property afterTriples = createProperty(getURI("afterTriples"));
 	public static final Property triples = createProperty(getURI("triples"));
 	public static final Property triple = createProperty(getURI("triple"));
 
@@ -170,90 +172,145 @@ public class U4Convert extends U4Vocabulary {
 	
 	protected void common() {
 		getModel().setNsPrefix(getPrefix(), getNS());
-//		u4SKOS = new U4SKOS(this);
 	}
 	
 	public U4Convert getChild(String urn) {
 		return new U4Convert(createChild(urn));
 	}	
+
+	public Boolean hasValue() {
+		return hasProperty(U4Convert.value);
+	}
 	
-//	Row.
-
-//	protected String getRowURN(String urn) {
-//		return "Row/" + urn;
-//	}
-//	
-//	public Boolean hasRowSteps() {
-//		return hasRowSteps("Default");
-//	}
-//	
-//	public Boolean hasRowSteps(String urn) {
-//		return hasSteps(getRowURN(urn));
-//	}
-//	
-//	public U4Convert addRowSteps() {
-//		return addRowSteps("Default");
-//	}
-//	
-//	public U4Convert addRowSteps(String urn) {
-//		return addSteps(getRowURN(urn));
-//	}
-//	
-//	public Set<U4Convert> getRowSteps() {
-//		return getRowSteps("Default");
-//	}
-//	
-//	public Set<U4Convert> getRowSteps(String urn) {
-//		return getSteps(getRowURN(urn));
-//	}
-//	
-//	public Boolean hasRowStep(String urn) {
-//		return hasStep(urn);
-//	}
-//	
-//	public U4Convert addRowStep(String urn) {
-//		return addStep(urn);
-//	}
-//	
-//	public U4Convert getRowStep(String urn) {
-//		return getStep(urn);
-//	}
-
-//	Steps.
-
-//	public Boolean hasStep(String urn) {
-//		return hasChild(urn);
-//	}
-//	
-//	public U4Convert getStep(String urn) {
-//		return getChild(urn);
-//	}
-//	
-//	public Boolean hasSteps(String urn) {
-//		return hasChild(urn);
-//	}
-//
-//	public U4Convert addSteps(String urn) {
-//		U4Convert child = new U4Convert(addChild(urn));
-//		child.createProperty(U4SKOS.broader, getSubject());
-//		createProperty(U4SKOS.narrower, child.getSubject());
-//		return child;
-//	}
-//	
-//	public Set<U4Convert> getSteps(String urn) {
-//		Set<U4Convert> steps = new HashSet<U4Convert>();
-//		for (RDFNode node : getProperties(U4SKOS.narrower)) {
-//			steps.add(new U4Convert((OntResource) node));
-//		}
-//		return steps;
-//	}
+	public U4Convert getValue() {
+		return new U4Convert(getResource(U4Convert.value));
+	}
 	
+	/**
+	 * Answer whether this AdJoin has a triple property.
+	 * @return
+	 */
+	public Boolean hasTriple() {
+		return hasProperty(U4Convert.triple);
+	}
+	
+	/**
+	 * Return the resource for the triple property.
+	 * @return
+	 */
+	public U4Convert getTriple() {
+		return new U4Convert(getResource(U4Convert.triple));
+	}
+
+	public void processValues(VelocityContext context) {
+		if (getSubject().isAnon()) { // i.e. (S, :value [)
+			if (hasSeq()) { // i.e. ([, rdf:type, rdf:Seq)
+				Seq seq = getSeq();
+				NodeIterator iterator = seq.iterator();
+				while (iterator.hasNext()) {
+					new U4Convert(iterator.next().asResource()).processValues(context);
+				}
+			} else { // i.e. ([, :value, O) 
+				evaluate(context, getString(U4Convert.value));
+			}
+		} else { // i.e (subject, P, O)
+//			if (hasBefore()) {
+//				statements.addAll(getStatements(getBefore(), context));
+//			}
+			if (hasValue()) {
+				new U4Convert(getValue().getSubject()).processValues(context);
+			}
+//			if (hasAfter()) {
+//				statements.addAll(getStatements(getAfter(), context));
+//			}
+		}
+	}
+	
+	/** Get all the statements for this AdJoin.
+	 * 
+	 * <p>This will handle the following AdJoin statements</p>
+	 * 
+	 * <p>(getSubject(), P, O)</p>
+	 * 
+	 * <p>(S, adjoin:triple, [)</p>
+	 * 
+	 * @param context
+	 * @return
+	 */
+	public List<Statement> getStatements(VelocityContext context) {
+		List<Statement> statements = new ArrayList<Statement>();
+		if (getSubject().isAnon()) { // i.e. (S, :triple [)
+			if (hasSeq()) { // i.e. ([, rdf:type, rdf:Seq)
+				Seq seq = getSeq();
+				NodeIterator iterator = seq.iterator();
+				while (iterator.hasNext()) {
+					statements.addAll(new U4Convert(iterator.next().asResource()).getStatements(context));
+				}
+			} else { // Assume it's a triple i.e. ([, :subjectURI, O), ([, :propertyURI, O), ([, ?, O)
+				statements.add(getStatement(context));
+			}
+		} else { // i.e (subject, P, O)
+//			if (hasBefore()) {
+//				statements.addAll(getStatements(getBefore(), context));
+//			}
+			if (hasTriple()) {
+				statements.addAll(new U4Convert(getTriple().getSubject()).getStatements(context));
+			}
+//			if (hasAfter()) {
+//				statements.addAll(getStatements(getAfter(), context));
+//			}
+		}
+		return statements;
+	}
+	
+	public Statement getStatement(VelocityContext context) {
+		Resource subject = ResourceFactory.createResource(evaluate(context, getSubjectURI()));
+		
+		Property property = ResourceFactory.createProperty(evaluate(context, getPropertyURI()));
+
+		Resource objectType = ResourceFactory.createResource(evaluate(context, getObjectType()));
+
+		if (objectType.equals(RDFS.Resource)) {
+			return ResourceFactory.createStatement(subject, property, ResourceFactory.createResource(evaluate(context, getObjectURI())));
+		}
+
+		if (objectType.equals(RDFS.Literal)) {
+			return ResourceFactory.createStatement(subject, property, ResourceFactory.createTypedLiteral(evaluate(context, getObjectURI()), TypeMapper.getInstance().getTypeByName(evaluate(context, getObjectDatatype()))));
+		}
+		
+		throw new Exception(String.format("Unknown objectType %s", objectType));
+	}
+	
+	public String evaluate(VelocityContext context, String input) {
+		if (context == null) {
+			throw new Exception("Context is null.");
+		}
+		
+		if (input == null) {
+			throw new Exception("Input is null.");
+		}
+		
+    	StringWriter output = new StringWriter();
+		try {
+			if (Velocity.evaluate(context, output, "U4Convert.evaluate()", input)) {
+				return output.toString();
+			} else {
+				throw new Exception("Velocity returned false.");
+			}
+		} catch (ParseErrorException e) {
+			throw new Exception("Velocity threw a ParseError.", e);
+		} catch (MethodInvocationException e) {
+			throw new Exception("Velocity threw a MethodInvocation.", e);
+		} catch (ResourceNotFoundException e) {
+			throw new Exception("Velocity threw a ResourceNotFound", e);
+		}
+	}
+
 	public Boolean hasChildren() {
 		return hasProperty(U4SKOS.narrower);
 	}
 	
 	public List<U4Convert> getChildren() {
-		logger.debug("getChildren() subject={}", getSubject());
 		List<U4Convert> children = new ArrayList<U4Convert>();
 		for (U4Convert child : U4Convert.create(getProperties(U4SKOS.narrower), true)) {
 			children.add(child);
@@ -298,16 +355,16 @@ public class U4Convert extends U4Vocabulary {
 		return getInteger(U4Convert.priority);
 	}
 	
-	public String getSubjectValue() {
-		return getString(U4Convert.subjectValue);
+	public String getSubjectURI() {
+		return getString(U4Convert.subjectURI);
 	}
 	
-	public String getPropertyValue() {
-		return getString(U4Convert.propertyValue);
+	public String getPropertyURI() {
+		return getString(U4Convert.propertyURI);
 	}
 	
-	public String getObjectValue() {
-		return getString(U4Convert.objectValue);
+	public String getObjectURI() {
+		return getString(U4Convert.objectURI);
 	}
 		
 	public String getObjectType() {
@@ -338,31 +395,55 @@ public class U4Convert extends U4Vocabulary {
 		return hasProperty(U4Convert.before);
 	}
 	
-	public U4Convert getBefore() {
-		return new U4Convert(getModel().createResource(getString(U4Convert.before)));
+	public List<U4Convert> getBefore() {
+		return getSeqOrResource(getResource(U4Convert.before));
 	}
 	
 	public Boolean hasAfter() {
-		return hasProperty(U4Convert.after);
+		return hasProperty(U4Convert.after); 
 	}
 	
-	public U4Convert getAfter() {
-		return new U4Convert(getModel().createResource(getString(U4Convert.after)));
+	public List<U4Convert> getAfter() {
+		return getSeqOrResource(getResource(U4Convert.after));
+	}
+
+	public List<U4Convert> getSeqOrResource(Resource resource) {
+		List<U4Convert> list = new ArrayList<U4Convert>();
+		
+		if (resource.isAnon()) {
+			Seq seq = getModel().getSeq(resource);
+			NodeIterator iterator = seq.iterator();
+			while (iterator.hasNext()) {
+				list.add(new U4Convert(iterator.next().asResource()));
+			}
+		} else {
+			list.add(new U4Convert(resource));
+		}
+		
+		return list;
 	}
 	
-	public List<Statement> getStatements(VelocityContext context) {
-		List<Statement> statements = new ArrayList<Statement>();
-		if (hasBefore()) {
-			statements.addAll(getBefore().getStatements(context));
-		}
-		if (hasTriples()) {
-			statements.addAll(getTriples().getStatements(context));
-		}
-		if (hasAfter()) {
-			statements.addAll(getAfter().getStatements(context));
-		}
-		return statements;
-	}
+//	public List<Statement> getStatements(List<U4Convert> list, VelocityContext context) {
+//		List<Statement> statements = new ArrayList<Statement>();
+//		for (U4Convert convert : list) {
+//			statements.addAll(convert.getStatements(context));
+//		}
+//		return statements;
+//	}
+//	
+//	public List<Statement> getStatements(VelocityContext context) {
+//		List<Statement> statements = new ArrayList<Statement>();
+//		if (hasBefore()) {
+//			statements.addAll(getStatements(getBefore(), context));
+//		}
+//		if (hasTriples()) {
+//			statements.addAll(getTriples().getStatements(context));
+//		}
+//		if (hasAfter()) {
+//			statements.addAll(getStatements(getAfter(), context));
+//		}
+//		return statements;
+//	}
 	
 //	Match.
 	public Boolean match(String input) {

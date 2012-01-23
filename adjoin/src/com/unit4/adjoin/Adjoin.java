@@ -17,6 +17,7 @@ import com.csvreader.CsvReader;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.util.FileManager;
+import com.hp.hpl.jena.vocabulary.RDF;
 import com.unit4.cli.Argument;
 import com.unit4.cli.ArgumentDeclaration;
 import com.unit4.cli.ArgumentHandler;
@@ -49,6 +50,7 @@ public class Adjoin {
 			new Adjoin().go(args); 
 		} catch (RuntimeException e) {
 			logger.info("Oops! Somethings gone wrong. Please email this output to my owner dick.murray@unit4.com");
+			logger.info("{}", e.getMessage());
 			for (StackTraceElement s : e.getStackTrace()) {
 				logger.info("{}", s.toString());
 			}
@@ -273,6 +275,7 @@ public class Adjoin {
         
         context.put("ORG", new FieldMethodizer("com.unit4.vocabulary.U4ORG"));
         context.put("RDF", new FieldMethodizer("com.hp.hpl.jena.vocabulary.RDF"));
+        context.put("RDFClass", RDF.class);
         context.put("RDFS", new FieldMethodizer("com.hp.hpl.jena.vocabulary.RDFS"));
         context.put("XSD", new FieldMethodizer("com.hp.hpl.jena.vocabulary.XSD"));
         context.put("VoID", new FieldMethodizer("com.unit4.vocabulary.U4VoID"));
@@ -284,13 +287,13 @@ public class Adjoin {
         logger.debug("Processing header templates.");
         if (headerTemplates != null) {
 	        for (U4Convert headerTemplate : headerTemplates) {
-	        	logger.trace("headerTemplate={}", headerTemplate);
-	        	if (headerTemplate.hasTriples()) {
-	        		logger.trace("{}", headerTemplate.getTriples());
+//	        	if (headerTemplate.hasTriples()) {
 	        		output.getModel().add(headerTemplate.getStatements(context));
-	        	}
+//	        	}
 	        }
         }
+        
+        output.getModel().write(System.out, "Turtle");
 
         //        Read the input.
         Long rowIndex;
@@ -339,12 +342,26 @@ public class Adjoin {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-        //    	Close input.
+
+        logger.debug("Processing footer templates.");
+        if (footerTemplates != null) {
+	        for (U4Convert footerTemplate : footerTemplates) {
+	        	if (footerTemplate.hasTriples()) {
+	        		output.getModel().add(footerTemplate.getStatements(context));
+	        	}
+	        }
+        }
+		
+		//    	Close input.
     	input.close();
     	//
     	logger.trace("Common \n{}", common.toString());
     	
      	output.getModel().write(System.out, "Turtle");
+    }
+    
+    public void processTemplate() {
+    	
     }
     
     protected void help() {

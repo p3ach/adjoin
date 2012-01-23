@@ -1,11 +1,11 @@
 @prefix u4convert:  <http://www.unit4.com/2011/11/01/u4convert-ns#> .
 
-@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix owl:     <http://www.w3.org/2002/07/owl#> .
-@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
-@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
-@prefix skos:    <http://www.w3.org/2004/02/skos/core#> . 
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> . 
 @prefix void: <http://rdfs.org/ns/void#> .
 
 <http://id.unit4.com/template>
@@ -22,7 +22,40 @@
 <http://id.unit4.com/template/Default/Header>
 	rdfs:comment "Default header."@en ;
 	u4convert:priority "1024"^^xsd:integer;
-	u4convert:before <http://id.unit4.com/template/Default/Header/Dataset> ;
+
+	u4convert:value [
+		a rdfs:Seq ;
+		rdf:_1 [
+			u4convert:value "$Common.setValue(\"randomUUID\", $UUID.randomUUID().toString())"^^xsd:string ;
+		] ;
+	] ;
+	
+	u4convert:triple [
+		a rdf:Seq ;
+		rdf:_1 [
+			u4convert:value "$Common.setValue(\"randomUUID\", $UUID.randomUUID().toString())"^^xsd:string ;
+			u4convert:subjectURI "http://id.example.org"^^xsd:String ;
+			u4convert:propertyURI "$RDF.type" ;
+			u4convert:objectType "$RDFS.Resource" ;
+			u4convert:objectURI "$RDFS.Resource" ;
+		] ;
+		rdf:_2 [
+			a rdf:Seq ;
+			rdf:_1 [
+				u4convert:subjectURI "http://id.example.org"^^xsd:String ;
+				u4convert:propertyURI "$RDF.type" ;
+				u4convert:objectType "$RDFS.Resource" ;
+				u4convert:objectURI "$VoID.Dataset" ;
+			] ;
+			rdf:_2 [
+				u4convert:subjectURI "http://id.example.org"^^xsd:String ;
+				u4convert:propertyURI "$RDF.type" ;
+				u4convert:objectType "$RDFS.Resource" ;
+				u4convert:objectURI "$VoID.Linkset" ;
+			] ;
+		] ;
+	] ;
+	
 	u4convert:triples [
 		a rdfs:Seq ;
 		rdf:_1 [
@@ -41,7 +74,27 @@
 			u4convert:value "$Output.getModel().setNsPrefix($Common.getValue(\"examplePrefix\"), $Common.getValue(\"exampleNS\"))"^^xsd:string ;		
 		] ;
 	] ;
-	u4convert:after <http://id.unit4.com/template/Default/Header/Dataset> ;
+	u4convert:after [
+		a rdfs:Seq ;
+		rdf:_1 [
+			u4convert:value "$Common.setValue(\"randomUUID\", $UUID.randomUUID().toString())"^^xsd:string ;
+		] ;
+		rdf:_2 [
+			u4convert:value "$Common.setValue(\"randomUUID\", $UUID.randomUUID().toString())"^^xsd:string ;
+		] ;
+	] ;
+.
+
+<http://id.unit4.com/template/Default/Header/CommonNSPrefixes>
+	u4convert:triples [
+		a rdfs:Seq ;
+		rdf:_1 [
+			u4convert:value "$Output.getModel().setNsPrefix(\"rdf\", $RDFClass.getURI())"^^xsd:string ;
+		] ;
+		rdf:_2 [
+			u4convert:value "$Output.getModel().setNsPrefix($VoID.PREFIX, $VoID.NS)"^^xsd:string ;
+		] ;
+	] ;
 .
 
 <http://id.unit4.com/template/Default/Header/Dataset>
