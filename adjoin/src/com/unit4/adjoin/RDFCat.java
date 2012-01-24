@@ -28,11 +28,11 @@ import com.unit4.tabular.U4Output;
 import com.unit4.tabular.U4Row;
 import com.unit4.vocabulary.U4Convert;
 
-public class Adjoin {
+public class RDFCat {
 
 //	Class.
 	
-	private static Logger logger = LoggerFactory.getLogger(Adjoin.class);
+	private static Logger logger = LoggerFactory.getLogger(RDFCat.class);
 	
 	public static final String regexURI = "http://www.example.org/id/U4Convert";
 	
@@ -47,7 +47,7 @@ public class Adjoin {
 	
     public static void main( String[] args ) {
 		try {
-			new Adjoin().go(args); 
+			new RDFCat().go(args); 
 		} catch (RuntimeException e) {
 			logger.info("Oops! Somethings gone wrong. Please email this output to my owner dick.murray@unit4.com");
 			logger.info("{}", e.getMessage());
@@ -143,7 +143,7 @@ public class Adjoin {
 //    protected LinkedList<U4Template> templates = new LinkedList<U4Template>();
     protected LinkedList<String> groups = new LinkedList<String>();
     
-    public Adjoin() {
+    public RDFCat() {
     	addTemplate(DEFAULT_TEMPLATE);
     	addGroup(DEFAULT_GROUP);
     }

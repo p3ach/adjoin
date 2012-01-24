@@ -33,7 +33,6 @@
 	u4convert:triple [
 		a rdf:Seq ;
 		rdf:_1 [
-			u4convert:value "$Common.setValue(\"randomUUID\", $UUID.randomUUID().toString())"^^xsd:string ;
 			u4convert:subjectURI "http://id.example.org"^^xsd:String ;
 			u4convert:propertyURI "$RDF.type" ;
 			u4convert:objectType "$RDFS.Resource" ;
