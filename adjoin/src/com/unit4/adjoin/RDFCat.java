@@ -26,7 +26,7 @@ import com.unit4.tabular.U4Columns;
 import com.unit4.tabular.U4Common;
 import com.unit4.tabular.U4Output;
 import com.unit4.tabular.U4Row;
-import com.unit4.vocabulary.U4Convert;
+import com.unit4.vocabulary.U4AdJoin;
 
 public class RDFCat {
 
@@ -138,7 +138,7 @@ public class RDFCat {
     public static final String DEFAULT_TEMPLATE = "file:Default.ttl";
     public static final String DEFAULT_GROUP = "Default";
     
-    protected U4Convert template = new U4Convert(ModelFactory.createDefaultModel().createResource(DEFAULT_TEMPLATE_URI));
+    protected U4AdJoin template = new U4AdJoin(ModelFactory.createDefaultModel().createResource(DEFAULT_TEMPLATE_URI));
     
 //    protected LinkedList<U4Template> templates = new LinkedList<U4Template>();
     protected LinkedList<String> groups = new LinkedList<String>();
@@ -152,7 +152,7 @@ public class RDFCat {
 //    	return this.templates;
 //    }
     
-    public U4Convert getTemplate() {
+    public U4AdJoin getTemplate() {
     	return this.template;
     }
     
@@ -192,13 +192,13 @@ public class RDFCat {
     	logger.debug("parse(arguement={})", argument);
 
     	logger.debug("Get templates.");
-    	List<U4Convert> columnTemplates = null; // new ArrayList<U4Convert>();
-    	List<U4Convert> headerTemplates = null; // new ArrayList<U4Convert>();
-    	List<U4Convert> beforeRowTemplates = null; // new ArrayList<U4Convert>();
-    	List<U4Convert> rowTemplates = null; // new ArrayList<U4Convert>();
-    	List<U4Convert> afterRowTemplates = null; // new ArrayList<U4Convert>();
-    	List<U4Convert> footerTemplates = null; // new ArrayList<U4Convert>();
-    	U4Convert template = getTemplate();
+    	List<U4AdJoin> columnTemplates = null; // new ArrayList<U4Convert>();
+    	List<U4AdJoin> headerTemplates = null; // new ArrayList<U4Convert>();
+    	List<U4AdJoin> beforeRowTemplates = null; // new ArrayList<U4Convert>();
+    	List<U4AdJoin> rowTemplates = null; // new ArrayList<U4Convert>();
+    	List<U4AdJoin> afterRowTemplates = null; // new ArrayList<U4Convert>();
+    	List<U4AdJoin> footerTemplates = null; // new ArrayList<U4Convert>();
+    	U4AdJoin template = getTemplate();
 		for (String group : groups()) {
 			logger.trace("group={}", group);
 			if ((columnTemplates == null) && template.hasColumn(group)) {
@@ -243,7 +243,7 @@ public class RDFCat {
 
 		logger.debug("Match columns to templates.");
 		for (Integer index = 0; index < columns.getNames().size(); index++) {
-			columns.setMatch(index, U4Convert.match(columnTemplates, columns.getName(index)));
+			columns.setMatch(index, U4AdJoin.match(columnTemplates, columns.getName(index)));
 		}
 		logger.trace("{}", columns.toString());
 		
@@ -286,7 +286,7 @@ public class RDFCat {
 
         logger.debug("Processing header templates.");
         if (headerTemplates != null) {
-	        for (U4Convert headerTemplate : headerTemplates) {
+	        for (U4AdJoin headerTemplate : headerTemplates) {
 //	        	if (headerTemplate.hasTriples()) {
 	        		output.getModel().add(headerTemplate.getStatements(context));
 //	        	}
@@ -294,6 +294,7 @@ public class RDFCat {
         }
         
         output.getModel().write(System.out, "Turtle");
+        logger.info("{}", common);
 
         //        Read the input.
         Long rowIndex;
@@ -315,7 +316,7 @@ public class RDFCat {
 				
 			    logger.trace("Processing beforeRow templates.");
 			    if (beforeRowTemplates!= null) {
-				    for (U4Convert beforeRowtemplate : beforeRowTemplates) {
+				    for (U4AdJoin beforeRowtemplate : beforeRowTemplates) {
 				    	if (beforeRowtemplate.hasTriples()) {
 				    		output.getModel().add(beforeRowtemplate.getTriples().getStatements(context));
 				    	}
@@ -330,7 +331,7 @@ public class RDFCat {
 						if (columns.hasMatch(index)) {
 							output.getModel().add(columns.getMatch(index).getStatements(context));
 						} else {
-							columns.setMatch(index, U4Convert.match(rowTemplates, row.getValue()));
+							columns.setMatch(index, U4AdJoin.match(rowTemplates, row.getValue()));
 							if (columns.hasMatch(index)) {
 								output.getModel().add(columns.getMatch(index).getStatements(context));
 							}
@@ -345,7 +346,7 @@ public class RDFCat {
 
         logger.debug("Processing footer templates.");
         if (footerTemplates != null) {
-	        for (U4Convert footerTemplate : footerTemplates) {
+	        for (U4AdJoin footerTemplate : footerTemplates) {
 	        	if (footerTemplate.hasTriples()) {
 	        		output.getModel().add(footerTemplate.getStatements(context));
 	        	}

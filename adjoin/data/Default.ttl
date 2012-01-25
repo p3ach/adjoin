@@ -1,4 +1,4 @@
-@prefix u4convert:  <http://www.unit4.com/2011/11/01/u4convert-ns#> .
+@prefix adjoin:  <http://id.unit4.com/2011/11/01/adjoin-ns#> .
 
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
@@ -8,146 +8,135 @@
 @prefix skos: <http://www.w3.org/2004/02/skos/core#> . 
 @prefix void: <http://rdfs.org/ns/void#> .
 
-<http://id.unit4.com/template>
+<http://id.unit4.com/template/AdJoin>
 	a void:Dataset ;
 	rdfs:comment "Template."@en ;
-	void:subset <http://id.unit4.com/template/Default> ;
+	void:subset <http://id.unit4.com/template/AdJoin/Default> ;
 .
 
-<http://id.unit4.com/template/Default>
+<http://id.unit4.com/template/AdJoin/Default>
 	a void:Dataset ;
 	rdfs:comment "Default template for use with AdJoin."@en ;
 .
 
-<http://id.unit4.com/template/Default/Header>
+<http://id.unit4.com/template/AdJoin/Default/Header>
 	rdfs:comment "Default header."@en ;
-	u4convert:priority "1024"^^xsd:integer;
+	adjoin:priority "1024"^^xsd:integer;
 
-	u4convert:value [
-		a rdfs:Seq ;
+	adjoin:value [
+		a rdf:Seq ;
 		rdf:_1 [
-			u4convert:value "$Common.setValue(\"randomUUID\", $UUID.randomUUID().toString())"^^xsd:string ;
+			adjoin:value "$Common.setValue(\"randomUUID\", $UUID.randomUUID().toString())"^^xsd:string ;
+		] ;
+		rdf:_2 [
+			adjoin:value "$Common.setValue(\"baseURI\", $String.format(\"http://id.example.org/%s\", $Common.getValue(\"randomUUID\")))"^^xsd:string ;
+		] ;
+		rdf:_3 [
+			a rdf:Seq ;
+			rdf:_1 [
+				adjoin:value "$Common.setValue(\"examplePrefix\", \"exampleNS\")"^^xsd:string ;
+			] ;
+			rdf:_2 [
+				adjoin:value "$Common.setValue(\"exampleNS\", $String.format(\"%s#\", $Common.getValue(\"baseURI\")))"^^xsd:string ;
+			] ;
+		] ;
+		rdf:_4 [
+			adjoin:value "$Output.getModel().setNsPrefix($Common.getValue(\"examplePrefix\"), $Common.getValue(\"exampleNS\"))"^^xsd:string ;		
 		] ;
 	] ;
 	
-	u4convert:triple [
+	adjoin:statement [
 		a rdf:Seq ;
 		rdf:_1 [
-			u4convert:subjectURI "http://id.example.org"^^xsd:String ;
-			u4convert:propertyURI "$RDF.type" ;
-			u4convert:objectType "$RDFS.Resource" ;
-			u4convert:objectURI "$RDFS.Resource" ;
+			adjoin:subjectURI "http://id.example.org"^^xsd:String ;
+			adjoin:propertyURI "$RDF.type" ;
+			adjoin:objectType "$RDFS.Resource" ;
+			adjoin:objectURI "$RDFS.Resource" ;
 		] ;
 		rdf:_2 [
 			a rdf:Seq ;
 			rdf:_1 [
-				u4convert:subjectURI "http://id.example.org"^^xsd:String ;
-				u4convert:propertyURI "$RDF.type" ;
-				u4convert:objectType "$RDFS.Resource" ;
-				u4convert:objectURI "$VoID.Dataset" ;
+				adjoin:subjectURI "http://id.example.org"^^xsd:String ;
+				adjoin:propertyURI "$RDF.type" ;
+				adjoin:objectType "$RDFS.Resource" ;
+				adjoin:objectURI "$VoID.Dataset" ;
 			] ;
 			rdf:_2 [
-				u4convert:subjectURI "http://id.example.org"^^xsd:String ;
-				u4convert:propertyURI "$RDF.type" ;
-				u4convert:objectType "$RDFS.Resource" ;
-				u4convert:objectURI "$VoID.Linkset" ;
+				adjoin:triple [
+					adjoin:subjectURI "http://id.example.org"^^xsd:String ;
+					adjoin:propertyURI "$RDF.type" ;
+					adjoin:objectType "$RDFS.Resource" ;
+					adjoin:objectURI "$VoID.Linkset" ;
+				] ;
 			] ;
 		] ;
 	] ;
-	
-	u4convert:triples [
+.
+
+<http://id.unit4.com/template/AdJoin/Default/Header/CommonNSPrefixes>
+	adjoin:triples [
 		a rdfs:Seq ;
 		rdf:_1 [
-			u4convert:value "$Common.setValue(\"randomUUID\", $UUID.randomUUID().toString())"^^xsd:string ;
+			adjoin:value "$Output.getModel().setNsPrefix(\"rdf\", $RDFClass.getURI())"^^xsd:string ;
 		] ;
 		rdf:_2 [
-			u4convert:value "$Common.setValue(\"baseURI\", $String.format(\"http://id.example.org/%s\", $Common.getValue(\"randomUUID\")))"^^xsd:string ;
-		] ;
-		rdf:_3 [
-			u4convert:value "$Common.setValue(\"examplePrefix\", \"exampleNS\")"^^xsd:string ;
-		] ;
-		rdf:_4 [
-			u4convert:value "$Common.setValue(\"exampleNS\", $String.format(\"%s#\", $Common.getValue(\"baseURI\")))"^^xsd:string ;
-		] ;
-		rdf:_5 [
-			u4convert:value "$Output.getModel().setNsPrefix($Common.getValue(\"examplePrefix\"), $Common.getValue(\"exampleNS\"))"^^xsd:string ;		
-		] ;
-	] ;
-	u4convert:after [
-		a rdfs:Seq ;
-		rdf:_1 [
-			u4convert:value "$Common.setValue(\"randomUUID\", $UUID.randomUUID().toString())"^^xsd:string ;
-		] ;
-		rdf:_2 [
-			u4convert:value "$Common.setValue(\"randomUUID\", $UUID.randomUUID().toString())"^^xsd:string ;
+			adjoin:value "$Output.getModel().setNsPrefix($VoID.PREFIX, $VoID.NS)"^^xsd:string ;
 		] ;
 	] ;
 .
 
-<http://id.unit4.com/template/Default/Header/CommonNSPrefixes>
-	u4convert:triples [
-		a rdfs:Seq ;
-		rdf:_1 [
-			u4convert:value "$Output.getModel().setNsPrefix(\"rdf\", $RDFClass.getURI())"^^xsd:string ;
-		] ;
-		rdf:_2 [
-			u4convert:value "$Output.getModel().setNsPrefix($VoID.PREFIX, $VoID.NS)"^^xsd:string ;
-		] ;
-	] ;
-.
-
-<http://id.unit4.com/template/Default/Header/Dataset>
+<http://id.unit4.com/template/AdJoin/Default/Header/Dataset>
 	rdfs:comment "Default header."@en ;
-	u4convert:priority "1024"^^xsd:integer;
-	u4convert:triples [
+	adjoin:priority "1024"^^xsd:integer;
+	adjoin:triples [
 		a rdfs:Seq ;
 		rdf:_1 [
-			u4convert:subjectValue "$Common.getValue(\"baseURI\")" ;
-			u4convert:propertyValue "$RDF.type" ;
-			u4convert:objectType "$RDFS.Resource" ;
-			u4convert:objectValue "$VoID.Dataset" ;
+			adjoin:subjectValue "$Common.getValue(\"baseURI\")" ;
+			adjoin:propertyValue "$RDF.type" ;
+			adjoin:objectType "$RDFS.Resource" ;
+			adjoin:objectValue "$VoID.Dataset" ;
 		] ;
 		rdf:_2 [
-			u4convert:value "$Common.setValue(\"baseURI\", $String.format(\"http://id.example.org/%s\", $Common.getValue(\"randomUUID\")))"^^xsd:string ;
+			adjoin:value "$Common.setValue(\"baseURI\", $String.format(\"http://id.example.org/%s\", $Common.getValue(\"randomUUID\")))"^^xsd:string ;
 		] ;
 		rdf:_3 [
-			u4convert:value "$Common.setValue(\"examplePrefix\", \"exampleNS\")"^^xsd:string ;
+			adjoin:value "$Common.setValue(\"examplePrefix\", \"exampleNS\")"^^xsd:string ;
 		] ;
 		rdf:_4 [
-			u4convert:value "$Common.setValue(\"exampleNS\", $String.format(\"%s#\", $Common.getValue(\"baseURI\")))"^^xsd:string ;
+			adjoin:value "$Common.setValue(\"exampleNS\", $String.format(\"%s#\", $Common.getValue(\"baseURI\")))"^^xsd:string ;
 		] ;
 		rdf:_5 [
-			u4convert:value "$Output.getModel().setNsPrefix($Common.getValue(\"examplePrefix\"), $Common.getValue(\"exampleNS\"))"^^xsd:string ;		
+			adjoin:value "$Output.getModel().setNsPrefix($Common.getValue(\"examplePrefix\"), $Common.getValue(\"exampleNS\"))"^^xsd:string ;		
 		] ;
 	] ;
 .
 
-<http://id.unit4.com/template/Default/Row>
+<http://id.unit4.com/template/AdJoin/Default/Row>
 	rdfs:comment "Default row regular expressions."@en;
-	skos:narrower <http://id.unit4.com/template/Default/Row/Default> ;
+	skos:narrower <http://id.unit4.com/template/AdJoin/Default/Row/Default> ;
 .
 
-<http://id.unit4.com/template/Default/Row/Default>
+<http://id.unit4.com/template/AdJoin/Default/Row/Default>
 	rdfs:comment "Default i.e. match anything"@en ;
-    u4convert:priority "1024"^^xsd:integer ;
-	u4convert:pattern "^.*$" ;
-	u4convert:triples [
+    adjoin:priority "1024"^^xsd:integer ;
+	adjoin:pattern "^.*$" ;
+	adjoin:triples [
 		a rdfs:Seq ;
 		rdf:_1 [
-			u4convert:subjectValue "$Common.getValue(\"rowURI\")" ;
-			u4convert:propertyValue "$String.format(\"%s%s\", $Common.getValue(\"exampleNS\"), $Columns.getName())" ;
-			u4convert:objectType "$RDFS.Literal" ;
-			u4convert:objectValue "$Row.getValue()" ;
-			u4convert:objectDatatype "$XSD.xstring" ;
+			adjoin:subjectValue "$Common.getValue(\"rowURI\")" ;
+			adjoin:propertyValue "$String.format(\"%s%s\", $Common.getValue(\"exampleNS\"), $Columns.getName())" ;
+			adjoin:objectType "$RDFS.Literal" ;
+			adjoin:objectValue "$Row.getValue()" ;
+			adjoin:objectDatatype "$XSD.xstring" ;
 		] ;
 	] ;
 .
 
-<http://id.unit4.com/template/Default/BeforeRow>
-	u4convert:triples [
+<http://id.unit4.com/template/AdJoin/Default/BeforeRow>
+	adjoin:triples [
 		a rdfs:Seq ;
 		rdf:_1 [
-			u4convert:value "$Common.setValue(\"rowURI\", $String.format(\"%s/%s\", $Common.getValue(\"baseURI\"), $Row.getIndex()))" ;
+			adjoin:value "$Common.setValue(\"rowURI\", $String.format(\"%s/%s\", $Common.getValue(\"baseURI\"), $Row.getIndex()))" ;
 		] ;
 	] ;
 .

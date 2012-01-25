@@ -37,11 +37,11 @@ public class U4Triple extends U4Vocabulary {
 	}
 
 	public Boolean hasValue() {
-		return hasProperty(U4Convert.value);
+		return hasProperty(U4AdJoin.value);
 	}
 	
 	public String getValue() {
-		return getString(U4Convert.value);
+		return getString(U4AdJoin.value);
 	}
 	
 	public U4Triple subjectValue(String subjectValue) {
@@ -49,7 +49,7 @@ public class U4Triple extends U4Vocabulary {
 	}
 	
 	public String getSubjectValue() {
-		return getString(U4Convert.subjectValue);
+		return getString(U4AdJoin.subjectValue);
 	}
 	
 	public U4Triple propertyValue(String propertyValue) {
@@ -57,19 +57,19 @@ public class U4Triple extends U4Vocabulary {
 	}
 	
 	public String getPropertyValue() {
-		return getString(U4Convert.propertyValue);
+		return getString(U4AdJoin.propertyValue);
 	}
 	
 	public String getObjectValue() {
-		return getString(U4Convert.objectValue);
+		return getString(U4AdJoin.objectValue);
 	}
 	
 	public String getObjectType() {
-		return getString(U4Convert.objectType);
+		return getString(U4AdJoin.objectType);
 	}
 	
 	public String getObjectDatatype() {
-		return getString(U4Convert.objectDatatype);
+		return getString(U4AdJoin.objectDatatype);
 	}
 
 	/**
@@ -90,22 +90,22 @@ public class U4Triple extends U4Vocabulary {
 	
 	public Boolean hasBefore() {
 		logger.debug("hasBefore()");
-		return hasProperty(U4Convert.before);
+		return hasProperty(U4AdJoin.before);
 	}
 	
 	public Resource getBefore() {
 		logger.debug("getBefore()");
-		return getResource(U4Convert.before);
+		return getResource(U4AdJoin.before);
 	}
 	
 	public Boolean hasAfter() {
 		logger.debug("hasAfter()");
-		return hasProperty(U4Convert.after);
+		return hasProperty(U4AdJoin.after);
 	}
 	
 	public Resource getAfter() {
 		logger.debug("getAfter()");
-		return (Resource) getProperty(U4Convert.after);
+		return (Resource) getProperty(U4AdJoin.after);
 	}
 	
 	/**

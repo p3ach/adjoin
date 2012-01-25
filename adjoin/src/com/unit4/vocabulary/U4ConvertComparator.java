@@ -2,12 +2,12 @@ package com.unit4.vocabulary;
 
 import java.util.Comparator;
 
-import com.unit4.vocabulary.U4Convert;
+import com.unit4.vocabulary.U4AdJoin;
 
-public class U4ConvertComparator implements Comparator<U4Convert> {
+public class U4ConvertComparator implements Comparator<U4AdJoin> {
 
 	@Override
-	public int compare(U4Convert o1, U4Convert o2) {
+	public int compare(U4AdJoin o1, U4AdJoin o2) {
 		Integer p1 = o1.getPriority();
 		Integer p2 = o2.getPriority();
 		if (p1 == null && p2 == null) {

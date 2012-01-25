@@ -14,7 +14,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Seq;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.unit4.exception.Exception;
-import com.unit4.vocabulary.U4Convert;
+import com.unit4.vocabulary.U4AdJoin;
 import com.unit4.vocabulary.U4Vocabulary;
 
 public class U4Triples extends U4Vocabulary {
@@ -32,19 +32,19 @@ public class U4Triples extends U4Vocabulary {
 	}
 	
 	public Boolean hasBefore() {
-		return hasProperty(U4Convert.before);
+		return hasProperty(U4AdJoin.before);
 	}
 	
-	public U4Convert getBefore() {
-		return new U4Convert(getResource(U4Convert.before));
+	public U4AdJoin getBefore() {
+		return new U4AdJoin(getResource(U4AdJoin.before));
 	}
 	
 	public Boolean hasAfter() {
-		return hasProperty(U4Convert.after);
+		return hasProperty(U4AdJoin.after);
 	}
 	
-	public U4Convert getAfter() {
-		return new U4Convert(getResource(U4Convert.after));
+	public U4AdJoin getAfter() {
+		return new U4AdJoin(getResource(U4AdJoin.after));
 	}
 	
 	public List<U4Triple> read() {

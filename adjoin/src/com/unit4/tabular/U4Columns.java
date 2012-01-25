@@ -6,14 +6,14 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.unit4.vocabulary.U4Convert;
+import com.unit4.vocabulary.U4AdJoin;
 
 public class U4Columns {
 	private static Logger logger = LoggerFactory.getLogger(U4Columns.class);
 	
 	protected Map<Integer, String> indexes = new HashMap<Integer, String>();
 	protected Map<String, Integer> names = new HashMap<String, Integer>();
-	protected Map<Integer, U4Convert> matches = new HashMap<Integer, U4Convert>();
+	protected Map<Integer, U4AdJoin> matches = new HashMap<Integer, U4AdJoin>();
 	
 	protected Integer index;
 	
@@ -57,11 +57,11 @@ public class U4Columns {
 		return getIndexes().get(index);
 	}
 
-	public Map<Integer, U4Convert> getMatches() {
+	public Map<Integer, U4AdJoin> getMatches() {
 		return this.matches;
 	}
 	
-	public void setMatch(Integer index, U4Convert match) {
+	public void setMatch(Integer index, U4AdJoin match) {
 		getMatches().put(index, match);
 	}
 	
@@ -69,7 +69,7 @@ public class U4Columns {
 		return (getMatch(index) != null);
 	}
 	
-	public U4Convert getMatch(Integer index) {
+	public U4AdJoin getMatch(Integer index) {
 		logger.debug("getMatch({})", index);
 		return getMatches().get(index);
 	}
