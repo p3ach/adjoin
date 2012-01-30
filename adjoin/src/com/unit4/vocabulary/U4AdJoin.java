@@ -53,18 +53,25 @@ public class U4AdJoin extends U4Vocabulary {
 	
 	public static final Property subjectURI = createProperty(getURI("subjectURI"));
 	public static final Property propertyURI = createProperty(getURI("propertyURI"));
-	public static final Property objectURI = createProperty(getURI("objectURI"));
 	public static final Property objectType = createProperty(getURI("objectType"));
+	public static final Property objectURI = createProperty(getURI("objectURI"));
+	public static final Property objectValue = createProperty(getURI("objectValue"));
 	public static final Property objectDatatype = createProperty(getURI("objectDatatype"));
 
+	public static final Property triples = createProperty(getURI("triples"));
+	public static final Property triple = createProperty(getURI("triple"));
+	
+	public static final Property values = createProperty(getURI("values"));
 	public static final Property value = createProperty(getURI("value"));
 	
 	public static final Property before = createProperty(getURI("before"));
 	public static final Property after = createProperty(getURI("after"));
 
+	public static final Property statements = createProperty(getURI("statements"));
 	public static final Property statement = createProperty(getURI("statement"));
 
 	public static final String DEFAULT_TEMPLATE_URI = "http://id.unit4.com/template/AdJoin";
+	public static final String DEFAULT_TEMPLATE_GROUP = "Default";
 
 	public static final String HEADER_URN = "Header";
 	public static final String FOOTER_URN = "Footer";
@@ -88,9 +95,9 @@ public class U4AdJoin extends U4Vocabulary {
 	}
 	
 	public static RDFNode getObject(String object, Resource type, RDFNode datatype) {
-		if (type.equals(RDFS.Resource)) {
+		if (type.equals(U4RDFS.Resource)) {
 			return ResourceFactory.createResource(object.replaceAll("[^a-zA-Z0-9:/_-]", "_")); 
-		} else if (type.equals(RDFS.Literal)) {
+		} else if (type.equals(U4RDFS.Literal)) {
 			if (datatype.equals(U4AdJoin.Null)) {
 				return ResourceFactory.createPlainLiteral(object);
 			} else if (datatype.equals(XSD.xstring)) {
@@ -195,7 +202,7 @@ public class U4AdJoin extends U4Vocabulary {
 	}
 
 	public void processValues(VelocityContext context) {
-		logger.debug("processValues(context={}", context);
+		logger.debug("processValues(context={})", context);
 		if (getSubject().isAnon()) { // i.e. (S, :value [)
 			if (hasSeq()) { // i.e. ([, rdf:type, rdf:Seq)
 				Seq seq = getSeq();
@@ -214,7 +221,7 @@ public class U4AdJoin extends U4Vocabulary {
 			}
 		}
 	}
-	
+
 	/** Get all the statements for this U4AdJoin.
 	 * 
 	 * <p></p>
@@ -231,7 +238,7 @@ public class U4AdJoin extends U4Vocabulary {
 		
 		List<Statement> statements = new ArrayList<Statement>();
 
-		if (getSubject().isAnon()) { // i.e. (S, :triple, [) where [ = getSubject().
+		if (isAnonymous()) { // i.e. (S, :triple, [) where [ = getSubject().
 			logger.trace("Subject is anonymous.");
 			if (hasSeq()) { // i.e. ([, rdf:type, rdf:Seq)
 				Seq seq = getSeq();
@@ -244,7 +251,7 @@ public class U4AdJoin extends U4Vocabulary {
 				logger.trace("Subject is not a Sequence.");
 				if (hasStatement()) {
 					logger.trace("Has adjoin:statement.");
-					statements.addAll(new U4AdJoin(getStatement().getSubject()).getStatements(context));
+					statements.addAll(getStatement().getStatements(context));
 				} else {
 					logger.trace("Does not have adjoin:statement.");
 					statements.add(getStatement(context));
@@ -259,6 +266,11 @@ public class U4AdJoin extends U4Vocabulary {
 			if (hasStatement()) {
 				logger.trace("Subject has a adjoin:statement");
 				statements.addAll(new U4AdJoin(getStatement().getSubject()).getStatements(context));
+			}
+			if (hasAfter()) {
+				for (U4AdJoin after : getAfter()) {
+					statements.addAll(after.getStatements(context));
+				}
 			}
 		}
 
@@ -281,13 +293,15 @@ public class U4AdJoin extends U4Vocabulary {
 		}
 
 		if (objectType.equals(RDFS.Literal)) {
-			return ResourceFactory.createStatement(subject, property, ResourceFactory.createTypedLiteral(evaluate(context, getObjectURI()), TypeMapper.getInstance().getTypeByName(evaluate(context, getObjectDatatype()))));
+			return ResourceFactory.createStatement(subject, property, ResourceFactory.createTypedLiteral(evaluate(context, getObjectValue()), TypeMapper.getInstance().getTypeByName(evaluate(context, getObjectDatatype()))));
 		}
 		
 		throw new Exception(String.format("Unknown objectType %s", objectType));
 	}
 	
 	public String evaluate(VelocityContext context, String input) {
+		logger.trace("evaluate(context={}, input={}", context, input);
+		
 		if (context == null) {
 			throw new Exception("Context is null.");
 		}
@@ -298,8 +312,10 @@ public class U4AdJoin extends U4Vocabulary {
 		
     	StringWriter output = new StringWriter();
 		try {
-			if (Velocity.evaluate(context, output, "U4Convert.evaluate()", input)) {
-				return output.toString();
+			if (Velocity.evaluate(context, output, "U4AdJoin.evaluate()", input)) {
+				String evaluate = output.toString();
+				logger.trace("output={}",evaluate);
+				return evaluate;
 			} else {
 				throw new Exception("Velocity returned false.");
 			}
@@ -369,12 +385,16 @@ public class U4AdJoin extends U4Vocabulary {
 		return getString(U4AdJoin.propertyURI);
 	}
 	
+	public String getObjectType() {
+		return getString(U4AdJoin.objectType);
+	}
+	
 	public String getObjectURI() {
 		return getString(U4AdJoin.objectURI);
 	}
-		
-	public String getObjectType() {
-		return getString(U4AdJoin.objectType);
+	
+	public String getObjectValue() {
+		return getString(U4AdJoin.objectValue);
 	}
 	
 	public String getObjectDatatype() {
@@ -448,12 +468,15 @@ public class U4AdJoin extends U4Vocabulary {
 	}
 
 	public Boolean hasHeader(String urn) {
-		return hasTemplate(urn + "/" + HEADER_URN);
+		logger.trace("hasHeader(urn={})", urn);
+		Boolean hasHeader = hasTemplate(urn + "/" + HEADER_URN); 
+		return hasHeader;
 	}
 	
 	public List<U4AdJoin> getHeader(String urn) {
 		logger.debug("getHeader(urn={})", urn);
-		return getTemplate(urn + "/" + HEADER_URN);
+		List<U4AdJoin> getHeader = getTemplate(urn + "/" + HEADER_URN); 
+		return getHeader;
 	}
 
 	public Boolean hasBeforeRow(String urn) {
@@ -493,8 +516,9 @@ public class U4AdJoin extends U4Vocabulary {
 	}
 
 	public Boolean hasTemplate(String urn) {
-		logger.debug("hasTemplate({})", urn);
-		return hasChild(urn);
+		logger.debug("hasTemplate(urn={})", urn);
+		Boolean hasTemplate = hasChild(urn); 
+		return hasTemplate;
 	}
 	
 	public List<U4AdJoin> getTemplate(String urn) {

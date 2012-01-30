@@ -32,15 +32,12 @@
 			adjoin:value "$Common.setValue(\"baseURI\", $String.format(\"http://id.example.org/%s\", $Common.getValue(\"randomUUID\")))"^^xsd:string ;
 		] ;
 		rdf:_3 [
-			a rdf:Seq ;
-			rdf:_1 [
-				adjoin:value "$Common.setValue(\"examplePrefix\", \"exampleNS\")"^^xsd:string ;
-			] ;
-			rdf:_2 [
-				adjoin:value "$Common.setValue(\"exampleNS\", $String.format(\"%s#\", $Common.getValue(\"baseURI\")))"^^xsd:string ;
-			] ;
+			adjoin:value "$Common.setValue(\"examplePrefix\", \"exampleNS\")"^^xsd:string ;
 		] ;
 		rdf:_4 [
+			adjoin:value "$Common.setValue(\"exampleNS\", $String.format(\"%s#\", $Common.getValue(\"baseURI\")))"^^xsd:string ;
+		] ;
+		rdf:_5 [
 			adjoin:value "$Output.getModel().setNsPrefix($Common.getValue(\"examplePrefix\"), $Common.getValue(\"exampleNS\"))"^^xsd:string ;		
 		] ;
 	] ;
@@ -54,42 +51,28 @@
 			adjoin:objectURI "$RDFS.Resource" ;
 		] ;
 		rdf:_2 [
-			a rdf:Seq ;
-			rdf:_1 [
-				adjoin:subjectURI "http://id.example.org"^^xsd:String ;
-				adjoin:propertyURI "$RDF.type" ;
-				adjoin:objectType "$RDFS.Resource" ;
-				adjoin:objectURI "$VoID.Dataset" ;
-			] ;
-			rdf:_2 [
-				adjoin:triple [
-					adjoin:subjectURI "http://id.example.org"^^xsd:String ;
-					adjoin:propertyURI "$RDF.type" ;
-					adjoin:objectType "$RDFS.Resource" ;
-					adjoin:objectURI "$VoID.Linkset" ;
-				] ;
-			] ;
+			adjoin:subjectURI "http://id.example.org"^^xsd:String ;
+			adjoin:propertyURI "$RDF.type" ;
+			adjoin:objectType "$RDFS.Resource" ;
+			adjoin:objectURI "$VoID.Dataset" ;
+		] ;
+		rdf:_3 [
+			adjoin:subjectURI "http://id.example.org"^^xsd:String ;
+			adjoin:propertyURI "$RDF.type" ;
+			adjoin:objectType "$RDFS.Resource" ;
+			adjoin:objectURI "$VoID.Linkset" ;
 		] ;
 	] ;
-.
+	
 
-<http://id.unit4.com/template/AdJoin/Default/Header/CommonNSPrefixes>
-	adjoin:triples [
-		a rdfs:Seq ;
-		rdf:_1 [
-			adjoin:value "$Output.getModel().setNsPrefix(\"rdf\", $RDFClass.getURI())"^^xsd:string ;
-		] ;
-		rdf:_2 [
-			adjoin:value "$Output.getModel().setNsPrefix($VoID.PREFIX, $VoID.NS)"^^xsd:string ;
-		] ;
-	] ;
 .
 
 <http://id.unit4.com/template/AdJoin/Default/Header/Dataset>
 	rdfs:comment "Default header."@en ;
 	adjoin:priority "1024"^^xsd:integer;
-	adjoin:triples [
-		a rdfs:Seq ;
+
+	adjoin:statement [
+		a rdf:Seq ;
 		rdf:_1 [
 			adjoin:subjectValue "$Common.getValue(\"baseURI\")" ;
 			adjoin:propertyValue "$RDF.type" ;
@@ -120,11 +103,11 @@
 	rdfs:comment "Default i.e. match anything"@en ;
     adjoin:priority "1024"^^xsd:integer ;
 	adjoin:pattern "^.*$" ;
-	adjoin:triples [
-		a rdfs:Seq ;
+	adjoin:statement [
+		a rdf:Seq ;
 		rdf:_1 [
-			adjoin:subjectValue "$Common.getValue(\"rowURI\")" ;
-			adjoin:propertyValue "$String.format(\"%s%s\", $Common.getValue(\"exampleNS\"), $Columns.getName())" ;
+			adjoin:subjectURI "$Common.getValue(\"rowURI\")" ;
+			adjoin:propertyURI "$String.format(\"%s%s\", $Common.getValue(\"exampleNS\"), $Columns.getName())" ;
 			adjoin:objectType "$RDFS.Literal" ;
 			adjoin:objectValue "$Row.getValue()" ;
 			adjoin:objectDatatype "$XSD.xstring" ;
@@ -133,8 +116,8 @@
 .
 
 <http://id.unit4.com/template/AdJoin/Default/BeforeRow>
-	adjoin:triples [
-		a rdfs:Seq ;
+	adjoin:value [
+		a rdf:Seq ;
 		rdf:_1 [
 			adjoin:value "$Common.setValue(\"rowURI\", $String.format(\"%s/%s\", $Common.getValue(\"baseURI\"), $Row.getIndex()))" ;
 		] ;

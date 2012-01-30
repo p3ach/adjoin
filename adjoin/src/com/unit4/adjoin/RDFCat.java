@@ -18,6 +18,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.util.FileManager;
 import com.hp.hpl.jena.vocabulary.RDF;
+import com.hp.hpl.jena.vocabulary.RDFS;
 import com.unit4.cli.Argument;
 import com.unit4.cli.ArgumentDeclaration;
 import com.unit4.cli.ArgumentHandler;
@@ -27,6 +28,9 @@ import com.unit4.tabular.U4Common;
 import com.unit4.tabular.U4Output;
 import com.unit4.tabular.U4Row;
 import com.unit4.vocabulary.U4AdJoin;
+import com.unit4.vocabulary.U4Org;
+import com.unit4.vocabulary.U4RDF;
+import com.unit4.vocabulary.U4RDFS;
 
 public class RDFCat {
 
@@ -134,18 +138,16 @@ public class RDFCat {
 
     private U4Output output;
     
-    public static final String DEFAULT_TEMPLATE_URI = "http://id.unit4.com/template";
     public static final String DEFAULT_TEMPLATE = "file:Default.ttl";
-    public static final String DEFAULT_GROUP = "Default";
     
-    protected U4AdJoin template = new U4AdJoin(ModelFactory.createDefaultModel().createResource(DEFAULT_TEMPLATE_URI));
+    protected U4AdJoin template = new U4AdJoin(ModelFactory.createDefaultModel().createResource(U4AdJoin.DEFAULT_TEMPLATE_URI));
     
 //    protected LinkedList<U4Template> templates = new LinkedList<U4Template>();
     protected LinkedList<String> groups = new LinkedList<String>();
     
     public RDFCat() {
     	addTemplate(DEFAULT_TEMPLATE);
-    	addGroup(DEFAULT_GROUP);
+    	addGroup(U4AdJoin.DEFAULT_TEMPLATE_GROUP);
     }
     
 //    public LinkedList<U4Template> templates() {
@@ -273,10 +275,9 @@ public class RDFCat {
         context.put("String", String.class);
         context.put("UUID", UUID.class);
         
-        context.put("ORG", new FieldMethodizer("com.unit4.vocabulary.U4ORG"));
-        context.put("RDF", new FieldMethodizer("com.hp.hpl.jena.vocabulary.RDF"));
-        context.put("RDFClass", RDF.class);
-        context.put("RDFS", new FieldMethodizer("com.hp.hpl.jena.vocabulary.RDFS"));
+        context.put("Org", U4Org.class);
+        context.put("RDF", new FieldMethodizer("com.unit4.vocabulary.U4RDF"));
+        context.put("RDFS", new FieldMethodizer("com.unit4.vocabulary.U4RDFS"));
         context.put("XSD", new FieldMethodizer("com.hp.hpl.jena.vocabulary.XSD"));
         context.put("VoID", new FieldMethodizer("com.unit4.vocabulary.U4VoID"));
         context.put("U4Payment", new FieldMethodizer("com.unit4.vocabulary.U4Payment")); 
@@ -284,12 +285,10 @@ public class RDFCat {
         
 //        @prefix interval: <http://reference.data.gov.uk/def/intervals/> .
 
-        logger.debug("Processing header templates.");
+        logger.trace("Processing header templates.");
         if (headerTemplates != null) {
 	        for (U4AdJoin headerTemplate : headerTemplates) {
-//	        	if (headerTemplate.hasTriples()) {
-	        		output.getModel().add(headerTemplate.getStatements(context));
-//	        	}
+        		output.getModel().add(headerTemplate.getStatements(context));
 	        }
         }
         
@@ -317,9 +316,7 @@ public class RDFCat {
 			    logger.trace("Processing beforeRow templates.");
 			    if (beforeRowTemplates!= null) {
 				    for (U4AdJoin beforeRowtemplate : beforeRowTemplates) {
-				    	if (beforeRowtemplate.hasTriples()) {
-				    		output.getModel().add(beforeRowtemplate.getTriples().getStatements(context));
-				    	}
+			    		output.getModel().add(beforeRowtemplate.getStatements(context));
 				    }
 			    }
 				    
@@ -338,6 +335,13 @@ public class RDFCat {
 						}
 					}
 				}
+
+				logger.trace("Processing afterRow templates.");
+			    if (afterRowTemplates!= null) {
+				    for (U4AdJoin afterRowtemplate : afterRowTemplates) {
+			    		output.getModel().add(afterRowtemplate.getStatements(context));
+				    }
+			    }
 			}
 
 		} catch (IOException e) {
@@ -347,9 +351,7 @@ public class RDFCat {
         logger.debug("Processing footer templates.");
         if (footerTemplates != null) {
 	        for (U4AdJoin footerTemplate : footerTemplates) {
-	        	if (footerTemplate.hasTriples()) {
-	        		output.getModel().add(footerTemplate.getStatements(context));
-	        	}
+        		output.getModel().add(footerTemplate.getStatements(context));
 	        }
         }
 		

@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -31,10 +33,7 @@ public class U4Vocabulary {
 
 	private static Logger logger = LoggerFactory.getLogger(U4Vocabulary.class);
 	
-	public static final String DEFAULT_ID_UNIT4_URI = "http://id.unit4.com";
-	
-	public static final String ID_UNIT4 = "http://id.unit4.com";
-	
+	public static final String DEFAULT_UNIT4_URI = "http://id.unit4.com";
 	public static final String DEFAULT_PREFIX = "example";
 	public static final String DEFAULT_NS = "http://id.example.org/ns/vocabulary#";
 	
@@ -45,16 +44,20 @@ public class U4Vocabulary {
 	public static String getNS() {
 		return DEFAULT_NS;
 	}
+	
+	public static void setNsPrefix(Model model) {
+		model.setNsPrefix(getPrefix(), getNS());
+	}
 
 	public static String getURI(String fragment) {
 		return getNS() + fragment;
 	}
 	
-	protected static Resource createResource(String uri) {
+	public static Resource createResource(String uri) {
 		return ResourceFactory.createResource(uri);
 	}
 	
-	protected static Property createProperty(String uri) {
+	public static Property createProperty(String uri) {
 		return ResourceFactory.createProperty(uri);
 	}
 	
@@ -97,25 +100,43 @@ public class U4Vocabulary {
 //	Child methods.
 	
 	public String getChildURI(String urn) {
-		return getSubject().getURI() + "/" + urn;
+		logger.trace("getChildURI(urn={})", urn);
+		String getChildURI = getSubject().getURI() + "/" + urn; 
+		return getChildURI;
 	}
 
 	public Boolean hasChild(String urn) {
-		return getModel().contains(createChild(urn), (Property) null, (RDFNode) null);
+		logger.debug("hasChild(urn={})", urn);
+		Boolean hasChild = getModel().contains(createChild(urn), (Property) null, (RDFNode) null); 
+		return hasChild; 
 	}
 	
 	public Resource createChild(String urn) {
-		return getModel().createResource(getChildURI(urn));
+		logger.debug("createChild(urn={})", urn);
+		Resource createChild = getModel().createResource(getChildURI(urn)); 
+		return createChild;
+	}
+	
+//	Anonymous
+	
+	public Boolean isAnonymous() {
+		return getSubject().isAnon();
 	}
 	
 //	Seq/Bag/Alt
 	
+	/**
+	 * Answer the statement (getSubject(), RDF.type, RDF.Seq).
+	 * @return
+	 */
 	public Boolean hasSeq() {
-		return hasProperty(RDF.type, RDF.Seq);
+		Boolean hasSeq = hasProperty(RDF.type, RDF.Seq); 
+		return hasSeq;
 	}
 	
 	public Seq getSeq() {
-		return getModel().getSeq(getSubject());
+		Seq getSeq = getModel().getSeq(getSubject());
+		return getSeq;
 	}
 	
 //	Create(add)Read(get)Update(?)Delete(remove) CRUD methods.
@@ -176,7 +197,8 @@ public class U4Vocabulary {
 		if (node == null) {
 			throw new Exception(String.format("Node is null for %s %s.", getSubject(), property));
 		} else if (node.isLiteral()) {
-			return node.asLiteral().getString();
+			String getString = node.asLiteral().getString(); 
+			return getString;
 		} else {
 			throw new Exception("Node is not a Literal.");
 		}
