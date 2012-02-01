@@ -27,25 +27,15 @@
 	adjoin:after [
 		a rdf:Seq ;
 		rdf:_1 [
-			adjoin:after <http://id.unit4.com/template/AdJoin/Default/HeaderValues> ;
+			adjoin:after <http://id.unit4.com/template/AdJoin/Default/Header/Values> ;
 		] ;
 		rdf:_2 [
-			adjoin:after <http://id.unit4.com/template/AdJoin/Default/HeaderStatements> ;
+			adjoin:after <http://id.unit4.com/template/AdJoin/Default/Header/Common> ;
 		] ;
-		rdf:_3 [
-			adjoin:after <http://id.unit4.com/template/AdJoin/Default/Header/Vocabulary> ;
-		] ;
-		rdf:_4 [
-			adjoin:after <http://id.unit4.com/template/AdJoin/Default/Header/Dataset> ;
-		] ;
-		rdf:_5 [
-			adjoin:after <http://id.unit4.com/template/AdJoin/Default/Header/Entity> ;
-		] ;
-		
 	] ;
 .
 
-<http://id.unit4.com/template/AdJoin/Default/HeaderValues>
+<http://id.unit4.com/template/AdJoin/Default/Header/Values>
 	adjoin:value [
 		a rdf:Seq ;
 		rdf:_1 [
@@ -66,7 +56,30 @@
 	] ;
 .
 
-<http://id.unit4.com/template/AdJoin/Default/HeaderStatements>	
+<http://id.unit4.com/template/AdJoin/Default/Header/Common>
+	rdfs:comment "Default AdJoin header."@en ;
+
+	adjoin:priority "1024"^^xsd:integer;
+	
+	adjoin:after [
+		a rdf:Seq ;
+		rdf:_1 [
+			adjoin:after <http://id.unit4.com/template/AdJoin/Default/Header/Statements> ;
+		] ;
+		rdf:_2 [
+			adjoin:after <http://id.unit4.com/template/AdJoin/Default/Header/Vocabulary> ;
+		] ;
+		rdf:_3 [
+			adjoin:after <http://id.unit4.com/template/AdJoin/Default/Header/Dataset> ;
+		] ;
+		rdf:_4 [
+			adjoin:after <http://id.unit4.com/template/AdJoin/Default/Header/Entity> ;
+		] ;
+		
+	] ;
+.
+
+<http://id.unit4.com/template/AdJoin/Default/Header/Statements>	
 	adjoin:statement [
 		a rdf:Seq ;
 		rdf:_1 [
@@ -93,15 +106,15 @@
 	adjoin:after [
 		a rdf:Seq ;
 		rdf:_1 [
-			adjoin:after <http://id.unit4.com/template/AdJoin/Default/Header/VocabularyValues> ;
+			adjoin:after <http://id.unit4.com/template/AdJoin/Default/Header/Vocabulary/Values> ;
 		] ;
 		rdf:_2 [
-			adjoin:after <http://id.unit4.com/template/AdJoin/Default/Header/VocabularyStatements> ;
+			adjoin:after <http://id.unit4.com/template/AdJoin/Default/Header/Vocabulary/Statements> ;
 		] ;
 	] ;
 .
 
-<http://id.unit4.com/template/AdJoin/Default/Header/VocabularyValues>
+<http://id.unit4.com/template/AdJoin/Default/Header/Vocabulary/Values>
 	adjoin:value [
 	a rdf:Seq ;
 		rdf:_1 [
@@ -119,15 +132,15 @@
 	adjoin:after [
 		a rdf:Seq ;
 		rdf:_1 [
-			adjoin:after <http://id.unit4.com/template/AdJoin/Default/Header/DatasetValues> ;
+			adjoin:after <http://id.unit4.com/template/AdJoin/Default/Header/Dataset/Values> ;
 		] ;
 		rdf:_2 [
-			adjoin:after <http://id.unit4.com/template/AdJoin/Default/Header/DatasetStatements> ;
+			adjoin:after <http://id.unit4.com/template/AdJoin/Default/Header/Dataset/Statements> ;
 		] ;
 	] ;
 .
 
-<http://id.unit4.com/template/AdJoin/Default/Header/DatasetValues>
+<http://id.unit4.com/template/AdJoin/Default/Header/Dataset/Values>
 	adjoin:value [
 		a rdf:Seq ;
 		rdf:_1 [
@@ -139,7 +152,7 @@
 	] ;
 .
 
-<http://id.unit4.com/template/AdJoin/Default/Header/DatasetStatements>
+<http://id.unit4.com/template/AdJoin/Default/Header/Dataset/Statements>
 	adjoin:statement [
 		a rdf:Seq ;
 		rdf:_1 [
@@ -154,6 +167,13 @@
 			adjoin:objectType "$RDFS.Resource" ;
 			adjoin:objectURI "$VoID.Dataset" ;
 		] ;
+		rdf:_3 [
+			adjoin:subjectURI "$Common.getValue(\"datasetURI\")" ;
+			adjoin:propertyURI "$DCT.created" ;
+			adjoin:objectType "$RDFS.Literal" ;
+			adjoin:objectValue "$Common.getValue(\"commonDate\")" ;
+			adjoin:objectDatatype "$XSD.string" ;
+		] ;
 	] ;
 .
 
@@ -161,18 +181,18 @@
 	adjoin:after [
 		a rdf:Seq ;
 		rdf:_1 [
-			adjoin:after <http://id.unit4.com/template/AdJoin/Default/Header/EntityValues> ;
+			adjoin:after <http://id.unit4.com/template/AdJoin/Default/Header/Entity/Values> ;
 		] ;
 		rdf:_2 [
-			adjoin:after <http://id.unit4.com/template/AdJoin/Default/Header/EntityStatements> ;
+			adjoin:after <http://id.unit4.com/template/AdJoin/Default/Header/Entity/Statements> ;
 		] ;
 	] ;
 .
 
-#<http://id.unit4.com/template/AdJoin/Default/Header/EntityValues>
+#<http://id.unit4.com/template/AdJoin/Default/Header/Entity/Values>
 #.
 
-<http://id.unit4.com/template/AdJoin/Default/Header/EntityStatements>
+<http://id.unit4.com/template/AdJoin/Default/Header/Entity/Statements>
 	adjoin:statement [
 		a rdf:Seq ;
 		rdf:_1 [
@@ -192,6 +212,15 @@
 .
 
 <http://id.unit4.com/template/AdJoin/Default/BeforeRow>
+	adjoin:after [
+		a rdf:Seq ;
+		rdf:_1 [
+			adjoin:after <http://id.unit4.com/template/AdJoin/Default/BeforeRow/Value> ;
+		] ;
+	] ;
+.
+
+<http://id.unit4.com/template/AdJoin/Default/BeforeRow/Value>
 	adjoin:value [
 		a rdf:Seq ;
 		rdf:_1 [

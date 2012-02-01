@@ -1,6 +1,10 @@
 package com.unit4.tabular;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +20,19 @@ public class U4Common {
 	}
 	
 	private HashMap<String,Object> values = new HashMap<String, Object>();
+	
+	public U4Common() {
+		common();
+	}
+	
+	public void common() {
+		setValue("commonUUID", UUID.randomUUID().toString());
+	    
+	    Date timestamp = new Date();
+	    setValue("commonDate", new SimpleDateFormat("dd/MM/yyyy").format(timestamp));
+	    setValue("commonTime", new SimpleDateFormat("HH:mm:ss").format(timestamp));
+        setValue("commonTimestamp", new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(timestamp));
+	}
 	
 	public HashMap<String,Object> getValues() {
 		return this.values;
