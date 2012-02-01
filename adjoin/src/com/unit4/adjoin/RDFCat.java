@@ -266,8 +266,8 @@ public class RDFCat {
 		logger.debug("Create Velocity.");
         Velocity.init();
         context = new VelocityContext();
-		context.put("Common", common);
 		context.put("Output", output);
+		context.put("Common", common);
         context.put("Columns", columns);
         context.put("Row", row);
         
@@ -275,12 +275,12 @@ public class RDFCat {
         context.put("String", String.class);
         context.put("UUID", UUID.class);
         
-        context.put("Org", U4Org.class);
+        context.put("Org", new FieldMethodizer("com.unit4.vocabulary.U4Org"));
         context.put("RDF", new FieldMethodizer("com.unit4.vocabulary.U4RDF"));
         context.put("RDFS", new FieldMethodizer("com.unit4.vocabulary.U4RDFS"));
-        context.put("XSD", new FieldMethodizer("com.hp.hpl.jena.vocabulary.XSD"));
+        context.put("XSD", new FieldMethodizer("com.unit4.vocabulary.U4XSD"));
         context.put("VoID", new FieldMethodizer("com.unit4.vocabulary.U4VoID"));
-        context.put("U4Payment", new FieldMethodizer("com.unit4.vocabulary.U4Payment")); 
+        context.put("U4Payment", new FieldMethodizer("com.unit4.vocabulary.U4Payment"));
 //        context.put("U4Interval", new FieldMethodizer("com.unit4.vocabulary.U4Payment"));
         
 //        @prefix interval: <http://reference.data.gov.uk/def/intervals/> .

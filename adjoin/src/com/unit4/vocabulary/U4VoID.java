@@ -5,6 +5,7 @@ import java.util.Set;
 
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntResource;
+import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.ResIterator;
@@ -31,7 +32,11 @@ public class U4VoID extends U4Vocabulary {
 	public static String getNS() {
 		return NS;
 	}
-
+	
+	public static void setNsPrefix(Model model) {
+		model.setNsPrefix(getPrefix(), getNS());
+	}
+	
 	public static String getURI(String fragment) {
 		return NS + fragment;
 	}

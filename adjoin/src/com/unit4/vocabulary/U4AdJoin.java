@@ -177,6 +177,15 @@ public class U4AdJoin extends U4Vocabulary {
 		return new U4AdJoin(createChild(urn));
 	}	
 
+	public Boolean hasValues() {
+		return hasProperty(U4AdJoin.values);
+	}
+	
+	public U4AdJoin getValues() {
+		return new U4AdJoin(getResource(U4AdJoin.values));
+	}
+
+	
 	public Boolean hasValue() {
 		return hasProperty(U4AdJoin.value);
 	}
@@ -222,22 +231,24 @@ public class U4AdJoin extends U4Vocabulary {
 		}
 	}
 
-	/** Get all the statements for this U4AdJoin.
-	 * 
-	 * <p></p>
-	 * 
-	 * <p></p>
-	 * 
-	 * <p></p>
-	 * 
-	 * @param context
-	 * @return
-	 */
 	public List<Statement> getStatements(VelocityContext context) {
 		logger.debug("Start getStatements(context={}) for subject {}", context, getSubject());
 		
 		List<Statement> statements = new ArrayList<Statement>();
 
+		if (hasValue()) {
+			logger.trace("Subject has :value.");
+			processValues(context);
+		} else {
+			logger.trace("Subject does not have :value.");
+		}
+		
+		if (hasBefore()) {
+			for (U4AdJoin before : getBefore()) {
+				statements.addAll(before.getStatements(context));
+			}
+		}
+		
 		if (isAnonymous()) { // i.e. (S, :triple, [) where [ = getSubject().
 			logger.trace("Subject is anonymous.");
 			if (hasSeq()) { // i.e. ([, rdf:type, rdf:Seq)
@@ -253,27 +264,28 @@ public class U4AdJoin extends U4Vocabulary {
 					logger.trace("Has adjoin:statement.");
 					statements.addAll(getStatement().getStatements(context));
 				} else {
-					logger.trace("Does not have adjoin:statement.");
-					statements.add(getStatement(context));
+					logger.trace("Does not have adjoin:statement property.");
+					if (hasSubjectURI()) {
+						statements.add(getStatement(context));
+					} else {
+						logger.trace("Does not have adjoin:subjectURI property.");
+					}
 				}
 			}
 		} else { // i.e (S, P, O) where S = getSubject().
 			logger.trace("Subject is not anonymous.");
-			if (hasValue()) {
-				logger.trace("Subject has :value.");
-				processValues(context);
-			}
 			if (hasStatement()) {
 				logger.trace("Subject has a adjoin:statement");
 				statements.addAll(new U4AdJoin(getStatement().getSubject()).getStatements(context));
 			}
-			if (hasAfter()) {
-				for (U4AdJoin after : getAfter()) {
-					statements.addAll(after.getStatements(context));
-				}
-			}
 		}
 
+		if (hasAfter()) {
+			for (U4AdJoin after : getAfter()) {
+				statements.addAll(after.getStatements(context));
+			}
+		}
+	
 		logger.debug("Finish getStatements(context={}) for subject {}", context, getSubject());
 
 		return statements;
@@ -375,6 +387,10 @@ public class U4AdJoin extends U4Vocabulary {
 	
 	public Integer getPriority() {
 		return getInteger(U4AdJoin.priority);
+	}
+	
+	public Boolean hasSubjectURI() {
+		return hasProperty(U4AdJoin.subjectURI);
 	}
 	
 	public String getSubjectURI() {
