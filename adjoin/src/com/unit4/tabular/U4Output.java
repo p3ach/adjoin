@@ -5,6 +5,8 @@ import org.slf4j.LoggerFactory;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.unit4.vocabulary.U4DCTerms;
+import com.unit4.vocabulary.U4FOAF;
 import com.unit4.vocabulary.U4Org;
 import com.unit4.vocabulary.U4RDF;
 import com.unit4.vocabulary.U4RDFS;
@@ -23,6 +25,8 @@ public class U4Output {
 	
 	public void common() {
 		Model model = getModel();
+		U4DCTerms.setNsPrefix(model);
+		U4FOAF.setNsPrefix(model);
 		U4Org.setNsPrefix(model);
 		U4RDF.setNsPrefix(model);
 		U4RDFS.setNsPrefix(model);

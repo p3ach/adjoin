@@ -2,10 +2,7 @@ package com.unit4.adjoin;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -17,11 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.csvreader.CsvReader;
-import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.util.FileManager;
-import com.hp.hpl.jena.vocabulary.RDF;
-import com.hp.hpl.jena.vocabulary.RDFS;
 import com.unit4.cli.Argument;
 import com.unit4.cli.ArgumentDeclaration;
 import com.unit4.cli.ArgumentHandler;
@@ -31,9 +25,6 @@ import com.unit4.tabular.U4Common;
 import com.unit4.tabular.U4Output;
 import com.unit4.tabular.U4Row;
 import com.unit4.vocabulary.U4AdJoin;
-import com.unit4.vocabulary.U4Org;
-import com.unit4.vocabulary.U4RDF;
-import com.unit4.vocabulary.U4RDFS;
 
 public class RDFCat {
 
@@ -53,7 +44,7 @@ public class RDFCat {
 	public static final String COLUMNS_URN = "Columns";
 	
     public static void main( String[] args ) {
-		try {
+ 		try {
 			new RDFCat().go(args); 
 		} catch (RuntimeException e) {
 			logger.info("Oops! Somethings gone wrong. Please email this output to my owner dick.murray@unit4.com");
@@ -67,8 +58,6 @@ public class RDFCat {
 					logger.info("{}", s.toString());
 				}
 			}
-		} finally {
-			logger.info("Goodbye.");
 		}
     }
 
@@ -197,6 +186,7 @@ public class RDFCat {
     	logger.debug("parse(arguement={})", argument);
 
     	logger.debug("Get templates.");
+    	List<U4AdJoin> columnsTemplates = null; // new ArrayList<U4Convert>();
     	List<U4AdJoin> columnTemplates = null; // new ArrayList<U4Convert>();
     	List<U4AdJoin> headerTemplates = null; // new ArrayList<U4Convert>();
     	List<U4AdJoin> beforeRowTemplates = null; // new ArrayList<U4Convert>();
@@ -206,6 +196,9 @@ public class RDFCat {
     	U4AdJoin template = getTemplate();
 		for (String group : groups()) {
 			logger.trace("group={}", group);
+			if ((columnsTemplates == null) && template.hasColumns(group)) {
+				columnsTemplates = template.getColumns(group);
+			}
 			if ((columnTemplates == null) && template.hasColumn(group)) {
 				columnTemplates = template.getColumn(group);
 			}
@@ -278,12 +271,14 @@ public class RDFCat {
         context.put("String", String.class);
         context.put("UUID", UUID.class);
         
+        context.put("DCTerms", new FieldMethodizer("com.unit4.vocabulary.U4DCTerms"));
+        context.put("FOAF", new FieldMethodizer("com.unit4.vocabulary.U4FOAF"));
         context.put("Org", new FieldMethodizer("com.unit4.vocabulary.U4Org"));
         context.put("RDF", new FieldMethodizer("com.unit4.vocabulary.U4RDF"));
         context.put("RDFS", new FieldMethodizer("com.unit4.vocabulary.U4RDFS"));
         context.put("XSD", new FieldMethodizer("com.unit4.vocabulary.U4XSD"));
         context.put("VoID", new FieldMethodizer("com.unit4.vocabulary.U4VoID"));
-        context.put("U4Payment", new FieldMethodizer("com.unit4.vocabulary.U4Payment"));
+//        context.put("U4Payment", new FieldMethodizer("com.unit4.vocabulary.U4Payment"));
 //        context.put("U4Interval", new FieldMethodizer("com.unit4.vocabulary.U4Payment"));
         
 //        @prefix interval: <http://reference.data.gov.uk/def/intervals/> .
@@ -294,10 +289,19 @@ public class RDFCat {
         		output.getModel().add(headerTemplate.getStatements(context));
 	        }
         }
-        
-        output.getModel().write(System.out, "Turtle");
-        logger.info("{}", common);
 
+        logger.trace("Processing columns templates.");
+        row.setIndex(null);
+        if (columnsTemplates != null) {
+	        for (U4AdJoin columnsTemplate : columnsTemplates) {
+				for (Integer index = 0; index < columns.getNames().size(); index++) {
+					columns.setIndex(index); // Set the current column index.
+					output.getModel().add(columnsTemplate.getStatements(context));
+				}
+	        }
+        }
+
+        
         //        Read the input.
         Long rowIndex;
 
@@ -361,7 +365,7 @@ public class RDFCat {
 		//    	Close input.
     	input.close();
     	//
-    	logger.trace("Common \n{}", common.toString());
+//    	logger.trace("Common \n{}", common.toString());
     	
      	output.getModel().write(System.out, "Turtle");
     }

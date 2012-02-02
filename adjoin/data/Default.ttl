@@ -51,7 +51,19 @@
 			adjoin:value "$Common.setValue(\"datasetURI\", $String.format(\"%s/adjoin/%s\", $Common.getValue(\"baseURI\"), $Common.getValue(\"randomUUID\")))"^^xsd:string ;
 		] ;
 		rdf:_5 [
-			adjoin:value "$Common.setValue(\"entityName\", \"Adjoin Example\")" ;		
+			adjoin:value "$Common.setValue(\"datasetLicence\", \"http://data.gov.uk/terms-and-conditions\")"^^xsd:string ;
+		] ;
+		rdf:_6 [
+			adjoin:value "$Common.setValue(\"columnURI\", $String.format(\"%s/column\", $Common.getValue(\"datasetURI\")))"^^xsd:string ;
+		] ;
+		rdf:_7 [
+			adjoin:value "$Common.setValue(\"entityURI\", $Common.getValue(\"baseURI\"))" ;		
+		] ;
+		rdf:_8 [
+			adjoin:value "$Common.setValue(\"entityName\", \"Adjoin Example Organisation\")" ;		
+		] ;
+		rdf:_9 [
+			adjoin:value "$Common.setValue(\"entityHomepage\", \"http://example.org\")" ;		
 		] ;
 	] ;
 .
@@ -169,10 +181,28 @@
 		] ;
 		rdf:_3 [
 			adjoin:subjectURI "$Common.getValue(\"datasetURI\")" ;
-			adjoin:propertyURI "$DCT.created" ;
+			adjoin:propertyURI "$DCTerms.created" ;
 			adjoin:objectType "$RDFS.Literal" ;
 			adjoin:objectValue "$Common.getValue(\"commonDate\")" ;
-			adjoin:objectDatatype "$XSD.string" ;
+			adjoin:objectDatatype "$XSD.date" ;
+		] ;
+		rdf:_4 [
+			adjoin:subjectURI "$Common.getValue(\"datasetURI\")" ;
+			adjoin:propertyURI "$DCTerms.creator" ;
+			adjoin:objectType "$RDFS.Resource" ;
+			adjoin:objectURI "$Common.getValue(\"entityURI\")" ;
+		] ;
+		rdf:_5 [
+			adjoin:subjectURI "$Common.getValue(\"datasetURI\")" ;
+			adjoin:propertyURI "$FOAF.homepage" ;
+			adjoin:objectType "$RDFS.Resource" ;
+			adjoin:objectURI "$Common.getValue(\"entityHomepage\")" ;
+		] ;
+		rdf:_6 [
+			adjoin:subjectURI "$Common.getValue(\"datasetURI\")" ;
+			adjoin:propertyURI "$DCTerms.licence" ;
+			adjoin:objectType "$RDFS.Resource" ;
+			adjoin:objectURI "$Common.getValue(\"datasetLicence\")" ;
 		] ;
 	] ;
 .
@@ -207,6 +237,32 @@
 			adjoin:objectType "$RDFS.Literal" ;
 			adjoin:objectValue "$Common.getValue(\"entityName\")" ;
 			adjoin:objectDatatype "$XSD.string" ;
+		] ;
+		rdf:_3 [
+			adjoin:subjectURI "$Common.getValue(\"baseURI\")" ;
+			adjoin:propertyURI "$FOAF.homepage" ;
+			adjoin:objectType "$RDFS.Resource" ;
+			adjoin:objectURI "$Common.getValue(\"entityHomepage\")" ;
+		] ;
+	] ;
+.
+
+<http://id.unit4.com/template/AdJoin/Default/Columns>
+	rdfs:comment "Default Columns"@en ;
+    adjoin:priority "1024"^^xsd:integer ;
+	adjoin:statement [
+		a rdf:Seq ;
+		rdf:_1 [
+			adjoin:subjectURI "$String.format(\"%s/%s\", $Common.getValue(\"columnURI\"), $Columns.getIndex())" ;
+			adjoin:propertyURI "$RDFS.label" ;
+			adjoin:objectType "$RDFS.Literal" ;
+			adjoin:objectValue "$Columns.getName()" ;
+		] ;
+		rdf:_2 [
+			adjoin:subjectURI "$String.format(\"%s/%s\", $Common.getValue(\"columnURI\"), $Columns.getIndex())" ;
+			adjoin:propertyURI "$VoID.inDataset" ;
+			adjoin:objectType "$RDFS.Resource" ;
+			adjoin:objectURI "$Common.getValue(\"datasetURI\")" ;
 		] ;
 	] ;
 .

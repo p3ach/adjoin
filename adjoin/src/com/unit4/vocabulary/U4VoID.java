@@ -24,6 +24,7 @@ public class U4VoID extends U4Vocabulary {
 
 	public static final Property subset = createProperty(getURI("subset"));
 	public static final Property rootResource = createProperty(getURI("rootResource"));
+	public static final Property inDataset = createProperty(getURI("inDataset"));
 		
 	public static String getPrefix() {
 		return PREFIX;

@@ -9,6 +9,8 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.hp.hpl.jena.rdf.model.Alt;
+import com.hp.hpl.jena.rdf.model.Bag;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
@@ -123,20 +125,30 @@ public class U4Vocabulary {
 		return getSubject().isAnon();
 	}
 	
-//	Seq/Bag/Alt
+//	Alt/Bag/Seq
+
+	public Boolean hasAlt() {
+		return hasProperty(RDF.type, RDF.Alt);
+	}
 	
-	/**
-	 * Answer the statement (getSubject(), RDF.type, RDF.Seq).
-	 * @return
-	 */
+	public Alt getAlt() {
+		return getModel().getAlt(getSubject());
+	}
+
+	public Boolean hasBag() {
+		return hasProperty(RDF.type, RDF.Bag);
+	}
+	
+	public Bag getBag() {
+		return getModel().getBag(getSubject());
+	}
+	
 	public Boolean hasSeq() {
-		Boolean hasSeq = hasProperty(RDF.type, RDF.Seq); 
-		return hasSeq;
+		return hasProperty(RDF.type, RDF.Seq);
 	}
 	
 	public Seq getSeq() {
-		Seq getSeq = getModel().getSeq(getSubject());
-		return getSeq;
+		return getModel().getSeq(getSubject());
 	}
 	
 //	Create(add)Read(get)Update(?)Delete(remove) CRUD methods.

@@ -29,6 +29,11 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 import com.hp.hpl.jena.vocabulary.XSD;
 import com.unit4.exception.Exception;
 
+/**
+ * Provides the heavy lifting for converting an input into RDF output based on an AdJoin template.
+ * @author dick
+ *
+ */
 public class U4AdJoin extends U4Vocabulary {
 	
 //	Class.
@@ -78,6 +83,7 @@ public class U4AdJoin extends U4Vocabulary {
 	public static final String BEFORE_ROW_URN = "BeforeRow";
 	public static final String AFTER_ROW_URN = "AfterRow";
 	public static final String ROW_URN = "Row";
+	public static final String COLUMNS_URN = "Columns";
 	public static final String COLUMN_URN = "Column";
 	
 	public static U4AdJoin match(List<U4AdJoin> set, String input) {
@@ -251,10 +257,13 @@ public class U4AdJoin extends U4Vocabulary {
 		
 		if (isAnonymous()) { // i.e. (S, :triple, [) where [ = getSubject().
 			logger.trace("Subject is anonymous.");
-			if (hasSeq()) { // i.e. ([, rdf:type, rdf:Seq)
-				Seq seq = getSeq();
-				logger.trace("Has sequence with {} entry(s).", seq.size());
-				NodeIterator iterator = seq.iterator();
+			if (hasBag()) { // i.e. ([, rdf:type, rdf:Bag)
+				NodeIterator iterator = getBag().iterator();
+				while (iterator.hasNext()) {
+					statements.addAll(new U4AdJoin(iterator.next().asResource()).getStatements(context));
+				}
+			} else if (hasSeq()) { // i.e. ([, rdf:type, rdf:Seq)
+				NodeIterator iterator = getSeq().iterator();
 				while (iterator.hasNext()) {
 					statements.addAll(new U4AdJoin(iterator.next().asResource()).getStatements(context));
 				}
@@ -291,6 +300,14 @@ public class U4AdJoin extends U4Vocabulary {
 		return statements;
 	}
 	
+	/**
+	 * Answer the statement for this AdJoin.
+	 * subjectURI, propertyURI and objectType are mandatory.
+	 * Supported objectType(s) are RDFS.Resource|Literal anything else will throw an Exception.
+	 * objectDatatype is optional.
+	 * @param context
+	 * @return
+	 */
 	public Statement getStatement(VelocityContext context) {
 		logger.debug("getStatement(context={})", context);
 		
@@ -305,10 +322,14 @@ public class U4AdJoin extends U4Vocabulary {
 		}
 
 		if (objectType.equals(RDFS.Literal)) {
-			return ResourceFactory.createStatement(subject, property, ResourceFactory.createTypedLiteral(evaluate(context, getObjectValue()), TypeMapper.getInstance().getTypeByName(evaluate(context, getObjectDatatype()))));
+			if (hasObjectDatatype()) {
+				return ResourceFactory.createStatement(subject, property, ResourceFactory.createTypedLiteral(evaluate(context, getObjectValue()), TypeMapper.getInstance().getTypeByName(evaluate(context, getObjectDatatype()))));
+			} else {
+				return ResourceFactory.createStatement(subject, property, ResourceFactory.createPlainLiteral(evaluate(context, getObjectValue())));
+			}
 		}
 		
-		throw new Exception(String.format("Unknown objectType %s", objectType));
+		throw new Exception(String.format("Unknown objectType [%s].", objectType));
 	}
 	
 	public String evaluate(VelocityContext context, String input) {
@@ -413,6 +434,10 @@ public class U4AdJoin extends U4Vocabulary {
 		return getString(U4AdJoin.objectValue);
 	}
 	
+	public Boolean hasObjectDatatype() {
+		return hasProperty(U4AdJoin.objectDatatype);
+	}
+	
 	public String getObjectDatatype() {
 		return getString(U4AdJoin.objectDatatype);
 	}
@@ -474,12 +499,19 @@ public class U4AdJoin extends U4Vocabulary {
 
 	// Template.
 	
+	public Boolean hasColumns(String urn) {
+		return hasTemplate(urn + "/" + COLUMNS_URN);
+	}
+
+	public List<U4AdJoin> getColumns(String urn) {
+		return getTemplate(urn + "/" + COLUMNS_URN);
+	}
+	
 	public Boolean hasColumn(String urn) {
 		return hasTemplate(urn + "/" + COLUMN_URN);
 	}
 
 	public List<U4AdJoin> getColumn(String urn) {
-		logger.debug("getColumn(urn={})", urn);
 		return getTemplate(urn + "/" + COLUMN_URN);
 	}
 

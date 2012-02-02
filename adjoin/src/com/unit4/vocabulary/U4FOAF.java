@@ -4,16 +4,16 @@ import com.hp.hpl.jena.ontology.OntResource;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.vocabulary.XSD;
 
-public class U4XSD extends U4Vocabulary {
+public class U4FOAF extends U4Vocabulary {
 	
 //	Class.
-	public static final String PREFIX = "xsd";
-	public static final String NS = "http://www.w3.org/2001/XMLSchema#";
+	public static final String PREFIX = "foaf";
+	public static final String NS = "http://xmlns.com/foaf/0.1/";
 	
-    public static final Resource string = XSD.xstring;
-    public static final Resource date = XSD.date;
+//    public static final Resource Alt = createResource(getURI("Alt"));
+
+    public static final Property homepage = createProperty(getURI("homepage"));
 		
 	public static String getPrefix() {
 		return PREFIX;
@@ -33,19 +33,19 @@ public class U4XSD extends U4Vocabulary {
 	
 	//	Instance.
 	
-	public U4XSD() {
+	public U4FOAF() {
 		super();
 	}
 	
-	public U4XSD(OntResource subject) {
+	public U4FOAF(OntResource subject) {
 		super(subject);
 	}
 
-	public U4XSD(U4Vocabulary vocabulary) {
+	public U4FOAF(U4Vocabulary vocabulary) {
 		super(vocabulary);
 	}
 	
 	public String toString() {
-		return String.format("U4XSD [%s]", getSubject());
+		return String.format("U4FOAF [%s]", getSubject());
 	}
 }
