@@ -1,6 +1,7 @@
 package com.unit4.adjoin;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -20,6 +21,7 @@ import com.unit4.cli.Argument;
 import com.unit4.cli.ArgumentDeclaration;
 import com.unit4.cli.ArgumentHandler;
 import com.unit4.cli.CLI;
+import com.unit4.exception.Exception;
 import com.unit4.tabular.U4Columns;
 import com.unit4.tabular.U4Common;
 import com.unit4.tabular.U4Output;
@@ -47,7 +49,7 @@ public class RDFCat {
  		try {
 			new RDFCat().go(args); 
 		} catch (RuntimeException e) {
-			logger.info("Oops! Somethings gone wrong. Please email this output to my owner dick.murray@unit4.com");
+			logger.info("Oops! Somethings gone wrong. Please email this output to my owner adjoin@unit4.com");
 			logger.info("{}", e.getMessage());
 			for (StackTraceElement s : e.getStackTrace()) {
 				logger.info("{}", s.toString());
@@ -77,7 +79,7 @@ public class RDFCat {
     		true, new ArgumentHandler() {
 				@Override
 				public void action(Argument argument) {
-					addTemplate(argument.value());
+					addTemplate(argument.getValue());
 				}
 			},
 			new String[]{"addTemplate"});
@@ -86,7 +88,7 @@ public class RDFCat {
     		true, new ArgumentHandler() {
 				@Override
 				public void action(Argument argument) {
-					addGroup(argument.value());
+					addGroup(argument.getValue());
 				}
 			},
 			new String[]{"addGroup"});
@@ -104,7 +106,7 @@ public class RDFCat {
     		true, new ArgumentHandler() {
 				@Override
 				public void action(Argument argument) {
-					maxRows(Long.valueOf(argument.value()));
+					maxRows(Long.valueOf(argument.getValue()));
 				}
 			},
 			new String[]{"maxRows"});
@@ -220,7 +222,11 @@ public class RDFCat {
 		}
 
     	logger.debug("Open input {}", argument);
-    	CsvReader input = new CsvReader(FileManager.get().open(argument.value()), Charset.forName("UTF-8"));
+    	InputStream is = FileManager.get().open(argument.getValue());
+    	if (is == null) {
+    		throw new Exception(String.format("Unable to read [%s].", argument.getValue()));
+    	}
+    	CsvReader input = new CsvReader(is, Charset.forName("UTF-8"));
     	
     	logger.debug("Read input headers.");
     	try {
@@ -327,7 +333,7 @@ public class RDFCat {
 				    }
 			    }
 				    
-				for (Integer index = 0; index < input.getValues().length; index += 1) {
+				for (Integer index = 0; index < input.getValues().length; index++) {
 					columns.setIndex(index); // Set the current column index.
 					if (row.getValue() == "") {
 						logger.trace("Value is empty string.");

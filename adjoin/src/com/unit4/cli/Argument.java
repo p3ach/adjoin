@@ -11,14 +11,14 @@ public class Argument {
 	protected String value = null;
 
 	public Argument(String text) {
-		text(text);
+		setText(text);
 
-		if (text.startsWith("--")) { // Long form argument i.e. -h
+		if (text.startsWith("--")) { // Long form argument i.e. --help
 	        text = text.substring(2) ;
-		} else if (text.startsWith("-")) { // Short form argument i.e. --help
+		} else if (text.startsWith("-")) { // Short form argument i.e. -h
 	        text = text.substring(1);
 	    } else { // Value argument i.e. fred
-	    	value(text);
+	    	setValue(text);
 	    	return;
 	    }
         
@@ -34,61 +34,61 @@ public class Argument {
             j = colon ;
 
         if (j == Integer.MAX_VALUE) { // i.e. no "=" or ":"
-        	name(text);
+        	setName(text);
         } else { // i.e. one or both of "=" or ":"
-	        name(text.substring(0,j));
-	        value(text.substring(j+1));
+	        setName(text.substring(0,j));
+	        setValue(text.substring(j+1));
         }
 	}
 	
-	protected void text(String text) {
+	public Argument(String name, String value) {
+		setName(name);
+		setValue(value);
+	}
+	
+	protected void setText(String text) {
 		this.text = text;
 	}
 	
-	public String text() {
+	public String getText() {
 		return this.text;
 	}
 	
-	public Argument(String name, String value) {
-		name(name);
-		value(value);
-	}
-	
-	protected void name(String name) {
+	protected void setName(String name) {
 		this.name = name;
 	}
 	
-	public String name() {
+	public String getName() {
 		return this.name;
 	}
 	
-	protected void value(String value) {
+	protected void setValue(String value) {
 		this.value = value;
 	}
 	
-	public String value() {
+	public String getValue() {
 		return this.value;
 	}
 
-	public Boolean shortForm() {
-		return (value().startsWith("-") && !value.startsWith("--"));
+	public Boolean isShortForm() {
+		return (getValue().startsWith("-") && !value.startsWith("--"));
 	}
 
-	public Boolean longForm() {
-		return value().startsWith("--");
+	public Boolean isLongForm() {
+		return getValue().startsWith("--");
 	}
 
-	public Boolean valueForm() {
-		String value = value();
-		return ((value == null ? false : !value().startsWith("-")));
+	public Boolean isValueForm() {
+		String value = getValue();
+		return ((value == null ? false : !getValue().startsWith("-")));
 	}
 	
 	public Boolean hasValue() {
-		String value = value();
+		String value = getValue();
 		return (value.indexOf("=") != 0 || value.indexOf(":") != 0);
 	}
 	
 	public String toString() {
-		return String.format("%s", text());
+		return String.format("Argument [%s]", getText());
 	}
 }

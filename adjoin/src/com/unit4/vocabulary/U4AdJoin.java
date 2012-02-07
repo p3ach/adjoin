@@ -59,7 +59,6 @@ public class U4AdJoin extends U4Vocabulary {
 	public static final Property subjectURI = createProperty(getURI("subjectURI"));
 	public static final Property propertyURI = createProperty(getURI("propertyURI"));
 	public static final Property objectType = createProperty(getURI("objectType"));
-	public static final Property objectURI = createProperty(getURI("objectURI"));
 	public static final Property objectValue = createProperty(getURI("objectValue"));
 	public static final Property objectDatatype = createProperty(getURI("objectDatatype"));
 
@@ -318,7 +317,7 @@ public class U4AdJoin extends U4Vocabulary {
 		Resource objectType = ResourceFactory.createResource(evaluate(context, getObjectType()));
 
 		if (objectType.equals(RDFS.Resource)) {
-			return ResourceFactory.createStatement(subject, property, ResourceFactory.createResource(evaluate(context, getObjectURI())));
+			return ResourceFactory.createStatement(subject, property, ResourceFactory.createResource(evaluate(context, getObjectValue())));
 		}
 
 		if (objectType.equals(RDFS.Literal)) {
@@ -425,9 +424,9 @@ public class U4AdJoin extends U4Vocabulary {
 	public String getObjectType() {
 		return getString(U4AdJoin.objectType);
 	}
-	
-	public String getObjectURI() {
-		return getString(U4AdJoin.objectURI);
+
+	public Boolean hasObjectValue() {
+		return hasProperty(U4AdJoin.objectValue);
 	}
 	
 	public String getObjectValue() {

@@ -20,6 +20,7 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Seq;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.shared.JenaException;
 import com.hp.hpl.jena.util.FileManager;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.unit4.exception.Exception;
@@ -79,11 +80,13 @@ public class U4Vocabulary {
 	}
 	
 	public U4Vocabulary readModel(String uri) {
-//		try {
-			FileManager.get().readModel(getModel(), uri);
-//		} catch (JenaException e) {
-//			throw new Exception(String.format("Unable to read %s.", uri), e);
-//		}
+		try {
+			if (FileManager.get().readModel(getModel(), uri) == null) {
+				throw new Exception(String.format("Unable to read %s.", uri));
+			}
+		} catch (JenaException e) {
+			throw new Exception(String.format("Unable to read %s.", uri), e);
+		}
 		return this;
 	}
 	

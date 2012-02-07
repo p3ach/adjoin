@@ -1,6 +1,7 @@
 package com.unit4.cli;
 
 import java.util.Arrays;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -9,6 +10,11 @@ import org.slf4j.LoggerFactory;
 
 import com.unit4.exception.Exception;
 
+/**
+ * 
+ * @author dick
+ *
+ */
 public class CLI {
 	
 //	Class.
@@ -23,7 +29,7 @@ public class CLI {
 		add(declarations);
 	}
 	
-	protected Set<ArgumentDeclaration> declarations() {
+	protected Set<ArgumentDeclaration> getDeclarations() {
 		return this.declarations;
 	}
 	
@@ -34,7 +40,7 @@ public class CLI {
 	}
 
 	protected void add(ArgumentDeclaration declaration) {
-		declarations().add(declaration);
+		getDeclarations().add(declaration);
 	}
 	
 	protected Boolean has(String name) {
@@ -42,8 +48,8 @@ public class CLI {
 	}
 	
 	protected ArgumentDeclaration argument(String name) {
-		for (ArgumentDeclaration argument : declarations()) {
-			if (argument.has(name)) {
+		for (ArgumentDeclaration argument : getDeclarations()) {
+			if (argument.hasName(name)) {
 				return argument;
 			}
 		}
@@ -65,14 +71,14 @@ public class CLI {
 	        if (declaration == null) {
 	        	unknownArgument(argument);
 	        } else {
-        		declaration.handler().action(argument);
+        		declaration.getHandler().action(argument);
 	        }
         }
 	}
 
 	protected ArgumentDeclaration match(Argument argument) {
-		for (ArgumentDeclaration declaration : declarations()) {
-			if (declaration.has(argument.name)) {
+		for (ArgumentDeclaration declaration : getDeclarations()) {
+			if (declaration.hasName(argument.name)) {
 				return declaration;
 			}
 		}
@@ -88,6 +94,6 @@ public class CLI {
 	}
 	
 	protected void unknownArgument(Argument argument) {
-		throw new Exception(String.format("Unknown argument %s.", argument.toString()));
+		throw new Exception(String.format("Unknown argument [%s].", argument.toString()));
 	}
 }

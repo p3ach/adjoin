@@ -45,7 +45,7 @@
 			adjoin:value "$Common.setValue(\"baseURI\", \"http://id.example.org\")"^^xsd:string ;
 		] ;
 		rdf:_3 [
-			adjoin:value "$Common.setValue(\"vocabularyURI\", $String.format(\"%s/adjoin/%s#\", $Common.getValue(\"baseURI\"), $Common.getValue(\"randomUUID\")))"^^xsd:string ;
+			adjoin:value "$Common.setValue(\"vocabularyURI\", $String.format(\"%s/adjoin/%s\", $Common.getValue(\"baseURI\"), $Common.getValue(\"randomUUID\")))"^^xsd:string ;
 		] ;
 		rdf:_4 [
 			adjoin:value "$Common.setValue(\"datasetURI\", $String.format(\"%s/adjoin/%s\", $Common.getValue(\"baseURI\"), $Common.getValue(\"randomUUID\")))"^^xsd:string ;
@@ -105,7 +105,7 @@
 			adjoin:subjectURI "$Common.getValue(\"baseURI\")" ;
 			adjoin:propertyURI "$RDF.type" ;
 			adjoin:objectType "$RDFS.Resource" ;
-			adjoin:objectURI "$VoID.Dataset" ;
+			adjoin:objectValue "$VoID.Dataset" ;
 		] ;
 	] ;
 .
@@ -171,13 +171,13 @@
 			adjoin:subjectURI "$Common.getValue(\"baseURI\")" ;
 			adjoin:propertyURI "$VoID.subset" ;
 			adjoin:objectType "$RDFS.Resource" ;
-			adjoin:objectURI "$Common.getValue(\"datasetURI\")" ;
+			adjoin:objectValue "$Common.getValue(\"datasetURI\")" ;
 		] ;
 		rdf:_2 [
 			adjoin:subjectURI "$Common.getValue(\"datasetURI\")" ;
 			adjoin:propertyURI "$RDF.type" ;
 			adjoin:objectType "$RDFS.Resource" ;
-			adjoin:objectURI "$VoID.Dataset" ;
+			adjoin:objectValue "$VoID.Dataset" ;
 		] ;
 		rdf:_3 [
 			adjoin:subjectURI "$Common.getValue(\"datasetURI\")" ;
@@ -190,19 +190,19 @@
 			adjoin:subjectURI "$Common.getValue(\"datasetURI\")" ;
 			adjoin:propertyURI "$DCTerms.creator" ;
 			adjoin:objectType "$RDFS.Resource" ;
-			adjoin:objectURI "$Common.getValue(\"entityURI\")" ;
+			adjoin:objectValue "$Common.getValue(\"entityURI\")" ;
 		] ;
 		rdf:_5 [
 			adjoin:subjectURI "$Common.getValue(\"datasetURI\")" ;
 			adjoin:propertyURI "$FOAF.homepage" ;
 			adjoin:objectType "$RDFS.Resource" ;
-			adjoin:objectURI "$Common.getValue(\"entityHomepage\")" ;
+			adjoin:objectValue "$Common.getValue(\"entityHomepage\")" ;
 		] ;
 		rdf:_6 [
 			adjoin:subjectURI "$Common.getValue(\"datasetURI\")" ;
 			adjoin:propertyURI "$DCTerms.licence" ;
 			adjoin:objectType "$RDFS.Resource" ;
-			adjoin:objectURI "$Common.getValue(\"datasetLicence\")" ;
+			adjoin:objectValue "$Common.getValue(\"datasetLicence\")" ;
 		] ;
 	] ;
 .
@@ -229,7 +229,7 @@
 			adjoin:subjectURI "$Common.getValue(\"baseURI\")" ;
 			adjoin:propertyURI "$RDF.type" ;
 			adjoin:objectType "$RDFS.Resource" ;
-			adjoin:objectURI "$Org.FormalOrganisation" ;
+			adjoin:objectValue "$Org.FormalOrganisation" ;
 		] ;
 		rdf:_2 [
 			adjoin:subjectURI "$Common.getValue(\"baseURI\")" ;
@@ -242,7 +242,7 @@
 			adjoin:subjectURI "$Common.getValue(\"baseURI\")" ;
 			adjoin:propertyURI "$FOAF.homepage" ;
 			adjoin:objectType "$RDFS.Resource" ;
-			adjoin:objectURI "$Common.getValue(\"entityHomepage\")" ;
+			adjoin:objectValue "$Common.getValue(\"entityHomepage\")" ;
 		] ;
 	] ;
 .
@@ -262,7 +262,7 @@
 			adjoin:subjectURI "$String.format(\"%s/%s\", $Common.getValue(\"columnURI\"), $Columns.getIndex())" ;
 			adjoin:propertyURI "$VoID.inDataset" ;
 			adjoin:objectType "$RDFS.Resource" ;
-			adjoin:objectURI "$Common.getValue(\"datasetURI\")" ;
+			adjoin:objectValue "$Common.getValue(\"datasetURI\")" ;
 		] ;
 	] ;
 .
@@ -298,7 +298,7 @@
 		a rdf:Seq ;
 		rdf:_1 [
 			adjoin:subjectURI "$Common.getValue(\"rowURI\")" ;
-			adjoin:propertyURI "$String.format(\"%s%s\", $Common.getValue(\"vocabularyURI\"), $Columns.getName())" ;
+			adjoin:propertyURI "$String.format(\"%s/column/%s\", $Common.getValue(\"vocabularyURI\"), $Columns.getIndex())" ;
 			adjoin:objectType "$RDFS.Literal" ;
 			adjoin:objectValue "$Row.getValue()" ;
 			adjoin:objectDatatype "$XSD.string" ;
@@ -306,3 +306,15 @@
 	] ;
 .
 
+<http://id.unit4.com/template/AdJoin/Default/Footer>
+	rdfs:comment "Default Footer."@en;
+	adjoin:statement [
+		a rdf:Seq ;
+		rdf:_1 [
+			adjoin:subjectURI "$Common.getValue(\"datasetURI\")" ;
+			adjoin:propertyURI "$DCTerms.triples" ;
+			adjoin:objectType "$RDFS.Literal" ;
+			adjoin:objectValue "$Output.getModel().size()" ;
+		] ;
+	] ;
+.

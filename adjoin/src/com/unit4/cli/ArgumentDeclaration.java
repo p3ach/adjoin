@@ -15,40 +15,40 @@ public class ArgumentDeclaration {
 	protected Set<String> names;
 	
 	public ArgumentDeclaration(Boolean value, ArgumentHandler handler, String[] names) {
-		value(value);
-		handler(handler);
-		names(names);
+		setValue(value);
+		setHandler(handler);
+		setNames(names);
 	}
 	
-	protected void value(Boolean value) {
+	protected void setValue(Boolean value) {
 		this.value = value;
 	}
 	
-	public Boolean value() {
+	public Boolean getValue() {
 		return this.value;
 	}
 	
-	protected void handler(ArgumentHandler handler) {
+	protected void setHandler(ArgumentHandler handler) {
 		this.handler = handler;
 	}
 	
-	public ArgumentHandler handler() {
+	public ArgumentHandler getHandler() {
 		return this.handler;
 	}
 	
-	protected void names(String[] names) {
+	protected void setNames(String[] names) {
 		this.names = new HashSet<String>(Arrays.asList(names));
 	}
 	
-	public Set<String> names() {
+	public Set<String> getNames() {
 		return this.names;
 	}
 	
-	public Boolean has(String name) {
-		return names().contains(name);
+	public Boolean hasName(String name) {
+		return getNames().contains(name);
 	}
 	
 	public String toString() {
-		return String.format("%s (%s)", handler().toString(), names().toString());
+		return String.format("ArgumentDeclaration [%s] [%s] [%s].", getValue(), getHandler().toString(), getNames().toString());
 	}
 }
