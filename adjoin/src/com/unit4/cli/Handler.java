@@ -1,5 +1,5 @@
 package com.unit4.cli;
 
-public interface ArgumentHandler {
+public interface Handler {
 	public void action(Argument argument);
 }

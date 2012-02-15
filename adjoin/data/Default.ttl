@@ -45,10 +45,10 @@
 			adjoin:value "$Common.setValue(\"baseURI\", \"http://id.example.org\")"^^xsd:string ;
 		] ;
 		rdf:_3 [
-			adjoin:value "$Common.setValue(\"vocabularyURI\", $String.format(\"%s/adjoin/%s\", $Common.getValue(\"baseURI\"), $Common.getValue(\"randomUUID\")))"^^xsd:string ;
+			adjoin:value "$Common.setValue(\"vocabularyURI\", $String.format(\"%s/%s/vocabulary#\", $Common.getValue(\"baseURI\"), $Common.getValue(\"randomUUID\")))"^^xsd:string ;
 		] ;
 		rdf:_4 [
-			adjoin:value "$Common.setValue(\"datasetURI\", $String.format(\"%s/adjoin/%s\", $Common.getValue(\"baseURI\"), $Common.getValue(\"randomUUID\")))"^^xsd:string ;
+			adjoin:value "$Common.setValue(\"datasetURI\", $String.format(\"%s/%s/dataset\", $Common.getValue(\"baseURI\"), $Common.getValue(\"randomUUID\")))"^^xsd:string ;
 		] ;
 		rdf:_5 [
 			adjoin:value "$Common.setValue(\"datasetLicence\", \"http://data.gov.uk/terms-and-conditions\")"^^xsd:string ;
@@ -204,6 +204,12 @@
 			adjoin:objectType "$RDFS.Resource" ;
 			adjoin:objectValue "$Common.getValue(\"datasetLicence\")" ;
 		] ;
+		rdf:_7 [
+			adjoin:subjectURI "$Common.getValue(\"datasetURI\")" ;
+			adjoin:propertyURI "$RDFS.comment" ;
+			adjoin:objectType "$RDFS.Literal" ;
+			adjoin:objectValue "$String.format(\"Dataset created from [%s].\", $Input.getURI())" ;
+		] ;
 	] ;
 .
 
@@ -253,13 +259,13 @@
 	adjoin:statement [
 		a rdf:Seq ;
 		rdf:_1 [
-			adjoin:subjectURI "$String.format(\"%s/%s\", $Common.getValue(\"columnURI\"), $Columns.getIndex())" ;
+			adjoin:subjectURI "$String.format(\"%scolumn%s\", $Common.getValue(\"vocabularyURI\"), $Columns.getIndex())" ;
 			adjoin:propertyURI "$RDFS.label" ;
 			adjoin:objectType "$RDFS.Literal" ;
 			adjoin:objectValue "$Columns.getName()" ;
 		] ;
 		rdf:_2 [
-			adjoin:subjectURI "$String.format(\"%s/%s\", $Common.getValue(\"columnURI\"), $Columns.getIndex())" ;
+			adjoin:subjectURI "$String.format(\"%scolumn%s\", $Common.getValue(\"vocabularyURI\"), $Columns.getIndex())" ;
 			adjoin:propertyURI "$VoID.inDataset" ;
 			adjoin:objectType "$RDFS.Resource" ;
 			adjoin:objectValue "$Common.getValue(\"datasetURI\")" ;
@@ -273,6 +279,9 @@
 		rdf:_1 [
 			adjoin:after <http://id.unit4.com/template/AdJoin/Default/BeforeRow/Value> ;
 		] ;
+		rdf:_2 [
+			adjoin:after <http://id.unit4.com/template/AdJoin/Default/BeforeRow/Statement> ;
+		] ;
 	] ;
 .
 
@@ -281,6 +290,18 @@
 		a rdf:Seq ;
 		rdf:_1 [
 			adjoin:value "$Common.setValue(\"rowURI\", $String.format(\"%s/row/%s\", $Common.getValue(\"datasetURI\"), $Row.getIndex()))" ;
+		] ;
+	] ;
+.
+
+<http://id.unit4.com/template/AdJoin/Default/BeforeRow/Statement>
+	adjoin:statement [
+		a rdf:Seq ;
+		rdf:_1 [
+			adjoin:subjectURI "$Common.getValue(\"rowURI\")" ;
+			adjoin:propertyURI "$VoID.inDataset" ;
+			adjoin:objectType "$RDFS.Resource" ;
+			adjoin:objectValue "$Common.getValue(\"datasetURI\")" ;
 		] ;
 	] ;
 .
@@ -298,7 +319,7 @@
 		a rdf:Seq ;
 		rdf:_1 [
 			adjoin:subjectURI "$Common.getValue(\"rowURI\")" ;
-			adjoin:propertyURI "$String.format(\"%s/column/%s\", $Common.getValue(\"vocabularyURI\"), $Columns.getIndex())" ;
+			adjoin:propertyURI "$String.format(\"%scolumn%s\", $Common.getValue(\"vocabularyURI\"), $Columns.getIndex())" ;
 			adjoin:objectType "$RDFS.Literal" ;
 			adjoin:objectValue "$Row.getValue()" ;
 			adjoin:objectDatatype "$XSD.string" ;
@@ -308,13 +329,19 @@
 
 <http://id.unit4.com/template/AdJoin/Default/Footer>
 	rdfs:comment "Default Footer."@en;
+	adjoin:value [
+		a rdf:Seq ;
+		rdf:_1 [
+			adjoin:value "$Common.setValue(\"tripleCount\", $Output.getModel().size())" ;
+		] ;
+	] ;
 	adjoin:statement [
 		a rdf:Seq ;
 		rdf:_1 [
 			adjoin:subjectURI "$Common.getValue(\"datasetURI\")" ;
 			adjoin:propertyURI "$DCTerms.triples" ;
 			adjoin:objectType "$RDFS.Literal" ;
-			adjoin:objectValue "$Output.getModel().size()" ;
+			adjoin:objectValue "$Common.increment($Common.getValue(\"tripleCount\"))" ;
 		] ;
 	] ;
 .

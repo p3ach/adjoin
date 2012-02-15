@@ -53,7 +53,7 @@ public class U4RDFS extends U4Vocabulary {
 		super();
 	}
 	
-	public U4RDFS(OntResource subject) {
+	public U4RDFS(Resource subject) {
 		super(subject);
 	}
 

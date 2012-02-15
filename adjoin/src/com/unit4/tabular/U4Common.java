@@ -80,6 +80,10 @@ public class U4Common {
 		return count;
 	}
 	
+	public Long increment(Long value) {
+		return value++;
+	}
+	
 	public Long countValueIndirect(String key) {
 		logger.trace("countValueIndirect(key={})", key);
 		return countValue((String) getValue(key));

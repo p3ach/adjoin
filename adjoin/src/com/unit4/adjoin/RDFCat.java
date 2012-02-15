@@ -18,12 +18,13 @@ import com.csvreader.CsvReader;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.util.FileManager;
 import com.unit4.cli.Argument;
-import com.unit4.cli.ArgumentDeclaration;
-import com.unit4.cli.ArgumentHandler;
+import com.unit4.cli.Declaration;
+import com.unit4.cli.Handler;
 import com.unit4.cli.CLI;
 import com.unit4.exception.Exception;
 import com.unit4.tabular.U4Columns;
 import com.unit4.tabular.U4Common;
+import com.unit4.tabular.U4Input;
 import com.unit4.tabular.U4Output;
 import com.unit4.tabular.U4Row;
 import com.unit4.vocabulary.U4AdJoin;
@@ -33,10 +34,6 @@ public class RDFCat {
 //	Class.
 	
 	private static Logger logger = LoggerFactory.getLogger(RDFCat.class);
-	
-	public static final String regexURI = "http://www.example.org/id/U4Convert";
-	
-	public static final String DEFAULT_ROW_STEPS_URN = "csv2rdf";
 	
 	public static final String HEADER_URN = "Header";
 	public static final String FOOTER_URN = "Footer";
@@ -65,9 +62,9 @@ public class RDFCat {
 
 //    Instance.
 
-    public final ArgumentDeclaration VALUE = new ArgumentDeclaration(
+    public final Declaration VALUE = new Declaration(
     		false,
-    		new ArgumentHandler() {
+    		new Handler() {
 				@Override
 				public void action(Argument argument) {
 					parse(argument);
@@ -75,8 +72,9 @@ public class RDFCat {
 			},
 			new String[]{null});
     
-    public final ArgumentDeclaration ADD_TEMPLATE = new ArgumentDeclaration(
-    		true, new ArgumentHandler() {
+    public final Declaration ADD_TEMPLATE = new Declaration(
+    		true,
+    		new Handler() {
 				@Override
 				public void action(Argument argument) {
 					addTemplate(argument.getValue());
@@ -84,8 +82,9 @@ public class RDFCat {
 			},
 			new String[]{"addTemplate"});
    
-    public final ArgumentDeclaration ADD_GROUP = new ArgumentDeclaration(
-    		true, new ArgumentHandler() {
+    public final Declaration ADD_GROUP = new Declaration(
+    		true,
+    		new Handler() {
 				@Override
 				public void action(Argument argument) {
 					addGroup(argument.getValue());
@@ -93,17 +92,20 @@ public class RDFCat {
 			},
 			new String[]{"addGroup"});
     
-    public final ArgumentDeclaration OUTPUT = new ArgumentDeclaration(
-    		true, new ArgumentHandler() {
+    public final Declaration OUTPUT = new Declaration(
+    		true,
+    		new Handler() {
 				@Override
 				public void action(Argument argument) {
+					setOutput(argument.getValue());
 				}
 			},
 			new String[]{"o", "output"});
     
     
-    public final ArgumentDeclaration MAX_ROWS = new ArgumentDeclaration(
-    		true, new ArgumentHandler() {
+    public final Declaration MAX_ROWS = new Declaration(
+    		true,
+    		new Handler() {
 				@Override
 				public void action(Argument argument) {
 					maxRows(Long.valueOf(argument.getValue()));
@@ -111,17 +113,17 @@ public class RDFCat {
 			},
 			new String[]{"maxRows"});
     
-    public final ArgumentDeclaration HELP = new ArgumentDeclaration(
+    public final Declaration HELP = new Declaration(
 			false,
-    		new ArgumentHandler() {
+    		new Handler() {
 				@Override
 				public void action(Argument argument) {
-					help();
+					System.out.print(cli.render());
 				}
 			},
 			new String[]{"h", "help"});
     
-    protected CLI cli = new CLI(new ArgumentDeclaration[]{VALUE, MAX_ROWS, ADD_TEMPLATE, ADD_GROUP, OUTPUT, HELP});
+    protected CLI cli = new CLI(new Declaration[]{VALUE, MAX_ROWS, ADD_TEMPLATE, ADD_GROUP, OUTPUT, HELP});
     
     private VelocityContext context;
     
@@ -170,6 +172,10 @@ public class RDFCat {
     	groups().addFirst(name);
     }
     
+    protected void setOutput(String output) {
+    	
+    }
+    
     protected void maxRows(Long maxRows) {
     	logger.debug("maxRows(maxRows={})", maxRows);
     	this.maxRows = maxRows;
@@ -181,6 +187,7 @@ public class RDFCat {
     
     protected void go(String[] args) {
     	logger.debug("go(args={})", Arrays.toString(args));
+    	logger.debug(cli.toString());
        	cli.process(args);
     }
 
@@ -221,16 +228,19 @@ public class RDFCat {
 			}
 		}
 
+		U4Input input = new U4Input();
+		input.setURI(argument.getValue());
+		
     	logger.debug("Open input {}", argument);
     	InputStream is = FileManager.get().open(argument.getValue());
     	if (is == null) {
     		throw new Exception(String.format("Unable to read [%s].", argument.getValue()));
     	}
-    	CsvReader input = new CsvReader(is, Charset.forName("UTF-8"));
+    	CsvReader csvInput = new CsvReader(is, Charset.forName("UTF-8"));
     	
     	logger.debug("Read input headers.");
     	try {
-			input.readHeaders();
+			csvInput.readHeaders();
 		} catch (IOException e) {
 			logger.error("Unable to read input headers due to [{}].", e);
 			return;
@@ -239,7 +249,7 @@ public class RDFCat {
 		logger.debug("Create Columns.");
 		U4Columns columns;
 		try {
-			columns = new U4Columns(input.getHeaders());
+			columns = new U4Columns(csvInput.getHeaders());
 		} catch (IOException e) {
 			logger.error("Unable to get input headers due to [{}].", e);
 			return;
@@ -268,6 +278,7 @@ public class RDFCat {
 		logger.debug("Create Velocity.");
         Velocity.init();
         context = new VelocityContext();
+        context.put("Input", input);
 		context.put("Output", output);
 		context.put("Common", common);
         context.put("Columns", columns);
@@ -313,9 +324,9 @@ public class RDFCat {
 
         logger.debug("Read rows.");
 		try {
-			while (input.readRecord()) {
+			while (csvInput.readRecord()) {
 				maxRows = maxRows();
-				rowIndex = input.getCurrentRecord();
+				rowIndex = csvInput.getCurrentRecord();
 				if (maxRows != null) {
 					if (rowIndex >= maxRows) {
 						logger.info("maxRows of {} reached.", maxRows);
@@ -324,7 +335,7 @@ public class RDFCat {
 				}
 				// Update the row details.
 				row.setIndex(rowIndex);
-				row.setValues(input.getValues());
+				row.setValues(csvInput.getValues());
 				
 			    logger.trace("Processing beforeRow templates.");
 			    if (beforeRowTemplates!= null) {
@@ -333,7 +344,8 @@ public class RDFCat {
 				    }
 			    }
 				    
-				for (Integer index = 0; index < input.getValues().length; index++) {
+			    logger.trace("Processing Row templates.");
+				for (Integer index = 0; index < csvInput.getValues().length; index++) {
 					columns.setIndex(index); // Set the current column index.
 					if (row.getValue() == "") {
 						logger.trace("Value is empty string.");
@@ -369,11 +381,11 @@ public class RDFCat {
         }
 		
 		//    	Close input.
-    	input.close();
+    	csvInput.close();
     	//
 //    	logger.trace("Common \n{}", common.toString());
     	
-     	output.getModel().write(System.out, "Turtle");
+     	output.render(); //getModel().write(System.out, "RDF/XML");
     }
     
     public void processTemplate() {

@@ -70,6 +70,10 @@ public class U4Vocabulary {
 		
 	public U4Vocabulary() {
 	}
+	
+	public U4Vocabulary(String uri) {
+		this(ModelFactory.createDefaultModel().createResource(uri));
+	}
 
 	public U4Vocabulary(Resource subject) {
 		setSubject(subject);
@@ -255,6 +259,17 @@ public class U4Vocabulary {
 	
 	public Boolean hasProperty(String urn, Property property, RDFNode object) {
 		return (createChild(urn).hasProperty(property, object));
+	}
+	
+//	Other get...(s).
+
+	public List<Statement> getStatements(Property property, RDFNode node) {
+		List<Statement> statements = new ArrayList<Statement>();
+		StmtIterator iterator = getModel().listStatements(getSubject(), property, node);
+		while (iterator.hasNext()) {
+			statements.add(iterator.nextStatement());
+		}
+		return statements;
 	}
 	
 //	Override methods.

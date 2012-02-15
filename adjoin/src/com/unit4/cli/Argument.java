@@ -6,12 +6,20 @@ public class Argument {
 	
 //	Instance.
 
-    protected String text = null;
-	protected String name = null;
-	protected String value = null;
+    private String text = null;
+	private String name = null;
+	private String value = null;
 
+	public Argument() {
+		
+	}
+	
 	public Argument(String text) {
 		setText(text);
+	}
+	
+	public Argument setText(String text) {
+		this.text = text;
 
 		if (text.startsWith("--")) { // Long form argument i.e. --help
 	        text = text.substring(2) ;
@@ -19,7 +27,7 @@ public class Argument {
 	        text = text.substring(1);
 	    } else { // Value argument i.e. fred
 	    	setValue(text);
-	    	return;
+	    	return this;
 	    }
         
 		// Split if the text has a "=" or ":" i.e. it is long form --arg:value --arg=value.
@@ -39,19 +47,16 @@ public class Argument {
 	        setName(text.substring(0,j));
 	        setValue(text.substring(j+1));
         }
-	}
-	
-	public Argument(String name, String value) {
-		setName(name);
-		setValue(value);
-	}
-	
-	protected void setText(String text) {
-		this.text = text;
+        
+        return this;
 	}
 	
 	public String getText() {
 		return this.text;
+	}
+	
+	public Boolean hasText() {
+		return (getText() != null);
 	}
 	
 	protected void setName(String name) {
@@ -61,6 +66,10 @@ public class Argument {
 	public String getName() {
 		return this.name;
 	}
+
+	public Boolean hasName() {
+		return (this.name != null);
+	}
 	
 	protected void setValue(String value) {
 		this.value = value;
@@ -69,26 +78,25 @@ public class Argument {
 	public String getValue() {
 		return this.value;
 	}
+	
+	public Boolean hasValue() {
+		return (this.value != null);
+	}
 
 	public Boolean isShortForm() {
-		return (getValue().startsWith("-") && !value.startsWith("--"));
+		String text = getText();
+		return (text.startsWith("-") && !text.startsWith("--"));
 	}
 
 	public Boolean isLongForm() {
-		return getValue().startsWith("--");
+		return getText().startsWith("--");
 	}
 
 	public Boolean isValueForm() {
-		String value = getValue();
-		return ((value == null ? false : !getValue().startsWith("-")));
-	}
-	
-	public Boolean hasValue() {
-		String value = getValue();
-		return (value.indexOf("=") != 0 || value.indexOf(":") != 0);
+		return (getValue() != null);
 	}
 	
 	public String toString() {
-		return String.format("Argument [%s]", getText());
+		return String.format("Argument [%s] [%s] [%s] [%s] [%s] [%s]", getText(), getName(), getValue(), isShortForm(), isLongForm(), isValueForm());
 	}
 }

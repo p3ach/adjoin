@@ -1,5 +1,7 @@
 package com.unit4.tabular;
 
+import java.io.OutputStream;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,6 +19,8 @@ public class U4Output {
 	private static Logger logger = LoggerFactory.getLogger(U4Output.class);
 	
 	private Model output;
+	private String language = null;
+	private OutputStream stream = System.out;
 	
 	public U4Output() {
 		setModel(ModelFactory.createDefaultModel());
@@ -40,5 +44,25 @@ public class U4Output {
 	
 	public Model getModel() {
 		return this.output;
+	}
+	
+	public void setLanguage(String language) {
+		this.language = language;
+	}
+	
+	public String getLanguage() {
+		return this.language;
+	}
+	
+	public void setStream(OutputStream stream) {
+		this.stream = stream;
+	}
+	
+	public OutputStream getStream() {
+		return this.stream;
+	}
+	
+	public void render() {
+		getModel().write(getStream(), getLanguage());
 	}
 }
