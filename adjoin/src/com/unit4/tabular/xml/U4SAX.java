@@ -35,6 +35,10 @@ public class U4SAX extends DefaultHandler implements U4Input {
 		
 	}
 	
+	public U4SAX(U4Common common) {
+		setCommon(common);
+	}
+	
 	public void setCommon(U4Common common) {
 		this.common = common;
 	}
@@ -80,9 +84,8 @@ public class U4SAX extends DefaultHandler implements U4Input {
 		}
 		List<String> values = new ArrayList<String>();
 		for (U4Element e : getElements()) {
-			names.addAll(e.getValues());
+			values.addAll(e.getValues());
 		}
-
 		getElements().pop();
 		getCommon().getColumns().setColumns(names);
 		getCommon().getRow().setValues(values);
