@@ -1,5 +1,7 @@
 package com.unit4.tabular;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,27 +43,31 @@ public class U4Row {
 		this.values = values;
 	}
 	
+	public void setValues(List<String> values) {
+		this.values = values.toArray(new String[values.size()]);
+	}
+	
 	public String[] getValues() {
 		return this.values;
 	}
 	
 	public String getValue(Integer index) {
-		logger.debug("getValue({})", index);
 		return getValues()[index];
 	}
 	
 	public String getValue(String name) {
-		logger.debug("getValue({})", name);
 		return getValues()[getColumns().getIndex(name)];
 	}
 	
 	public String getValueIndirect(String key) {
-		logger.trace("getValueIndirect(key={})", key);
 		return getValue((String) getCommon().getValue(key));
 	}
 	
 	public String getValue() {
-		logger.debug("getValue()");
 		return getValue(getColumns().getIndex());
+	}
+	
+	public String toString() {
+		return values.toString(); 
 	}
 }

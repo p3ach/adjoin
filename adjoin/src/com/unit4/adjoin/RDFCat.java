@@ -3,6 +3,7 @@ package com.unit4.adjoin;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -43,91 +44,78 @@ public class RDFCat {
 	public static final String COLUMNS_URN = "Columns";
 	
     public static void main( String[] args ) {
- 		try {
+// 		try {
 			new RDFCat().go(args); 
-		} catch (RuntimeException e) {
-			logger.info("Oops! Somethings gone wrong. Please email this output to my owner adjoin@unit4.com");
-			logger.info("{}", e.getMessage());
-			for (StackTraceElement s : e.getStackTrace()) {
-				logger.info("{}", s.toString());
-			}
-			if (e.getCause() != null) {
-				logger.info("Caused by...");
-				for (StackTraceElement s : e.getCause().getStackTrace()) {
-					logger.info("{}", s.toString());
-				}
-			}
-		}
+//		} catch (RuntimeException e) {
+//			logger.info("Oops! Somethings gone wrong. Please email this output to my owner adjoin@unit4.com");
+//			logger.info("{}", e.getMessage());
+//			for (StackTraceElement s : e.getStackTrace()) {
+//				logger.info("{}", s.toString());
+//			}
+//			if (e.getCause() != null) {
+//				logger.info("Caused by...");
+//				for (StackTraceElement s : e.getCause().getStackTrace()) {
+//					logger.info("{}", s.toString());
+//				}
+//			}
+//		}
     }
 
 //    Instance.
 
     public final Declaration VALUE = new Declaration(
-    		false,
-    		new Handler() {
-				@Override
-				public void action(Argument argument) {
-					parse(argument);
-				}
-			},
-			new String[]{null});
+		new Handler() {
+			public void go(Argument argument) {
+				parse(argument);
+			}
+		}
+    );
     
     public final Declaration ADD_TEMPLATE = new Declaration(
-    		true,
-    		new Handler() {
-				@Override
-				public void action(Argument argument) {
-					addTemplate(argument.getValue());
-				}
-			},
-			new String[]{"addTemplate"});
+    	Declaration.REQUIRE_VALUE, 
+		new Handler() {
+			public void go(Argument argument) {
+				addTemplate(argument.getValue());
+			}
+		},
+		Arrays.asList("addTemplate")
+	);
    
     public final Declaration ADD_GROUP = new Declaration(
-    		true,
-    		new Handler() {
-				@Override
-				public void action(Argument argument) {
-					addGroup(argument.getValue());
-				}
-			},
-			new String[]{"addGroup"});
+		Declaration.REQUIRE_VALUE, 
+		new Handler() {
+			public void go(Argument argument) {
+				addGroup(argument.getValue());
+			}
+		},
+		Arrays.asList("addGroup")
+	);
     
     public final Declaration OUTPUT = new Declaration(
-    		true,
-    		new Handler() {
-				@Override
-				public void action(Argument argument) {
-					setOutput(argument.getValue());
-				}
-			},
-			new String[]{"o", "output"});
-    
+		Declaration.REQUIRE_VALUE,
+		new Handler() {
+			public void go(Argument argument) {
+				setOutput(argument.getValue());
+			}
+		},
+		Arrays.asList("o", "output")
+	);
     
     public final Declaration MAX_ROWS = new Declaration(
-    		true,
+    		Declaration.REQUIRE_VALUE,
     		new Handler() {
-				@Override
-				public void action(Argument argument) {
+				public void go(Argument argument) {
 					maxRows(Long.valueOf(argument.getValue()));
 				}
 			},
-			new String[]{"maxRows"});
+			Arrays.asList("maxRows")
+	);
     
-    public final Declaration HELP = new Declaration(
-			false,
-    		new Handler() {
-				@Override
-				public void action(Argument argument) {
-					System.out.print(cli.render());
-				}
-			},
-			new String[]{"h", "help"});
-    
-    protected CLI cli = new CLI(new Declaration[]{VALUE, MAX_ROWS, ADD_TEMPLATE, ADD_GROUP, OUTPUT, HELP});
+    private CLI cli = new CLI(new ArrayList<Declaration>(Arrays.asList(VALUE, MAX_ROWS, ADD_TEMPLATE, ADD_GROUP, OUTPUT)));
     
     private VelocityContext context;
     
-    protected Long maxRows = null;
+    private Long maxRows = null;
     
     protected String configFile = null;
     protected String outputFile = null;
@@ -186,9 +174,7 @@ public class RDFCat {
     }
     
     protected void go(String[] args) {
-    	logger.debug("go(args={})", Arrays.toString(args));
-    	logger.debug(cli.toString());
-       	cli.process(args);
+       	cli.go(args);
     }
 
     protected void parse(Argument argument) {
@@ -384,7 +370,7 @@ public class RDFCat {
     	csvInput.close();
     	//
 //    	logger.trace("Common \n{}", common.toString());
-    	
+//    	output.setLanguage("RDF/XML");
      	output.render(); //getModel().write(System.out, "RDF/XML");
     }
     

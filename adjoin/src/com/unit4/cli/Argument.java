@@ -97,6 +97,6 @@ public class Argument {
 	}
 	
 	public String toString() {
-		return String.format("Argument [%s] [%s] [%s] [%s] [%s] [%s]", getText(), getName(), getValue(), isShortForm(), isLongForm(), isValueForm());
+		return String.format("Argument text[%s] name[%s] value[%s] isShort[%s] isLong[%s] isValue[%s]", getText(), getName(), getValue(), isShortForm(), isLongForm(), isValueForm());
 	}
 }

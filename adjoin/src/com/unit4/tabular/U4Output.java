@@ -19,7 +19,7 @@ public class U4Output {
 	private static Logger logger = LoggerFactory.getLogger(U4Output.class);
 	
 	private Model output;
-	private String language = null;
+	private String language = "Turtle";
 	private OutputStream stream = System.out;
 	
 	public U4Output() {

@@ -10,7 +10,7 @@
 
 <http://id.unit4.com/template/AdJoin>
 	a void:Dataset ;
-	rdfs:comment "Template."@en ;
+	rdfs:comment "Template. When merging templates lower priorities are processed first. Default template has a priority of 65536."@en ;
 	void:subset <http://id.unit4.com/template/AdJoin/Default> ;
 .
 
@@ -22,7 +22,7 @@
 <http://id.unit4.com/template/AdJoin/Default/Header>
 	rdfs:comment "Default AdJoin header."@en ;
 
-	adjoin:priority "1024"^^xsd:integer;
+	adjoin:priority "65536"^^xsd:integer;
 	
 	adjoin:after [
 		a rdf:Seq ;
@@ -71,7 +71,7 @@
 <http://id.unit4.com/template/AdJoin/Default/Header/Common>
 	rdfs:comment "Default AdJoin header."@en ;
 
-	adjoin:priority "1024"^^xsd:integer;
+	adjoin:priority "65536"^^xsd:integer;
 	
 	adjoin:after [
 		a rdf:Seq ;
@@ -113,7 +113,7 @@
 <http://id.unit4.com/template/AdJoin/Default/Header/Vocabulary>
 	rdfs:comment "Default AdJoin header vocabulary."@en ;
 
-	adjoin:priority "1024"^^xsd:integer;
+	adjoin:priority "65536"^^xsd:integer;
 
 	adjoin:after [
 		a rdf:Seq ;
@@ -255,7 +255,7 @@
 
 <http://id.unit4.com/template/AdJoin/Default/Columns>
 	rdfs:comment "Default Columns"@en ;
-    adjoin:priority "1024"^^xsd:integer ;
+    adjoin:priority "65536"^^xsd:integer ;
 	adjoin:statement [
 		a rdf:Seq ;
 		rdf:_1 [
@@ -313,7 +313,7 @@
 
 <http://id.unit4.com/template/AdJoin/Default/Row/Default>
 	rdfs:comment "Default i.e. match anything"@en ;
-    adjoin:priority "1024"^^xsd:integer ;
+    adjoin:priority "65536"^^xsd:integer ;
 	adjoin:pattern "^.*$" ;
 	adjoin:statement [
 		a rdf:Seq ;

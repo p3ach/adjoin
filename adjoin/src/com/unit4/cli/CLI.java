@@ -22,9 +22,7 @@ public class CLI {
 
 	public static final Boolean AUTO_HELP = true;
 	public static final Boolean NO_AUTO_HELP = false;
-	
-	public static final List<Declaration> EMPTY_DECLARATIONS = new ArrayList<Declaration>();
-	
+
 //	Instance.
 	
 	private Boolean autoHelp;
@@ -32,20 +30,22 @@ public class CLI {
 	private List<Declaration> declarations;
 
 	private List<Argument> arguments;
-	
+
 	private final Declaration HELP = new Declaration(
-		new Handler() {
-			public void action(Argument argument) {
-			}
-		},
-		Arrays.asList("-h", "--help"),
-		Declaration.LOOK_FOR
-	);
+			new Handler() {
+				public void go(Argument argument) {
+					autoHelp();
+				}
+			},
+			Arrays.asList("h", "help"),
+			Declaration.LOOK_FOR
+		);
+	
 	
 //	Constructors.
 	
 	public CLI() {
-		this(AUTO_HELP, EMPTY_DECLARATIONS);
+		this(AUTO_HELP, new ArrayList<Declaration>());
 	}
 	
 	public CLI(List<Declaration> declarations) {
@@ -70,15 +70,14 @@ public class CLI {
 	
 	public CLI setDeclarations(List<Declaration> declarations) {
 		this.declarations = declarations;
+		if (getAutoHelp()) {
+			this.declarations.add(HELP);
+		}
 		return this;
 	}
 	
 	public List<Declaration> getDeclarations() {
-		List<Declaration> declarations = this.declarations;
-		if (getAutoHelp()) {
-			declarations.add(HELP);
-		}
-		return declarations;
+		return this.declarations;
 	}
 	
 	public Declaration getDeclaration(Argument argument) {
@@ -103,65 +102,58 @@ public class CLI {
 		return this.arguments;
 	}
 	
-	public void process(String[] argv) {
+	public void go(String[] argv) {
 		setArguments(argv);
-		process();
+		go();
 	}
 	
-	public void process() {
-		List<Argument> arguments = getArguments();
-		List<Declaration> declarations = getDeclarations();
-		
-		for (Declaration declaration : declarations) {
+	public void go() {
+		for (Declaration declaration : getDeclarations()) {
 			if (declaration.getLookFor()) {
-				for (Argument argument : arguments) {
+				for (Argument argument : getArguments()) {
 					if (declaration.equals(argument)) {
-						declaration.getHandler().action(argument);
+						declaration.getHandler().go(argument);
 					}
 				}
 			}
 		}
 		
-		Argument argument;
-        for (String arg : argv) {
-        	argument = new Argument(arg);
+        for (Argument argument : getArguments()) {
             if (endProcessing(argument)) {
                 break ;
             }
             if (ignoreArgument(argument)) {
                 continue ;
             }
-	        for (Declaration declaration : getDeclarations()) {
-	        	if (declaration.hasName(argument.getName())) {
-	        		if (declaration.hasValidValues()) {
-	        			if (argument.hasValue()) {
-	        				if (declaration.hasValidValues() && declaration.getValidValues().contains(argument.getValue())) {
-	        					declaration.getHandler().action(argument);
-	        				} else {
-	        					invalidValue(argument);
-	        				}
-	        			} else {
-	        				missingValue(declaration);
-	        			}
-	        		} else {
-	               		declaration.getHandler().action(argument);
-	        		}
-	        	} else {
-	        		unknownArgument(argument);
-	        	}
+            
+	        Declaration declaration = match(argument);
+	        if (declaration == null) {
+        		unknownArgument(argument);
+	        } else {
+        		if (declaration.hasValidValues()) {
+        			if (argument.hasValue()) {
+        				if (declaration.getValidValues().contains(argument.getValue())) {
+        					declaration.getHandler().go(argument);
+        				} else {
+        					invalidValue(argument);
+        				}
+        			} else {
+        				missingValue(declaration);
+        			}
+        		} else {
+               		declaration.getHandler().go(argument);
+        		}
 	        }
         }
+
+        if (getArguments().size() == 0) {
+			autoHelp();
+		}
 	}
 
-	protected Declaration match(Argument argument) {
+	public Declaration match(Argument argument) {
 		for (Declaration declaration : getDeclarations()) {
-			if (declaration.hasName(argument.name)) {
-				if (declaration.hasValidValues()) {
-					if (declaration.getValidValues().contains(argument.getValue())) {
-						return declaration;
-					} else {
-					}
-				}
+			if (declaration.hasName(argument.getName())) {
 				return declaration;
 			}
 		}
@@ -187,6 +179,12 @@ public class CLI {
 	protected void invalidValue(Argument argument) {
 		throw new Exception(String.format("Invalid value for [%s].", argument));
 	}
+
+	public void autoHelp() {
+		for (Declaration declaration : getDeclarations()) {
+			System.out.println(String.format("%s", declaration.toString()));
+		}
+	}
 	
 	public Object render() {
 		return renderAsText();
@@ -194,7 +192,7 @@ public class CLI {
 	
 	public String renderAsText() {
 		StringBuilder sb = new StringBuilder();
-		for (Declaration ad : getDeclarations()) {
+		for (Declaration declaration : getDeclarations()) {
 //			sb.append(ad.getNames() + ":" + ad.getValue() + "\n");
 		}
 		return sb.toString();

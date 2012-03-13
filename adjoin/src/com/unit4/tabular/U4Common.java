@@ -1,6 +1,5 @@
 package com.unit4.tabular;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -10,6 +9,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class U4Common {
+	
+	// Class.
+	
 	private static Logger logger = LoggerFactory.getLogger(U4Common.class);
 	
 	public static String createURI(String uri) {
@@ -18,13 +20,59 @@ public class U4Common {
 		logger.trace("returnURI={}", returnURI);
 		return returnURI;
 	}
+
+	// Instance.
 	
+	private U4Input input;
+	private U4Output output;
+	private U4Columns columns;
+	private U4Row row;
+
 	private HashMap<String,Object> values = new HashMap<String, Object>();
 	
 	public U4Common() {
 		common();
 	}
 	
+	public U4Common(U4Input input, U4Output output, U4Columns columns, U4Row row) {
+		setInput(input);
+		setOutput(output);
+		setColumns(columns);
+		setRow(row);
+	}
+	
+	public void setInput(U4Input input) {
+		this.input = input;
+	}
+	
+	public U4Input getInput() {
+		return this.input;
+	}
+	
+	public void setOutput(U4Output output) {
+		this.output = output;
+	}
+	
+	public U4Output getOutput() {
+		return this.output;
+	}
+	
+	public void setColumns(U4Columns columns) {
+		this.columns = columns;
+	}
+	
+	public U4Columns getColumns() {
+		return this.columns;
+	}
+	
+	public void setRow(U4Row row) {
+		this.row = row;
+	}
+	
+	public U4Row getRow() {
+		return this.row;
+	}
+
 	public void common() {
 		setValue("commonUUID", UUID.randomUUID().toString());
 	    

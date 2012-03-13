@@ -1,78 +1,235 @@
-@prefix u4convert:  <http://www.unit4.com/2011/11/01/u4convert-ns#> .
+@prefix adjoin:  <http://id.unit4.com/2011/11/01/adjoin-ns#> .
 
-@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix owl:     <http://www.w3.org/2002/07/owl#> .
-@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
-@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
-@prefix skos:    <http://www.w3.org/2004/02/skos/core#> . 
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> . 
 @prefix void: <http://rdfs.org/ns/void#> .
 
-<http://id.unit4.com/template>
+<http://id.unit4.com/template/AdJoin>
 	a void:Dataset ;
 	rdfs:comment "Template."@en ;
-	void:subset <http://id.unit4.com/template/Template> ;
+	void:subset <http://id.unit4.com/template/AdJoin/Template> ;
 .
 
-<http://id.unit4.com/template/Template>
+<http://id.unit4.com/template/AdJoin/Template>
 	a void:Dataset ;
-	rdfs:comment "Used with a template.csv format file to create a template.ttl format file for use with AdJoin."@en ;
+	rdfs:comment "Default template for use with AdJoin to generate a Template from a CSV file."@en ;
 .
 
-<http://id.unit4.com/template/Template/Header>
-	rdfs:comment "Default header."@en ;
-	u4convert:priority "1024"^^xsd:integer;
-	u4convert:triples [
-		a rdfs:Seq ;
+<http://id.unit4.com/template/AdJoin/Template/Header>
+	rdfs:comment "Default AdJoin header."@en ;
+
+	adjoin:priority "1024"^^xsd:integer;
+	
+	adjoin:after [
+		a rdf:Seq ;
 		rdf:_1 [
-			u4convert:value "$Common.setValue(\"randomUUID\", $UUID.randomUUID().toString())"^^xsd:string ;
+			adjoin:after <http://id.unit4.com/template/AdJoin/Template/Header/Values> ;
 		] ;
 		rdf:_2 [
-			u4convert:value "$Common.setValue(\"baseURI\", $String.format(\"http://id.example.org/%s\", $Common.getValue(\"randomUUID\")))"^^xsd:string ;
+			adjoin:after <http://id.unit4.com/template/AdJoin/Template/Header/Common> ;
+		] ;
+	] ;
+.
+
+<http://id.unit4.com/template/AdJoin/Template/Header/Values>
+	adjoin:value [
+		a rdf:Seq ;
+		rdf:_1 [
+			adjoin:value "$Common.setValue(\"randomUUID\", $UUID.randomUUID().toString())"^^xsd:string ;
+		] ;
+		rdf:_2 [
+			adjoin:value "$Common.setValue(\"baseURI\", \"http://id.unit4.com/template/AdJoin\")"^^xsd:string ;
 		] ;
 		rdf:_3 [
-			u4convert:value "$Common.setValue(\"examplePrefix\", \"exampleNS\")"^^xsd:string ;
-		] ;
-		rdf:_4 [
-			u4convert:value "$Common.setValue(\"exampleNS\", $String.format(\"%s#\", $Common.getValue(\"baseURI\")))"^^xsd:string ;
-		] ;
-		rdf:_5 [
-			u4convert:value "$Output.getModel().setNsPrefix($Common.getValue(\"examplePrefix\"), $Common.getValue(\"exampleNS\"))"^^xsd:string ;		
+			adjoin:value "$Common.setValue(\"datasetURI\", $String.format(\"%s/%s/dataset\", $Common.getValue(\"baseURI\"), $Common.getValue(\"randomUUID\")))"^^xsd:string ;
 		] ;
 	] ;
-	u4convert:after <http://id.unit4.com/template/Template/Header/Dataset> ;
 .
 
-<http://id.unit4.com/template/Template/Header>
+<http://id.unit4.com/template/AdJoin/Template/Header/Common>
+	rdfs:comment "Default AdJoin header."@en ;
 
+	adjoin:priority "1024"^^xsd:integer;
+	
+	adjoin:after [
+		a rdf:Seq ;
+		rdf:_1 [
+			adjoin:after <http://id.unit4.com/template/AdJoin/Template/Header/Statements> ;
+		] ;
+		rdf:_2 [
+			adjoin:after <http://id.unit4.com/template/AdJoin/Template/Header/Dataset> ;
+		] ;
+	] ;
 .
 
-<http://id.unit4.com/template/Default/Row>
+<http://id.unit4.com/template/AdJoin/Template/Header/Statements>	
+	adjoin:statement [
+		a rdf:Seq ;
+		rdf:_1 [
+			adjoin:subjectURI "$Common.getValue(\"baseURI\")" ;
+			adjoin:propertyURI "$RDF.type" ;
+			adjoin:objectValue "$VoID.Dataset" ;
+		] ;
+		rdf:_2 [
+			adjoin:subjectURI "$Common.getValue(\"baseURI\")" ;
+			adjoin:propertyURI "$RDFS.comment" ;
+			adjoin:objectType "$RDFS.Literal" ;
+			adjoin:objectValue "Template." ;
+		] ;
+	] ;
+.
+
+<http://id.unit4.com/template/AdJoin/Template/Header/Dataset>
+	rdfs:comment "Default AdJoin header dataset."@en ;
+
+	adjoin:after [
+		a rdf:Seq ;
+		rdf:_1 [
+			adjoin:after <http://id.unit4.com/template/AdJoin/Template/Header/Dataset/Values> ;
+		] ;
+		rdf:_2 [
+			adjoin:after <http://id.unit4.com/template/AdJoin/Template/Header/Dataset/Statements> ;
+		] ;
+	] ;
+.
+
+<http://id.unit4.com/template/AdJoin/Template/Header/Dataset/Values>
+	adjoin:value [
+		a rdf:Seq ;
+		rdf:_1 [
+			adjoin:value "$Common.setValue(\"datasetPrefix\", \"dataset\")"^^xsd:string ;
+		] ;
+		rdf:_2 [
+			adjoin:value "$Output.getModel().setNsPrefix($Common.getValue(\"datasetPrefix\"), $Common.getValue(\"datasetURI\"))"^^xsd:string ;		
+		] ;
+	] ;
+.
+
+<http://id.unit4.com/template/AdJoin/Template/Header/Dataset/Statements>
+	adjoin:statement [
+		a rdf:Seq ;
+		rdf:_1 [
+			adjoin:subjectURI "$Common.getValue(\"baseURI\")" ;
+			adjoin:propertyURI "$VoID.subset" ;
+			adjoin:objectType "$RDFS.Resource" ;
+			adjoin:objectValue "$Common.getValue(\"datasetURI\")" ;
+		] ;
+		rdf:_2 [
+			adjoin:subjectURI "$Common.getValue(\"datasetURI\")" ;
+			adjoin:propertyURI "$RDF.type" ;
+			adjoin:objectType "$RDFS.Resource" ;
+			adjoin:objectValue "$VoID.Dataset" ;
+		] ;
+		rdf:_3 [
+			adjoin:subjectURI "$Common.getValue(\"datasetURI\")" ;
+			adjoin:propertyURI "$RDFS.comment" ;
+			adjoin:objectType "$RDFS.Literal" ;
+			adjoin:objectValue "$String.format(\"Dataset created from [%s].\", $Input.getURI())" ;
+		] ;
+	] ;
+.
+
+#<http://id.unit4.com/template/AdJoin/Template/Columns>
+#	rdfs:comment "Columns."@en ;
+#    adjoin:priority "1024"^^xsd:integer ;
+#.
+
+<http://id.unit4.com/template/AdJoin/Template/BeforeRow>
+	adjoin:after [
+		a rdf:Seq ;
+		rdf:_1 [
+			adjoin:after <http://id.unit4.com/template/AdJoin/Template/BeforeRow/Value> ;
+		] ;
+		rdf:_2 [
+			adjoin:after <http://id.unit4.com/template/AdJoin/Template/BeforeRow/Statement> ;
+		] ;
+	] ;
+.
+
+<http://id.unit4.com/template/AdJoin/Template/BeforeRow/Value>
+	adjoin:value [
+		a rdf:Seq ;
+		rdf:_1 [
+			adjoin:value "$Common.setValue(\"rowValueIndex\", 0)" ;
+		] ;
+		rdf:_2 [
+			adjoin:value "$Common.setValue(\"rowParentURI\", $Row.get(\"Parent\"))" ;
+		] ;
+		rdf:_3 [
+			adjoin:value "$Common.setValue(\"rowChildURI\", $Row.get(\"Child\"))" ;
+		] ;
+	] ;
+.
+
+#<http://id.unit4.com/template/AdJoin/Template/BeforeRow/Statement>
+#.
+
+<http://id.unit4.com/template/AdJoin/Template/Column>
+	rdfs:comment "Column.";
+	adjoin:priority "1024"^^xsd:integer;
+	skos:narrower <http://id.unit4.com/template/AdJoin/Template/Column/Parent>;
+	skos:narrower <http://id.unit4.com/template/AdJoin/Template/Column/Child>;
+.
+
+<http://id.unit4.com/template/AdJoin/Template/Column/Parent>
+	adjoin:priority "1024"^^xsd:integer;
+	adjoin:pattern "^Parent$";
+.
+
+<http://id.unit4.com/template/AdJoin/Template/Column/Child>
+	adjoin:priority "1024"^^xsd:integer;
+	adjoin:pattern "^Child$";
+	adjoin:statement [
+		a rdf:Seq ;
+		rdf:_1 [
+			adjoin:subjectURI "$Common.getValue(\"rowParentURI\")";
+			adjoin:propertyURI "$SKOS.narrower" ;
+			adjoin:objectType "$RDFS.Resource" ;
+			adjoin:objectValue "$Common.getValue(\"rowChildURI\")";
+		] ;
+	] ;
+.
+
+<http://id.unit4.com/template/AdJoin/Template/Row>
 	rdfs:comment "Default row regular expressions."@en;
-	skos:narrower <http://id.unit4.com/template/Default/Row/Default> ;
+	skos:narrower <http://id.unit4.com/template/AdJoin/Template/Row/Default> ;
 .
 
-<http://id.unit4.com/template/Default/Row/Default>
+<http://id.unit4.com/template/AdJoin/Template/Row/Default>
 	rdfs:comment "Default i.e. match anything"@en ;
-    u4convert:priority "1024"^^xsd:integer ;
-	u4convert:pattern "^.*$" ;
-	u4convert:triples [
-		a rdfs:Seq ;
+    adjoin:priority "2048"^^xsd:integer ;
+	adjoin:pattern "^.*$" ;
+	adjoin:statement [
+		a rdf:Seq ;
 		rdf:_1 [
-			u4convert:subjectValue "$Common.getValue(\"rowURI\")" ;
-			u4convert:propertyValue "$String.format(\"%s%s\", $Common.getValue(\"exampleNS\"), $Columns.getName())" ;
-			u4convert:objectType "$RDFS.Literal" ;
-			u4convert:objectValue "$Row.getValue()" ;
-			u4convert:objectDatatype "$XSD.xstring" ;
+			adjoin:subjectURI "$Common.getValue(\"rowChildURI\")" ;
+			adjoin:propertyURI "$String.format(\"%scolumn%s\", $Common.getValue(\"vocabularyURI\"), $Columns.getIndex())" ;
+			adjoin:objectType "$RDFS.Literal" ;
+			adjoin:objectValue "FRED" ;
+			adjoin:objectDatatype "$XSD.string" ;
 		] ;
 	] ;
 .
 
-<http://id.unit4.com/template/Default/BeforeRow>
-	u4convert:triples [
-		a rdfs:Seq ;
+<http://id.unit4.com/template/AdJoin/Template/Footer>
+	rdfs:comment "Default Footer."@en;
+	adjoin:value [
+		a rdf:Seq ;
 		rdf:_1 [
-			u4convert:value "$Common.setValue(\"rowURI\", $String.format(\"%s/%s\", $Common.getValue(\"baseURI\"), $Row.getIndex()))" ;
+			adjoin:value "$Common.setValue(\"tripleCount\", $Output.getModel().size())" ;
+		] ;
+	] ;
+	adjoin:statement [
+		a rdf:Seq ;
+		rdf:_1 [
+			adjoin:subjectURI "$Common.getValue(\"datasetURI\")" ;
+			adjoin:propertyURI "$DCTerms.triples" ;
+			adjoin:objectType "$RDFS.Literal" ;
+			adjoin:objectValue "$Common.increment($Common.getValue(\"tripleCount\"))" ;
 		] ;
 	] ;
 .

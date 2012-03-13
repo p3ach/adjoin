@@ -33,23 +33,31 @@ public class Declaration {
 //	Constructors.
 	
 	public Declaration() {
-		this(NO_REQUIRE_VALUE, EMPTY_VALID_VALUES, NULL_HANDLER, EMPTY_NAMES, NO_LOOK_FOR);
+		this(NO_REQUIRE_VALUE, null, NULL_HANDLER, EMPTY_NAMES, NO_LOOK_FOR);
 	}
 
+	/**
+	 * Declare a value handler. 
+	 * @param handler
+	 */
+	public Declaration(Handler handler) {
+		this(NO_REQUIRE_VALUE, null, handler, null, NO_LOOK_FOR);
+	}
+	
 	public Declaration(Handler handler, List<String> names) {
-		this(NO_REQUIRE_VALUE, EMPTY_VALID_VALUES, handler, names, NO_LOOK_FOR);
+		this(NO_REQUIRE_VALUE, null, handler, names, NO_LOOK_FOR);
 	}
 	
 	public Declaration(Boolean requireValue, Handler handler, List<String> names) {
-		this(requireValue, EMPTY_VALID_VALUES, handler, names, NO_LOOK_FOR);
+		this(requireValue, null, handler, names, NO_LOOK_FOR);
 	}
 	
 	public Declaration(Handler handler, List<String> names, Boolean lookFor) {
-		this(NO_REQUIRE_VALUE, EMPTY_VALID_VALUES, handler, names, lookFor);
+		this(NO_REQUIRE_VALUE, null, handler, names, lookFor);
 	}
 	
 	public Declaration(Boolean requireValue, List<String> validValues, Handler handler, List<String> names, Boolean lookFor) {
-		setrequireValue(requireValue);
+		setRequireValue(requireValue);
 		setValidValues(validValues);
 		setHandler(handler);
 		setNames(names);
@@ -58,12 +66,12 @@ public class Declaration {
 	
 //	Set/Get (Has).
 	
-	public Declaration setrequireValue(Boolean value) {
+	public Declaration setRequireValue(Boolean value) {
 		this.requireValue = value;
 		return this;
 	}
 	
-	public Boolean getrequireValue() {
+	public Boolean getRequireValue() {
 		return this.requireValue;
 	}
 	
@@ -103,7 +111,15 @@ public class Declaration {
 	}
 	
 	public Boolean hasName(String name) {
-		return getNames().contains(name);
+		if (name == null) {
+			return (getNames() == null);
+		} else {
+			 if (getNames() == null) {
+				 return false;
+			 } else {
+				 return getNames().contains(name);
+			 }
+		}
 	}
 	
 	public Declaration setLookFor(Boolean lookFor) {
@@ -116,13 +132,12 @@ public class Declaration {
 	}
 	
 	public Boolean equals(Argument argument) {
-		return getNames().contains(argument.getName());
+		return hasName(argument.getName());
 	}
 	
 	public Boolean equals(List<Argument> arguments) {
-		List<String> names = getNames();
 		for (Argument argument : arguments) {
-			if (names.contains(argument.getName())) {
+			if (hasName(argument.getName())) {
 				return true;
 			}
 		}
@@ -130,6 +145,6 @@ public class Declaration {
 	}
 	
 	public String toString() {
-		return String.format("Declaration [%s] [%s] [%s]", getrequireValue(), getHandler(), getNames());
+		return String.format("Declaration [%s]", getNames());
 	}
 }

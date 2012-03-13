@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import com.hp.hpl.jena.rdf.model.Alt;
 import com.hp.hpl.jena.rdf.model.Bag;
+import com.hp.hpl.jena.rdf.model.Container;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
@@ -66,7 +67,8 @@ public class U4Vocabulary {
 	
 	//	Instance.	
 	
-	private Resource subject = null;
+	private Model model;
+	private Resource subject;
 		
 	public U4Vocabulary() {
 	}
@@ -94,12 +96,17 @@ public class U4Vocabulary {
 		return this;
 	}
 	
+	public void setModel(Model model) {
+		this.model = model;
+	}
+	
 	public Model getModel() {
-		return getSubject().getModel();
+		return this.model;
 	}
 	
 	public void setSubject(Resource subject) {
 		this.subject = subject;
+		setModel(subject.getModel());
 	}
 	
 	public Resource getSubject() {
@@ -129,11 +136,35 @@ public class U4Vocabulary {
 //	Anonymous
 	
 	public Boolean isAnonymous() {
-		return getSubject().isAnon();
+		Boolean isAnonymous = getSubject().isAnon();
+		logger.trace("isAnonymous() = {}", isAnonymous);
+		return isAnonymous;
 	}
 	
-//	Alt/Bag/Seq
+//	Container/Alt/Bag/Seq
 
+	/**
+	 * Test if this U4Vocabulary has a (S, rdf:type, rdf:Alt|rdf:Bag|rdf:Seq).
+	 * @return
+	 */
+	public Boolean hasContainer() {
+		Boolean hasContainer = (hasAlt() || hasBag() || hasSeq());
+		logger.trace("hasContainer() = {}", hasContainer);
+		return hasContainer;
+	}
+	
+	public Container getContainer() {
+		if (hasAlt()) {
+			return getAlt();
+		} else if (hasBag()) {
+			return getBag();
+		} else if (hasSeq()) {
+			return getSeq();
+		} else {
+			throw new Exception(String.format("No container found for %s", getSubject().toString()));
+		}
+	}
+	
 	public Boolean hasAlt() {
 		return hasProperty(RDF.type, RDF.Alt);
 	}
@@ -223,6 +254,18 @@ public class U4Vocabulary {
 		}
 	}
 	
+	public String getString(Property property, String value) {
+		RDFNode node = getProperty(property);
+		if (node == null) {
+			return value;
+		} else if (node.isLiteral()) {
+			String getString = node.asLiteral().getString(); 
+			return getString;
+		} else {
+			throw new Exception("Node is not a Literal.");
+		}
+	}
+	
 	public Set<RDFNode> getProperties(Property property) {
 		Set<RDFNode> nodes = new HashSet<RDFNode>();
 		StmtIterator iterator = getSubject().listProperties(property);
@@ -246,7 +289,9 @@ public class U4Vocabulary {
 
 	public Boolean hasProperty(Property property) {
 //		return getModel().contains(getSubject(), property);
-		return getSubject().hasProperty(property);
+		Boolean hasProperty = getSubject().hasProperty(property);
+		logger.trace("hasProperty({}) = {}", property.toString(), hasProperty.toString());
+		return hasProperty;
 	}
 	
 	public Boolean hasProperty(Property property, RDFNode object) {
