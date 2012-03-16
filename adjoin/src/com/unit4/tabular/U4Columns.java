@@ -13,11 +13,13 @@ import com.unit4.vocabulary.U4AdJoin;
 public class U4Columns {
 	private static Logger logger = LoggerFactory.getLogger(U4Columns.class);
 	
+	private U4Common common;
+	
 	private Map<Integer, String> indexes;
 	private Map<String, Integer> names;
 	private Map<Integer, U4AdJoin> matches = new HashMap<Integer, U4AdJoin>();
 	
-	protected Integer index;
+	private Integer index;
 	
 	public U4Columns() {
 	}

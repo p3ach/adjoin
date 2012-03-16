@@ -1,4 +1,4 @@
-package com.unit4.tabular.xml;
+package com.unit4.input;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -9,34 +9,30 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.apache.velocity.runtime.parser.node.GetExecutor;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import com.hp.hpl.jena.util.FileManager;
 import com.unit4.tabular.U4Common;
-import com.unit4.tabular.U4Input;
+import com.unit4.xml.U4Element;
 
 /**
  * U4SAX extends the SAX 2.0 DefaultHandler and implements the Unit4 tabular U4Input. 
  * @author dick
  *
  */
-public class U4SAX extends DefaultHandler implements U4Input {
+public class U4InputXML extends DefaultHandler implements U4Input {
 
 	// Instance.
 	
 	private U4Common common;
+	private U4InputCallback callback;
 	
 	private Stack<U4Element> elements = new Stack<U4Element>();
 
-	public U4SAX() {
+	public U4InputXML() {
 		
-	}
-	
-	public U4SAX(U4Common common) {
-		setCommon(common);
 	}
 	
 	public void setCommon(U4Common common) {
@@ -47,16 +43,25 @@ public class U4SAX extends DefaultHandler implements U4Input {
 		return this.common;
 	}
 	
+	public void setCallback(U4InputCallback callback) {
+		this.callback = callback;
+	}
+	
+	public U4InputCallback getCallback() {
+		return this.callback;
+	}
+	
 	public Stack<U4Element> getElements() {
 		return this.elements;
 	}
 	
-	public void parse(String uri, U4Common common) {
-		setCommon(common);
+	public void parse(String uri) {
 		SAXParserFactory spf = SAXParserFactory.newInstance();
 		try {
 			SAXParser sp = spf.newSAXParser();
+			getCallback().header(common);
 			sp.parse(FileManager.get().open(uri), this);
+			getCallback().footer(common);
 		}catch(SAXException se) {
 			se.printStackTrace();
 		}catch(ParserConfigurationException pce) {
@@ -64,9 +69,6 @@ public class U4SAX extends DefaultHandler implements U4Input {
 		}catch (IOException ie) {
 			ie.printStackTrace();
 		}		
-	}
-	
-	public void row(U4Common common) {
 	}
 	
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
@@ -89,6 +91,6 @@ public class U4SAX extends DefaultHandler implements U4Input {
 		getElements().pop();
 		getCommon().getColumns().setColumns(names);
 		getCommon().getRow().setValues(values);
-		row(getCommon());
+		getCallback().row(getCommon());
 	}
 }

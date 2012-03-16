@@ -23,10 +23,14 @@ import com.unit4.cli.Declaration;
 import com.unit4.cli.Handler;
 import com.unit4.cli.CLI;
 import com.unit4.exception.Exception;
+import com.unit4.input.U4Input;
+import com.unit4.input.U4InputCallback;
+import com.unit4.input.U4InputFactory;
+import com.unit4.input.U4InputXML;
+import com.unit4.output.U4Output;
+import com.unit4.output.U4OutputRDF;
 import com.unit4.tabular.U4Columns;
 import com.unit4.tabular.U4Common;
-import com.unit4.tabular.U4Input;
-import com.unit4.tabular.U4Output;
 import com.unit4.tabular.U4Row;
 import com.unit4.vocabulary.U4AdJoin;
 
@@ -43,22 +47,8 @@ public class RDFCat {
 	public static final String ROW_URN = "Row";
 	public static final String COLUMNS_URN = "Columns";
 	
-    public static void main( String[] args ) {
-// 		try {
-			new RDFCat().go(args); 
-//		} catch (RuntimeException e) {
-//			logger.info("Oops! Somethings gone wrong. Please email this output to my owner adjoin@unit4.com");
-//			logger.info("{}", e.getMessage());
-//			for (StackTraceElement s : e.getStackTrace()) {
-//				logger.info("{}", s.toString());
-//			}
-//			if (e.getCause() != null) {
-//				logger.info("Caused by...");
-//				for (StackTraceElement s : e.getCause().getStackTrace()) {
-//					logger.info("{}", s.toString());
-//				}
-//			}
-//		}
+    public static void main(String[] args) {
+		new RDFCat().go(args); 
     }
 
 //    Instance.
@@ -178,6 +168,60 @@ public class RDFCat {
     }
 
     protected void parse(Argument argument) {
+    	U4Common common = new U4Common();
+    	
+    	U4Input input = U4InputFactory.getInstance().createInputByURI(argument.getValue());
+    	
+    	U4InputCallback inputCallback = new U4InputCallback() {
+			
+			@Override
+			public void header(U4Common common) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void beforeRow(U4Common common) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void row(U4Common common) {
+				System.out.println(common.getColumns().toString());
+				System.out.println(common.getRow().toString());
+			}
+			
+			@Override
+			public void afterRow(U4Common common) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void footer(U4Common common) {
+				// TODO Auto-generated method stub
+				
+			}
+		};
+		input.setCommon(common);
+		input.setCallback(inputCallback);
+		
+		U4Output output = new U4OutputRDF();
+		
+		U4Columns columns = new U4Columns();
+		
+		U4Row row = new U4Row();
+		
+		common.setInput(input);
+		common.setOutput(output);
+		common.setColumns(columns);
+		common.setRow(row);
+		
+		input.parse(argument.getValue());
+    }
+    
+    protected void parseold(Argument argument) {
     	logger.debug("parse(arguement={})", argument);
 
     	logger.debug("Get templates.");

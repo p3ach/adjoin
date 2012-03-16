@@ -1,4 +1,4 @@
-package com.unit4.tabular.xml;
+package com.unit4.xml;
 
 public class U4Attribute {
 	private String qName;

@@ -8,6 +8,9 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.unit4.input.U4Input;
+import com.unit4.output.U4Output;
+
 public class U4Common {
 	
 	// Class.
@@ -39,6 +42,7 @@ public class U4Common {
 		setOutput(output);
 		setColumns(columns);
 		setRow(row);
+		common();
 	}
 	
 	public void setInput(U4Input input) {

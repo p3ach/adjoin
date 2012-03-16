@@ -1,7 +1,5 @@
-package com.unit4.tabular;
+package com.unit4.input;
 
-import com.unit4.tabular.csv.U4CSV;
-import com.unit4.tabular.xml.U4SAX;
 
 public class U4InputFactory {
 	
@@ -25,11 +23,21 @@ public class U4InputFactory {
 	private U4InputFactory() {
 	}
 
-	public U4Input createInput(String uri) {
+	public U4Input createInputByType(String type) {
+		if (type == "csv") {
+			return new U4InputCSV();
+		} else if (type == "xml") {
+			return new U4InputXML();
+		} else {
+			return null;
+		}
+	}
+	
+	public U4Input createInputByURI(String uri) {
 		if (uri.endsWith(".csv")) {
-			return new U4CSV();
+			return new U4InputCSV();
 		} else if (uri.endsWith(".xml")) {
-			return new U4SAX();
+			return new U4InputXML();
 		} else {
 			return null;
 		}

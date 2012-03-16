@@ -1,4 +1,4 @@
-package com.unit4.tabular.xml;
+package com.unit4.xml;
 
 import java.util.ArrayList;
 import java.util.List;

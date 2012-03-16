@@ -1,4 +1,4 @@
-package com.unit4.tabular;
+package com.unit4.output;
 
 import java.io.OutputStream;
 
@@ -15,14 +15,14 @@ import com.unit4.vocabulary.U4RDFS;
 import com.unit4.vocabulary.U4VoID;
 import com.unit4.vocabulary.U4XSD;
 
-public class U4Output {
+public class U4OutputRDF implements U4Output {
 	private static Logger logger = LoggerFactory.getLogger(U4Output.class);
 	
 	private Model output;
 	private String language = "Turtle";
 	private OutputStream stream = System.out;
 	
-	public U4Output() {
+	public U4OutputRDF() {
 		setModel(ModelFactory.createDefaultModel());
 		common();
 	}
