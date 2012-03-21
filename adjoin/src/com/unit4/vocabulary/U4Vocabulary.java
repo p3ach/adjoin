@@ -116,14 +116,14 @@ public class U4Vocabulary {
 //	Child methods.
 	
 	public String getChildURI(String urn) {
-		logger.trace("getChildURI(urn={})", urn);
-		String getChildURI = getSubject().getURI() + "/" + urn; 
+		final String getChildURI = getSubject().getURI() + "/" + urn;
+		logger.trace("getChildURI({})={}", urn,getChildURI);
 		return getChildURI;
 	}
 
 	public Boolean hasChild(String urn) {
-		logger.debug("hasChild(urn={})", urn);
-		Boolean hasChild = getModel().contains(createChild(urn), (Property) null, (RDFNode) null); 
+		final Boolean hasChild = getModel().contains(createChild(urn), (Property) null, (RDFNode) null); 
+		logger.trace("hasChild({})={}", urn,hasChild);
 		return hasChild; 
 	}
 	
@@ -243,11 +243,13 @@ public class U4Vocabulary {
 	}
 	
 	public String getString(Property property) {
-		RDFNode node = getProperty(property);
+		logger.debug("getProperty({})", property);
+		final RDFNode node = getProperty(property);
 		if (node == null) {
 			throw new Exception(String.format("Node is null for %s %s.", getSubject(), property));
 		} else if (node.isLiteral()) {
-			String getString = node.asLiteral().getString(); 
+			final String getString = node.asLiteral().getString();
+			logger.trace("={}", getString);
 			return getString;
 		} else {
 			throw new Exception("Node is not a Literal.");
@@ -255,11 +257,13 @@ public class U4Vocabulary {
 	}
 	
 	public String getString(Property property, String value) {
-		RDFNode node = getProperty(property);
+		logger.debug("getProperty({},{})", property, value);
+		final RDFNode node = getProperty(property);
 		if (node == null) {
 			return value;
 		} else if (node.isLiteral()) {
-			String getString = node.asLiteral().getString(); 
+			final String getString = node.asLiteral().getString(); 
+			logger.trace("={}", getString);
 			return getString;
 		} else {
 			throw new Exception("Node is not a Literal.");

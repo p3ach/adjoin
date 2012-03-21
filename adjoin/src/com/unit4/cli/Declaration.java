@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.unit4.ebnf.EBNF;
+
 public class Declaration {
 	
 //	Class.
@@ -22,6 +24,9 @@ public class Declaration {
 	public final static Boolean LOOK_FOR = true;
 	public final static Boolean NO_LOOK_FOR = false;
 	
+	public final static Boolean END_CLI = true;
+	public final static Boolean NO_END_CLI = false;
+	
 //	Instance.
 	
 	private Boolean requireValue;
@@ -29,11 +34,12 @@ public class Declaration {
 	private Handler handler;
 	private List<String> names;
 	private Boolean lookFor;
+	private Boolean endCLI;
 
 //	Constructors.
 	
 	public Declaration() {
-		this(NO_REQUIRE_VALUE, null, NULL_HANDLER, EMPTY_NAMES, NO_LOOK_FOR);
+		this(NO_REQUIRE_VALUE, null, NULL_HANDLER, EMPTY_NAMES, NO_LOOK_FOR, NO_END_CLI);
 	}
 
 	/**
@@ -41,27 +47,28 @@ public class Declaration {
 	 * @param handler
 	 */
 	public Declaration(Handler handler) {
-		this(NO_REQUIRE_VALUE, null, handler, null, NO_LOOK_FOR);
+		this(NO_REQUIRE_VALUE, null, handler, null, NO_LOOK_FOR, NO_END_CLI);
 	}
 	
 	public Declaration(Handler handler, List<String> names) {
-		this(NO_REQUIRE_VALUE, null, handler, names, NO_LOOK_FOR);
+		this(NO_REQUIRE_VALUE, null, handler, names, NO_LOOK_FOR, NO_END_CLI);
 	}
 	
 	public Declaration(Boolean requireValue, Handler handler, List<String> names) {
-		this(requireValue, null, handler, names, NO_LOOK_FOR);
+		this(requireValue, null, handler, names, NO_LOOK_FOR, NO_END_CLI);
 	}
 	
 	public Declaration(Handler handler, List<String> names, Boolean lookFor) {
-		this(NO_REQUIRE_VALUE, null, handler, names, lookFor);
+		this(NO_REQUIRE_VALUE, null, handler, names, lookFor, NO_END_CLI);
 	}
 	
-	public Declaration(Boolean requireValue, List<String> validValues, Handler handler, List<String> names, Boolean lookFor) {
+	public Declaration(Boolean requireValue, List<String> validValues, Handler handler, List<String> names, Boolean lookFor, Boolean endCLI) {
 		setRequireValue(requireValue);
 		setValidValues(validValues);
 		setHandler(handler);
 		setNames(names);
 		setLookFor(lookFor);
+		setEndCLI(endCLI);
 	}
 	
 //	Set/Get (Has).
@@ -131,6 +138,15 @@ public class Declaration {
 		return this.lookFor;
 	}
 	
+	public Declaration setEndCLI(Boolean endCLI) {
+		this.endCLI = endCLI;
+		return this;
+	}
+	
+	public Boolean getEndCLI() {
+		return this.endCLI;
+	}
+	
 	public Boolean equals(Argument argument) {
 		return hasName(argument.getName());
 	}
@@ -145,6 +161,6 @@ public class Declaration {
 	}
 	
 	public String toString() {
-		return String.format("Declaration [%s]", getNames());
+		return String.format("%s requiresValue=%s (%s) lookFor=%s endCLI=%s", getNames(), getRequireValue(), getValidValues(), getLookFor(), getEndCLI());
 	}
 }

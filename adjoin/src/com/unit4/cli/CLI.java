@@ -32,13 +32,16 @@ public class CLI {
 	private List<Argument> arguments;
 
 	private final Declaration HELP = new Declaration(
+			Declaration.NO_REQUIRE_VALUE,
+			null,
 			new Handler() {
 				public void go(Argument argument) {
 					autoHelp();
 				}
 			},
 			Arrays.asList("h", "help"),
-			Declaration.LOOK_FOR
+			Declaration.LOOK_FOR,
+			Declaration.END_CLI
 		);
 	
 	
@@ -113,6 +116,9 @@ public class CLI {
 				for (Argument argument : getArguments()) {
 					if (declaration.equals(argument)) {
 						declaration.getHandler().go(argument);
+						if (declaration.getEndCLI()) {
+							return;
+						}
 					}
 				}
 			}
@@ -142,6 +148,9 @@ public class CLI {
         			}
         		} else {
                		declaration.getHandler().go(argument);
+					if (declaration.getEndCLI()) {
+						return;
+					}
         		}
 	        }
         }

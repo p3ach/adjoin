@@ -27,6 +27,7 @@ public class U4InputXML extends DefaultHandler implements U4Input {
 	// Instance.
 	
 	private U4Common common;
+	private String uri;
 	private U4InputCallback callback;
 	
 	private Stack<U4Element> elements = new Stack<U4Element>();
@@ -35,16 +36,29 @@ public class U4InputXML extends DefaultHandler implements U4Input {
 		
 	}
 	
-	public void setCommon(U4Common common) {
+	public U4Input setCommon(U4Common common) {
 		this.common = common;
+		return this;
 	}
 	
 	public U4Common getCommon() {
 		return this.common;
 	}
+
+	@Override
+	public U4Input setURI(String uri) {
+		this.uri = uri;
+		return this;
+	}
 	
-	public void setCallback(U4InputCallback callback) {
+	@Override
+	public String getURI() {
+		return this.uri;
+	}
+	
+	public U4Input setCallback(U4InputCallback callback) {
 		this.callback = callback;
+		return this;
 	}
 	
 	public U4InputCallback getCallback() {
@@ -54,14 +68,20 @@ public class U4InputXML extends DefaultHandler implements U4Input {
 	public Stack<U4Element> getElements() {
 		return this.elements;
 	}
-	
+
+	@Override
+	public void parse() {
+		parse(getURI());
+	}
+
 	public void parse(String uri) {
 		SAXParserFactory spf = SAXParserFactory.newInstance();
 		try {
 			SAXParser sp = spf.newSAXParser();
-			getCallback().header(common);
+			getCommon().getRow().setIndex((long) 0);
+			getCallback().header();
 			sp.parse(FileManager.get().open(uri), this);
-			getCallback().footer(common);
+			getCallback().footer();
 		}catch(SAXException se) {
 			se.printStackTrace();
 		}catch(ParserConfigurationException pce) {
@@ -89,8 +109,14 @@ public class U4InputXML extends DefaultHandler implements U4Input {
 			values.addAll(e.getValues());
 		}
 		getElements().pop();
+
 		getCommon().getColumns().setColumns(names);
+		
+		getCommon().getRow().setIndex(getCommon().getRow().getIndex()+1);
 		getCommon().getRow().setValues(values);
-		getCallback().row(getCommon());
+		
+		getCallback().beforeRow();
+		getCallback().row();
+		getCallback().afterRow();
 	}
 }

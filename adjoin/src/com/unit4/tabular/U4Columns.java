@@ -32,6 +32,14 @@ public class U4Columns {
 		setColumns(names);
 	}
 	
+	public void setCommon(U4Common common) {
+		this.common = common;
+	}
+	
+	public U4Common getCommon() {
+		return this.common;
+	}
+	
 	public void setColumns(String[] names) {
 		setColumns(Arrays.asList(names));
 	}
@@ -72,30 +80,44 @@ public class U4Columns {
 	}
 	
 	public String getName() {
-		logger.debug("getName()");
+		logger.trace("getName()");
 		return getName(getIndex());
 	}
 	
 	public String getName(Integer index) {
-		logger.debug("getName({})", index);
-		return getIndexes().get(index);
+		String name = getIndexes().get(index); 
+		logger.trace("getName({})={}", index, name);
+		return name;
 	}
 
 	public Map<Integer, U4AdJoin> getMatches() {
 		return this.matches;
 	}
 	
+	public void setMatch(U4AdJoin match) {
+		setMatch(getIndex(), match);
+	}
+	
 	public void setMatch(Integer index, U4AdJoin match) {
 		getMatches().put(index, match);
+	}
+	
+	public Boolean hasMatch() {
+		return hasMatch(getIndex());
 	}
 	
 	public Boolean hasMatch(Integer index) {
 		return (getMatch(index) != null);
 	}
+
+	public U4AdJoin getMatch() {
+		return getMatch(getIndex());
+	}
 	
 	public U4AdJoin getMatch(Integer index) {
-		logger.debug("getMatch({})", index);
-		return getMatches().get(index);
+		final U4AdJoin getMatch = getMatches().get(index); 
+		logger.trace("getMatch({})={}", index, getMatch);
+		return getMatch;
 	}
 	
 	public void setIndex(Integer index) {

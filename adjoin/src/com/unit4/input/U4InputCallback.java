@@ -1,11 +1,15 @@
 package com.unit4.input;
 
-import com.unit4.tabular.U4Common;
-
+/**
+ * Extend this interface to provide the callback for Objects implementing U4Input.
+ *  
+ * @author dick
+ *
+ */
 public interface U4InputCallback {
-	public void header(U4Common common);
-	public void beforeRow(U4Common common);
-	public void row(U4Common common);
-	public void afterRow(U4Common common);
-	public void footer(U4Common common);
+	public void header();
+	public void beforeRow();
+	public void row();
+	public void afterRow();
+	public void footer();
 }

@@ -28,11 +28,13 @@ import com.unit4.input.U4InputCallback;
 import com.unit4.input.U4InputFactory;
 import com.unit4.input.U4InputXML;
 import com.unit4.output.U4Output;
+import com.unit4.output.U4OutputFactory;
 import com.unit4.output.U4OutputRDF;
 import com.unit4.tabular.U4Columns;
 import com.unit4.tabular.U4Common;
 import com.unit4.tabular.U4Row;
 import com.unit4.vocabulary.U4AdJoin;
+import com.unit4.vocabulary.U4AdJoinTemplate;
 
 public class RDFCat {
 
@@ -46,6 +48,8 @@ public class RDFCat {
 	public static final String AFTER_ROW_URN = "AfterRow";
 	public static final String ROW_URN = "Row";
 	public static final String COLUMNS_URN = "Columns";
+
+    public static final String DEFAULT_TEMPLATE = "file:Default.ttl";
 	
     public static void main(String[] args) {
 		new RDFCat().go(args); 
@@ -103,55 +107,25 @@ public class RDFCat {
     
     private CLI cli = new CLI(new ArrayList<Declaration>(Arrays.asList(VALUE, MAX_ROWS, ADD_TEMPLATE, ADD_GROUP, OUTPUT)));
     
-    private VelocityContext context;
-    
     private Long maxRows = null;
     
-    protected String configFile = null;
-    protected String outputFile = null;
-
-    private U4Output output;
-    
-    public static final String DEFAULT_TEMPLATE = "file:Default.ttl";
-    
-    protected U4AdJoin template = new U4AdJoin(ModelFactory.createDefaultModel().createResource(U4AdJoin.DEFAULT_TEMPLATE_URI));
-    
-//    protected LinkedList<U4Template> templates = new LinkedList<U4Template>();
-    protected LinkedList<String> groups = new LinkedList<String>();
+    private final U4AdJoinTemplate template = new U4AdJoinTemplate();
     
     public RDFCat() {
     	addTemplate(DEFAULT_TEMPLATE);
-    	addGroup(U4AdJoin.DEFAULT_TEMPLATE_GROUP);
+    	addGroup(U4AdJoinTemplate.DEFAULT_TEMPLATE_GROUP);
     }
     
-//    public LinkedList<U4Template> templates() {
-//    	return this.templates;
-//    }
-    
-    public U4AdJoin getTemplate() {
+    public U4AdJoinTemplate getTemplate() {
     	return this.template;
     }
     
-    protected void addTemplate(String uri) {
-    	logger.debug("addTemplate(uri={})", uri);
-    	getTemplate().readModel(uri);
-    }
-
-    protected LinkedList<String> groups() {
-    	return this.groups;
+    public void addTemplate(String uri) {
+    	getTemplate().addTemplate(uri);
     }
     
-    /**
-     * Add a group as the first element of the Group list i.e. LIFO.
-     * @param name
-     */
-    protected void addGroup(String name) {
-    	logger.debug("addGroup(name={})", name);
-    	groups().addFirst(name);
-    }
-    
-    protected void setOutput(String output) {
-    	
+    public void addGroup(String name) {
+    	getTemplate().addGroup(name);
     }
     
     protected void maxRows(Long maxRows) {
@@ -166,23 +140,68 @@ public class RDFCat {
     protected void go(String[] args) {
        	cli.go(args);
     }
+    
+    public void parse(Argument argument) {
+    	final U4Common common = new U4Common();
+    	
+    	common.setInput(U4InputFactory.getInstance().createInputByURI(argument.getValue()));
+    	common.setOutput(U4OutputFactory.getInstance().createOutputByType("RDF"));
+		common.setTemplate(template);
+    	common.setColumns(new U4Columns());
+		common.setRow(new U4Row());
 
-    protected void parse(Argument argument) {
+    	common.getOutput().processInput();
+    	
+    	((U4OutputRDF) common.getOutput()).render();
+    }
+    
+    public void parse2(Argument argument) {
     	U4Common common = new U4Common();
     	
     	U4Input input = U4InputFactory.getInstance().createInputByURI(argument.getValue());
+    	input.setCommon(common);
+
+    	U4Output output = U4OutputFactory.getInstance().createOutputByType("RDF");
+    	output.setCommon(common);
+
+    	U4Columns columns = new U4Columns();
+    	columns.setCommon(common);
+		
+		U4Row row = new U4Row();
+		row.setCommon(common);
+		
+		common.setInput(input);
+		common.setOutput(output);
+		common.setColumns(columns);
+		common.setRow(row);
+
+    	output.processInput();
+    	
+    	List<U4AdJoin> columnsTemplates = null; // new ArrayList<U4Convert>();
+    	List<U4AdJoin> columnTemplates = null; // new ArrayList<U4Convert>();
+    	final List<U4AdJoin> headerTemplates = null; // new ArrayList<U4Convert>();
+    	List<U4AdJoin> beforeRowTemplates = null; // new ArrayList<U4Convert>();
+    	List<U4AdJoin> rowTemplates = null; // new ArrayList<U4Convert>();
+    	List<U4AdJoin> afterRowTemplates = null; // new ArrayList<U4Convert>();
+    	List<U4AdJoin> footerTemplates = null; // new ArrayList<U4Convert>();
+
+   		Velocity.init();
+   		final VelocityContext context = new VelocityContext();
     	
     	U4InputCallback inputCallback = new U4InputCallback() {
-			
 			@Override
 			public void header(U4Common common) {
-				// TODO Auto-generated method stub
-				
+				RDFCat.this.header();
+		        if (headerTemplates != null) {
+			        for (U4AdJoin headerTemplate : headerTemplates) {
+		        		((U4OutputRDF) common.getOutput()).getModel().add(headerTemplate.getStatements(context));
+			        }
+		        }
+
 			}
 			
 			@Override
 			public void beforeRow(U4Common common) {
-				// TODO Auto-generated method stub
 				
 			}
 			
@@ -194,30 +213,63 @@ public class RDFCat {
 			
 			@Override
 			public void afterRow(U4Common common) {
-				// TODO Auto-generated method stub
 				
 			}
 			
 			@Override
 			public void footer(U4Common common) {
-				// TODO Auto-generated method stub
 				
 			}
 		};
 		input.setCommon(common);
 		input.setCallback(inputCallback);
 		
-		U4Output output = new U4OutputRDF();
 		
-		U4Columns columns = new U4Columns();
 		
-		U4Row row = new U4Row();
-		
-		common.setInput(input);
-		common.setOutput(output);
-		common.setColumns(columns);
-		common.setRow(row);
-		
+	
+        context.put("Input", input);
+		context.put("Output", output);
+		context.put("Common", common);
+        context.put("Columns", columns);
+        context.put("Row", row);
+        
+        context.put("Math", Math.class);
+        context.put("String", String.class);
+        context.put("UUID", UUID.class);
+        
+        context.put("DCTerms", new FieldMethodizer("com.unit4.vocabulary.U4DCTerms"));
+        context.put("FOAF", new FieldMethodizer("com.unit4.vocabulary.U4FOAF"));
+        context.put("Org", new FieldMethodizer("com.unit4.vocabulary.U4Org"));
+        context.put("RDF", new FieldMethodizer("com.unit4.vocabulary.U4RDF"));
+        context.put("RDFS", new FieldMethodizer("com.unit4.vocabulary.U4RDFS"));
+        context.put("XSD", new FieldMethodizer("com.unit4.vocabulary.U4XSD"));
+        context.put("VoID", new FieldMethodizer("com.unit4.vocabulary.U4VoID"));
+
+    	U4AdJoin template = getTemplate();
+		for (String group : groups()) {
+			if ((columnsTemplates == null) && template.hasColumns(group)) {
+				columnsTemplates = template.getColumns(group);
+			}
+			if ((columnTemplates == null) && template.hasColumn(group)) {
+				columnTemplates = template.getColumn(group);
+			}
+			if ((headerTemplates == null) && template.hasHeader(group)) {
+				headerTemplates = template.getHeader(group);
+			}
+			if ((beforeRowTemplates == null) && template.hasBeforeRow(group)) {
+				beforeRowTemplates = template.getBeforeRow(group);
+			}
+			if ((rowTemplates == null) && template.hasRow(group)) {
+				rowTemplates = template.getRow(group);
+			}
+			if ((afterRowTemplates == null) && template.hasAfterRow(group)) {
+				afterRowTemplates = template.getAfterRow(group);
+			}
+			if ((footerTemplates == null) && template.hasFooter(group)) {
+				footerTemplates = template.getFooter(group);
+			}
+		}
+        
 		input.parse(argument.getValue());
     }
     
@@ -416,13 +468,5 @@ public class RDFCat {
 //    	logger.trace("Common \n{}", common.toString());
 //    	output.setLanguage("RDF/XML");
      	output.render(); //getModel().write(System.out, "RDF/XML");
-    }
-    
-    public void processTemplate() {
-    	
-    }
-    
-    protected void help() {
-    	logger.info("Usage: java adjoin.Adjoin" );
     }
 }

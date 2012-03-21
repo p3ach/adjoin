@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import com.unit4.input.U4Input;
 import com.unit4.output.U4Output;
+import com.unit4.vocabulary.U4AdJoinTemplate;
 
 public class U4Common {
 	
@@ -28,6 +29,7 @@ public class U4Common {
 	
 	private U4Input input;
 	private U4Output output;
+	private U4AdJoinTemplate template;
 	private U4Columns columns;
 	private U4Row row;
 
@@ -37,16 +39,9 @@ public class U4Common {
 		common();
 	}
 	
-	public U4Common(U4Input input, U4Output output, U4Columns columns, U4Row row) {
-		setInput(input);
-		setOutput(output);
-		setColumns(columns);
-		setRow(row);
-		common();
-	}
-	
 	public void setInput(U4Input input) {
 		this.input = input;
+		input.setCommon(this);
 	}
 	
 	public U4Input getInput() {
@@ -55,14 +50,24 @@ public class U4Common {
 	
 	public void setOutput(U4Output output) {
 		this.output = output;
+		output.setCommon(this);
 	}
 	
 	public U4Output getOutput() {
 		return this.output;
 	}
+
+	public void setTemplate(U4AdJoinTemplate template) {
+		this.template = template;
+	}
+	
+	public U4AdJoinTemplate getTemplate() {
+		return this.template;
+	}
 	
 	public void setColumns(U4Columns columns) {
 		this.columns = columns;
+		columns.setCommon(this);
 	}
 	
 	public U4Columns getColumns() {
@@ -71,6 +76,7 @@ public class U4Common {
 	
 	public void setRow(U4Row row) {
 		this.row = row;
+		row.setCommon(this);
 	}
 	
 	public U4Row getRow() {

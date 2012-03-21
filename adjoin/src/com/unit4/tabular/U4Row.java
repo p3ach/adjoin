@@ -2,22 +2,63 @@ package com.unit4.tabular;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class U4Row {
+/**
+ * U4Row
+ * 
+ * Implements Iterable<String>, Iterator<String>.
+ * 
+ * @author dick
+ *
+ */
+public class U4Row implements Iterable<String>, Iterator<String> {
 	private static Logger logger = LoggerFactory.getLogger(U4Row.class);
 	
 	private U4Common common;
-	private U4Columns columns;
+
 	private Long index;
-	private List<String> values;
+
+	private final List<String> values = new ArrayList<String>();
+	private Iterator<String> iterator;
+	
+//	Constructor
 	
 	public U4Row() {
 	}
 
+//	Iterable
+	
+	@Override
+	public Iterator<String> iterator() {
+		getColumns().setIndex(-1);
+		this.iterator = getValues().iterator(); 
+		return this;
+	}
+
+//	Iterator
+
+	@Override
+	public boolean hasNext() {
+		return iterator.hasNext();
+	}
+
+	@Override
+	public String next() {
+		getColumns().setIndex(getColumns().getIndex()+1);
+		return iterator.next();
+	}
+
+	@Override
+	public void remove() {
+	}
+
+//	Set/Get
+	
 	public void setCommon(U4Common common) {
 		this.common = common;
 	}
@@ -25,13 +66,9 @@ public class U4Row {
 	public U4Common getCommon() {
 		return this.common;
 	}
-	
-	public void setColumns(U4Columns columns) {
-		this.columns = columns;
-	}
 
 	public U4Columns getColumns() {
-		return this.columns;
+		return getCommon().getColumns();
 	}
 	
 	public void setIndex(Long index) {
@@ -46,11 +83,20 @@ public class U4Row {
 	}
 	
 	public void setValues(List<String> values) {
-		this.values = values;
+		this.values.clear();
+		this.values.addAll(values);
 	}
 	
 	public List<String> getValues() {
 		return this.values;
+	}
+	
+	/**
+	 * Get the value for the current Columns index.
+	 * @return
+	 */
+	public String getValue() {
+		return getValue(getColumns().getIndex());
 	}
 	
 	/**
@@ -81,14 +127,6 @@ public class U4Row {
 	 */
 	public String getValueIndirect(String key) {
 		return getValue((String) getCommon().getValue(key));
-	}
-	
-	/**
-	 * Get the value for the current Columns index.
-	 * @return
-	 */
-	public String getValue() {
-		return getValue(getColumns().getIndex());
 	}
 	
 	public String toString() {

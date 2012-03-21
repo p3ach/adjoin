@@ -35,9 +35,9 @@ public class U4InputFactory {
 	
 	public U4Input createInputByURI(String uri) {
 		if (uri.endsWith(".csv")) {
-			return new U4InputCSV();
+			return new U4InputCSV().setURI(uri);
 		} else if (uri.endsWith(".xml")) {
-			return new U4InputXML();
+			return new U4InputXML().setURI(uri);
 		} else {
 			return null;
 		}

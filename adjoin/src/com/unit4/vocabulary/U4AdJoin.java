@@ -78,9 +78,6 @@ public class U4AdJoin extends U4Vocabulary {
 	public static final Property statement = createProperty(getURI("statement"));
 
 	public static final String DEFAULT_OBJECT_TYPE = U4RDFS.Resource.getURI();
-	
-	public static final String DEFAULT_TEMPLATE_URI = "http://id.unit4.com/template/AdJoin";
-	public static final String DEFAULT_TEMPLATE_GROUP = "Default";
 
 	public static final String HEADER_URN = "Header";
 	public static final String FOOTER_URN = "Footer";
@@ -90,10 +87,10 @@ public class U4AdJoin extends U4Vocabulary {
 	public static final String COLUMNS_URN = "Columns";
 	public static final String COLUMN_URN = "Column";
 	
-	public static U4AdJoin match(List<U4AdJoin> set, String input) {
-		logger.debug("match({},{})", set, input);
-		if (set != null) {
-			for (U4AdJoin item : set) {
+	public static U4AdJoin match(List<U4AdJoin> templates, String input) {
+		logger.debug("match({},{})", templates, input);
+		if (templates != null) {
+			for (U4AdJoin item : templates) {
 				if (item.match(input)) {
 					logger.trace("Matched {}", item);
 					return item;
@@ -242,7 +239,7 @@ public class U4AdJoin extends U4Vocabulary {
 //	}
 
 	public List<Statement> getStatements(VelocityContext context) {
-		logger.debug("Start getStatements(context={}) for subject {}", context.toString(), getSubject());
+		logger.debug("getStatements(context={}) for {}", context.toString(), getSubject().toString());
 		
 		List<Statement> statements = new ArrayList<Statement>();
 
@@ -282,7 +279,7 @@ public class U4AdJoin extends U4Vocabulary {
 			}
 		}
 	
-		logger.debug("Finish getStatements(context={}) for subject {}", context, getSubject());
+		logger.trace("statements.size={}", statements.size());
 
 		return statements;
 	}
@@ -464,11 +461,11 @@ public class U4AdJoin extends U4Vocabulary {
 	}
 
 	public List<U4AdJoin> getSeqOrResource(Resource resource) {
-		List<U4AdJoin> list = new ArrayList<U4AdJoin>();
+		final List<U4AdJoin> list = new ArrayList<U4AdJoin>();
 		
 		if (resource.isAnon()) {
-			Seq seq = getModel().getSeq(resource);
-			NodeIterator iterator = seq.iterator();
+			final Seq seq = getModel().getSeq(resource);
+			final NodeIterator iterator = seq.iterator();
 			while (iterator.hasNext()) {
 				list.add(new U4AdJoin(iterator.next().asResource()));
 			}
@@ -481,17 +478,20 @@ public class U4AdJoin extends U4Vocabulary {
 	
 //	Match.
 	public Boolean match(String input) {
+		logger.debug("match({})", input);
+		final Boolean match;
 		if (hasPattern()) {
-			String pattern = getPattern();
+			final String pattern = getPattern();
 			if (pattern == null) {
-				return false;
+				match = false;
 			} else {
-				Boolean result = Pattern.matches(pattern, input);
-				return result;
+				match = Pattern.matches(pattern, input);
 			}
 		} else {
-			return false;
+			match = false;
 		}
+		logger.trace("={}", match);
+		return match;
 	}
 
 	// Template.
@@ -561,9 +561,7 @@ public class U4AdJoin extends U4Vocabulary {
 	}
 
 	public Boolean hasTemplate(String urn) {
-		logger.debug("hasTemplate(urn={})", urn);
-		Boolean hasTemplate = hasChild(urn); 
-		return hasTemplate;
+		return hasChild(urn);
 	}
 	
 	public List<U4AdJoin> getTemplate(String urn) {

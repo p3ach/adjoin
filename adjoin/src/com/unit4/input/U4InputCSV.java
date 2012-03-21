@@ -16,11 +16,13 @@ public class U4InputCSV implements U4Input {
 	private static Logger logger = LoggerFactory.getLogger(U4InputCSV.class);
 	
 	private U4Common common;
+	private String uri;
 	private U4InputCallback callback;
 
 	@Override
-	public void setCommon(U4Common common) {
+	public U4Input setCommon(U4Common common) {
 		this.common = common;
+		return this;
 	}
 	
 	@Override
@@ -29,8 +31,20 @@ public class U4InputCSV implements U4Input {
 	}
 
 	@Override
-	public void setCallback(U4InputCallback callback) {
+	public U4Input setURI(String uri) {
+		this.uri = uri;
+		return this;
+	}
+	
+	@Override
+	public String getURI() {
+		return this.uri;
+	}
+	
+	@Override
+	public U4Input setCallback(U4InputCallback callback) {
 		this.callback = callback;
+		return this;
 	}
 	
 	@Override
@@ -38,6 +52,11 @@ public class U4InputCSV implements U4Input {
 		return this.callback;
 	}
 
+	@Override
+	public void parse() {
+		parse(getURI());
+	}
+	
 	@Override
 	public void parse(String uri) {
     	InputStream inputStream = FileManager.get().open(uri);
@@ -57,7 +76,7 @@ public class U4InputCSV implements U4Input {
 			while (csvReader.readRecord()) {
 				getCommon().getRow().setIndex(csvReader.getCurrentRecord());
 				getCommon().getRow().setValues(csvReader.getValues());
-				getCallback().row(getCommon());
+				getCallback().row();
 			}
 		} catch (IOException e) {
 			logger.error("Unable to read input row due to [{}].", e);
