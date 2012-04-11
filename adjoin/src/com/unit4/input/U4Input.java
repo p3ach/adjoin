@@ -1,8 +1,9 @@
 package com.unit4.input;
 
+import com.unit4.cli.Options;
 import com.unit4.tabular.U4Common;
 
-public interface U4Input {
+public interface U4Input extends Options {
 	public U4Input setCommon(U4Common common);
 	public U4Common getCommon();
 

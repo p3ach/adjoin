@@ -105,11 +105,18 @@ public class CLI {
 		return this.arguments;
 	}
 	
+	/**
+	 * Convenience method to allow easy call from <code>public static void main(String[] args)</code>
+	 * @param argv
+	 */
 	public void go(String[] argv) {
 		setArguments(argv);
 		go();
 	}
 	
+	/**
+	 * Run the CLI.
+	 */
 	public void go() {
 		for (Declaration declaration : getDeclarations()) {
 			if (declaration.getLookFor()) {

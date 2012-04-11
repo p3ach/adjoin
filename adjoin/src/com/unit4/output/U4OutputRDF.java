@@ -1,8 +1,12 @@
 package com.unit4.output;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.apache.velocity.VelocityContext;
@@ -13,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.unit4.exception.Exception;
 import com.unit4.input.U4Input;
 import com.unit4.input.U4InputCallback;
 import com.unit4.tabular.U4Columns;
@@ -31,19 +36,18 @@ import com.unit4.vocabulary.U4XSD;
 public class U4OutputRDF implements U4Output {
 	private static Logger logger = LoggerFactory.getLogger(U4OutputRDF.class);
 
+	private static final OutputStream DEFAULT_OUTPUT_STREAM = System.out;
+	private static final String DEFAULT_LANGUAGE = "RDF/XML";
+	
 	private U4Common common;
 	
-	private Model output;
-	private String language = "Turtle";
-	private OutputStream stream = System.out;
+	private Model model;
+	
+	private Map<String, Object> options = new HashMap<String, Object>();
 	
 	public U4OutputRDF() {
-		setModel(ModelFactory.createDefaultModel());
-		common();
-	}
-	
-	public void common() {
-		Model model = getModel();
+		final Model model = ModelFactory.createDefaultModel(); 
+		setModel(model);
 		U4DCTerms.setNsPrefix(model);
 		U4FOAF.setNsPrefix(model);
 		U4Org.setNsPrefix(model);
@@ -53,29 +57,72 @@ public class U4OutputRDF implements U4Output {
 		U4XSD.setNsPrefix(model);
 	}
 
-	public void setModel(Model output) {
-		this.output = output;
+	protected void setModel(Model output) {
+		this.model = output;
 	}
 	
-	public Model getModel() {
-		return this.output;
+	protected Model getModel() {
+		return this.model;
 	}
 	
-	public U4OutputRDF setLanguage(String language) {
-		this.language = language;
-		return this;
+	@Override
+	public void setOptions(Map<String, Object> options) {
+		this.options = options;
+	}
+
+	@Override
+	public Map<String, Object> getOptions() {
+		return this.options;
 	}
 	
-	public String getLanguage() {
-		return this.language;
+	@Override
+	public void setOption(String key, Object value) {
+		getOptions().put(key, value);
 	}
 	
-	public void setStream(OutputStream stream) {
-		this.stream = stream;
+	@Override
+	public Object getOption(String key) {
+		return getOptions().get(key);
+	}
+
+	@Override
+	public Object getOption(String key, Object defaultValue) {
+		if (hasOption(key)) {
+			return options.get(key);
+		} else {
+			return defaultValue;
+		}
 	}
 	
-	public OutputStream getStream() {
-		return this.stream;
+	@Override
+	public Boolean hasOption(String key) {
+		return getOptions().containsKey(key);
+	}
+
+	@Override
+	public void removeOptions() {
+		getOptions().clear();
+	}
+
+	@Override
+	public void removeOption(String key) {
+		getOptions().remove(key);
+	}
+	
+	protected String getLanguage() {
+		return (String) getOption("language", DEFAULT_LANGUAGE);
+	}
+	
+	protected OutputStream getOutputStream() {
+		if (hasOption("output")) {
+			try {
+				return new FileOutputStream((String) getOption("output"));
+			} catch (FileNotFoundException e) {
+				throw new Exception("Failed to create output file.", e);
+			}
+		} else {
+			return DEFAULT_OUTPUT_STREAM;
+		}
 	}
 
 	public void setCommon(U4Common common) {
@@ -234,7 +281,8 @@ public class U4OutputRDF implements U4Output {
 		return true;
 	}
 	
-	public void render() {
-		getModel().write(getStream(), getLanguage());
+	public Boolean write() {
+		getModel().write(getOutputStream(), getLanguage());
+		return true;
 	}
 }
