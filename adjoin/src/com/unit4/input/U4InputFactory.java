@@ -38,6 +38,8 @@ public class U4InputFactory {
 			return new U4InputCSV().setURI(uri);
 		} else if (uri.endsWith(".xml")) {
 			return new U4InputXML().setURI(uri);
+		} else if (uri.endsWith(".xsd")) {
+			return new U4InputXML().setURI(uri);
 		} else {
 			return null;
 		}

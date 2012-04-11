@@ -1,0 +1,208 @@
+@prefix adjoin:  <http://id.unit4.com/2011/11/01/adjoin-ns#> .
+
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> . 
+@prefix void: <http://rdfs.org/ns/void#> .
+
+<http://id.unit4.com/template/AdJoin>
+	a void:Dataset;
+	void:subset <http://id.unit4.com/template/AdJoin/RDFS>;
+.
+
+<http://id.unit4.com/template/AdJoin/RDFS>
+	a void:Dataset;
+	rdfs:label "RDFS"@en;
+	rdfs:comment "AdJoin template to create RDFS Classes and Properties."@en;
+.
+
+<http://id.unit4.com/template/AdJoin/RDFS/Header>
+	rdfs:label "Header"@en;
+	adjoin:priority "65535"^^xsd:integer;
+	adjoin:statement [
+		a rdf:Seq;
+		rdf:_1 [
+			adjoin:before <http://id.unit4.com/template/AdJoin/RDFS/Header/Values>;
+		];
+		rdf:_2 [
+			adjoin:before <http://id.unit4.com/template/AdJoin/RDFS/Header/Statements>;
+		];
+	];
+.
+
+<http://id.unit4.com/template/AdJoin/RDFS/Header/Values>
+	rdfs:label "Header/Values"@en;
+	adjoin:priority "65535"^^xsd:integer;
+	adjoin:statement [
+		a rdf:Seq;
+		rdf:_1 [
+			adjoin:value "$Common.setValue(\"vocabularyURI\",\"http://id.example.org/vocabulary#\")";
+		];
+		rdf:_2 [
+			adjoin:value "$Common.setValue(\"vocabularyPrefix\",\"example\")";
+		];
+		rdf:_3 [
+			adjoin:value "$Common.setValue(\"vocabularyLabel\",\"Example\")";
+		];
+		rdf:_4 [
+			adjoin:value "$Common.setValue(\"vocabularyComment\",\"Example Comment\")";
+		];
+		rdf:_5 [
+			adjoin:value "$Common.setValue(\"vocabularyLicense\",\"http://www.opendatacommons.org/licenses/pddl/1.0\")";		
+		];
+		rdf:_6 [
+			adjoin:value "$Common.setValue(\"vocabularyMBox\",\"somebody@example.org\")";
+		];
+		rdf:_7 [
+			adjoin:value "$Common.setValue(\"vocabularyName\",\"Some Body\")";
+		];
+	];
+.
+
+<http://id.unit4.com/template/AdJoin/RDFS/Header/Statements>
+	rdfs:label "Header/Values"@en;
+	adjoin:priority "65535"^^xsd:integer;
+	adjoin:statement [
+		a rdf:Seq;
+		rdf:_1 [
+			adjoin:subjectURI "$Common.getValue(\"vocabularyURI\")";
+			adjoin:propertyURI "$RDFS.label";
+			adjoin:objectType "$RDFS.Literal";
+			adjoin:objectValue "$Common.getValue(\"vocabularyLabel\")";
+		];
+		rdf:_2 [
+			adjoin:subjectURI "$Common.getValue(\"vocabularyURI\")";
+			adjoin:propertyURI "$RDFS.comment";
+			adjoin:objectType "$RDFS.Literal";
+			adjoin:objectValue "$Common.getValue(\"vocabularyComment\")";
+		];
+		rdf:_3 [
+			adjoin:subjectURI "$Common.getValue(\"vocabularyURI\")";
+			adjoin:propertyURI "$DCTerms.created";
+			adjoin:objectType "$RDFS.Literal";
+			adjoin:objectValue "$Common.getValue(\"commonDate\")";
+		];
+		rdf:_4 [
+			adjoin:subjectURI "$Common.getValue(\"vocabularyURI\")";
+			adjoin:propertyURI "$DCTerms.license";
+			adjoin:objectValue "$Common.getValue(\"vocabularyLicense\")";
+		]
+	];
+.
+
+<http://id.unit4.com/template/AdJoin/RDFS/Columns>
+	rdfs:label "Columns"@en;
+	rdfs:comment "Run once for each input column after the Header but before the first input row.";
+    adjoin:priority "65535"^^xsd:integer;
+.
+
+<http://id.unit4.com/template/AdJoin/RDFS/Column>
+	rdfs:label "Column"@en;
+	adjoin:priority "65535"^^xsd:integer;
+	skos:narrower <http://id.unit4.com/template/AdJoin/RDFS/Column/classParent>;
+	skos:narrower <http://id.unit4.com/template/AdJoin/RDFS/Column/class>;
+	skos:narrower <http://id.unit4.com/template/AdJoin/RDFS/Column/label>;
+	skos:narrower <http://id.unit4.com/template/AdJoin/RDFS/Column/comment>;
+	skos:narrower <http://id.unit4.com/template/AdJoin/RDFS/Column/property>;
+.
+
+<http://id.unit4.com/template/AdJoin/RDFS/Column/classParent>
+	rdfs:label "Column/classParent"@en;
+	adjoin:priority "65535"^^xsd:integer;
+	adjoin:pattern "^classParent$";
+    adjoin:statement [
+		a rdf:Seq;
+		rdf:_1 [
+			adjoin:subjectURI "$Common.getValue(\"rowSubjectURI\")";
+			adjoin:propertyURI "$RDFS.subClassOf";
+			adjoin:objectType "$RDFS.Resource";
+			adjoin:objectValue "$String.format(\"%s%s\", $Common.getValue(\"vocabularyURI\"), $Row.getValue())";
+		];
+	];
+.
+
+<http://id.unit4.com/template/AdJoin/RDFS/Column/class>
+	rdfs:label "Column/class"@en;
+	adjoin:priority "65535"^^xsd:integer;
+	adjoin:pattern "^class$";
+    adjoin:statement [
+		a rdf:Seq;
+		rdf:_1 [
+			adjoin:subjectURI "$Common.getValue(\"rowSubjectURI\")";
+			adjoin:propertyURI "$RDF.type";
+			adjoin:objectType "$RDFS.Resource";
+			adjoin:objectValue "http://www.w3.org/2000/01/rdf-schema#Class";
+		];
+	];
+.
+
+<http://id.unit4.com/template/AdJoin/RDFS/Column/label>
+	rdfs:label "Column/label"@en;
+	adjoin:priority "65535"^^xsd:integer;
+	adjoin:pattern "^label$";
+    adjoin:statement [
+		a rdf:Seq;
+		rdf:_1 [
+			adjoin:subjectURI "$Common.getValue(\"rowSubjectURI\")";
+			adjoin:propertyURI "$RDFS.label";
+			adjoin:objectType "$RDFS.Literal";
+			adjoin:objectValue "$Row.getValue()";
+		];
+	];
+.
+
+<http://id.unit4.com/template/AdJoin/RDFS/Column/comment>
+	rdfs:label "Column/comment"@en;
+	adjoin:priority "65535"^^xsd:integer;
+	adjoin:pattern "^comment$";
+    adjoin:statement [
+		a rdf:Seq;
+		rdf:_1 [
+			adjoin:subjectURI "$Common.getValue(\"rowSubjectURI\")";
+			adjoin:propertyURI "$RDFS.comment";
+			adjoin:objectType "$RDFS.Literal";
+			adjoin:objectValue "$Row.getValue()";
+		];
+	];
+.
+
+<http://id.unit4.com/template/AdJoin/RDFS/Column/property>
+	rdfs:label "Column/property"@en;
+	adjoin:priority "65535"^^xsd:integer;
+	adjoin:pattern "^property$";
+    adjoin:statement [
+		a rdf:Seq;
+		rdf:_1 [
+			adjoin:subjectURI "$Common.getValue(\"rowSubjectURI\")";
+			adjoin:propertyURI "$RDF.type";
+			adjoin:objectValue "$RDF.Property";
+		];
+	];
+.
+
+<http://id.unit4.com/template/AdJoin/RDFS/BeforeRow>
+	rdfs:label "BeforeRow"@en;
+	rdfs:comment "Run once before every input row is processed."@en;
+    adjoin:priority "65535"^^xsd:integer;
+    adjoin:statement [
+		a rdf:Seq;
+		rdf:_1 [
+			adjoin:value "#if( $Row.getValue(\"property\").equals(\"\") ) $Common.setValue(\"rowSubjectURI\", $String.format(\"%s%s\", $Common.getValue(\"vocabularyURI\"), $Row.getValue(\"class\"))) #else $Common.setValue(\"rowSubjectURI\", $String.format(\"%s%s\", $Common.getValue(\"vocabularyURI\"), $Row.getValue(\"property\"))) #end";
+		];
+	];
+.
+
+<http://id.unit4.com/template/AdJoin/RDFS/Row>
+	rdfs:label "Row"@en;
+	rdfs:comment "Run once for each input row."@en;
+	adjoin:priority "65535"^^xsd:integer;
+.
+
+<http://id.unit4.com/template/AdJoin/RDFS/Footer>
+	rdfs:label "Footer"@en;
+	rdfs:comment "Run once at the end of the input."@en;
+    adjoin:priority "65535"^^xsd:integer;
+.

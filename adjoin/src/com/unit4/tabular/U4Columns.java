@@ -90,6 +90,17 @@ public class U4Columns {
 		return name;
 	}
 
+	/**
+	 * Answer whether the name exists.
+	 * @param name the name to question.
+	 * @return true if the name exists otherwise return false.
+	 */
+	public Boolean hasName(String name) {
+		Boolean hasName = getNames().containsKey(name);
+		logger.trace("hasName({})={}", name, hasName);
+		return hasName;
+	}
+
 	public Map<Integer, U4AdJoin> getMatches() {
 		return this.matches;
 	}

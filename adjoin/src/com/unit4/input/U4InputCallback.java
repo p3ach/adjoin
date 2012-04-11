@@ -7,9 +7,9 @@ package com.unit4.input;
  *
  */
 public interface U4InputCallback {
-	public void header();
-	public void beforeRow();
-	public void row();
-	public void afterRow();
-	public void footer();
+	public U4InputCallback header();
+	public U4InputCallback beforeRow();
+	public U4InputCallback row();
+	public U4InputCallback afterRow();
+	public U4InputCallback footer();
 }

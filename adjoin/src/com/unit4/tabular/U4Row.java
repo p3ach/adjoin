@@ -74,17 +74,20 @@ public class U4Row implements Iterable<String>, Iterator<String> {
 	public void setIndex(Long index) {
 		this.index = index;
 	}
+	
 	public Long getIndex() {
 		return this.index;
 	}
-	
-	public void setValues(String[] values) {
+
+	public U4Row setValues(String[] values) {
 		setValues(new ArrayList<String>(Arrays.asList(values)));
+		return this;
 	}
 	
-	public void setValues(List<String> values) {
+	public U4Row setValues(List<String> values) {
 		this.values.clear();
 		this.values.addAll(values);
+		return this;
 	}
 	
 	public List<String> getValues() {
@@ -96,7 +99,9 @@ public class U4Row implements Iterable<String>, Iterator<String> {
 	 * @return
 	 */
 	public String getValue() {
-		return getValue(getColumns().getIndex());
+		final String getValue = getValue(getColumns().getIndex());
+		logger.trace("getValue()={}", getValue); 
+		return getValue;
 	}
 	
 	/**
@@ -105,7 +110,9 @@ public class U4Row implements Iterable<String>, Iterator<String> {
 	 * @return
 	 */
 	public String getValue(Integer index) {
-		return getValues().get(index);
+		final String getValue = getValues().get(index);
+		logger.trace("getValue({})={}", index, getValue);
+		return getValue;
 	}
 
 	/**

@@ -14,7 +14,7 @@ public class U4DCTerms extends U4Vocabulary {
     public static final Property created = createProperty(getURI("created"));
     public static final Property creator = createProperty(getURI("creator"));
     public static final Property description = createProperty(getURI("description"));
-    public static final Property licence = createProperty(getURI("licence"));
+    public static final Property license = createProperty(getURI("license"));
     public static final Property title = createProperty(getURI("title"));
     public static final Property triples = createProperty(getURI("triples"));
     

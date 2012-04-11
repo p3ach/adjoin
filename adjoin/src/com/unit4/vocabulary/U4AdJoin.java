@@ -71,6 +71,8 @@ public class U4AdJoin extends U4Vocabulary {
 	public static final Property values = createProperty(getURI("values"));
 	public static final Property value = createProperty(getURI("value"));
 	
+//	public static final Property if = createProperty(getURI("if"));
+	
 	public static final Property before = createProperty(getURI("before"));
 	public static final Property after = createProperty(getURI("after"));
 
@@ -192,7 +194,6 @@ public class U4AdJoin extends U4Vocabulary {
 		return new U4AdJoin(getResource(U4AdJoin.values));
 	}
 
-	
 	public Boolean hasValue() {
 		return hasProperty(U4AdJoin.value);
 	}
@@ -200,6 +201,14 @@ public class U4AdJoin extends U4Vocabulary {
 	public U4AdJoin getValue() {
 		return new U4AdJoin(getResource(U4AdJoin.value));
 	}
+
+//	public Boolean hasIf() {
+//		return hasProperty(U4AdJoin.if);
+//	}
+//	
+//	public U4AdJoin getIf() {
+//		return new U4AdJoin(getResource(U4AdJoin.if));
+//	}
 	
 	/**
 	 * Answer whether this AdJoin has an adjoin:statement property.
@@ -217,27 +226,6 @@ public class U4AdJoin extends U4Vocabulary {
 		return new U4AdJoin(getResource(U4AdJoin.statement));
 	}
 
-//	public void processValues(VelocityContext context) {
-//		logger.debug("processValues(context={})", context);
-//		if (getSubject().isAnon()) { // i.e. (S, :value [)
-//			if (hasSeq()) { // i.e. ([, rdf:type, rdf:Seq)
-//				Seq seq = getSeq();
-//				NodeIterator iterator = seq.iterator();
-//				while (iterator.hasNext()) {
-//					new U4AdJoin(iterator.next().asResource()).processValues(context);
-//				}
-//			} else { // i.e. ([, :value, O)
-//				if (hasValue()) {
-//					evaluate(context, getString(U4AdJoin.value));
-//				}
-//			}
-//		} else { // i.e (subject, P, O)
-//			if (hasValue()) {
-//				getValue().processValues(context);
-//			}
-//		}
-//	}
-
 	public List<Statement> getStatements(VelocityContext context) {
 		logger.debug("getStatements(context={}) for {}", context.toString(), getSubject().toString());
 		
@@ -250,7 +238,7 @@ public class U4AdJoin extends U4Vocabulary {
 		}
 		
 		if (isAnonymous()) {
-			if (hasContainer()) {
+			if (hasContainer()) { // i.e. RDF:Alt|Bag|Seq.
 				NodeIterator iterator = getContainer().iterator();
 				while (iterator.hasNext()) {
 					statements.addAll(new U4AdJoin(iterator.next().asResource()).getStatements(context));
@@ -293,7 +281,15 @@ public class U4AdJoin extends U4Vocabulary {
 	 * @return
 	 */
 	public Statement getStatement(VelocityContext context) {
-		Resource subject = ResourceFactory.createResource(evaluate(context, getSubjectURI()));
+		final Object subjectURI = evaluate(context, getSubjectURI());
+		Resource subject;
+		if (subjectURI instanceof String) {
+			subject = ResourceFactory.createResource((String) subjectURI);
+		} else if (subjectURI instanceof Resource) {
+			subject = (Resource) subjectURI;
+		} else {
+			throw new Exception("subjectURI");
+		}
 		
 		Property property = ResourceFactory.createProperty(evaluate(context, getPropertyURI()));
 
@@ -329,10 +325,10 @@ public class U4AdJoin extends U4Vocabulary {
 			throw new Exception("Input is null.");
 		}
 		
-    	StringWriter output = new StringWriter();
+    	final StringWriter output = new StringWriter();
 		try {
 			if (Velocity.evaluate(context, output, "U4AdJoin.evaluate()", input)) {
-				String evaluate = output.toString();
+				final String evaluate = output.toString();
 				logger.trace("output={}",evaluate);
 				return evaluate;
 			} else {
@@ -408,6 +404,10 @@ public class U4AdJoin extends U4Vocabulary {
 		return getString(U4AdJoin.propertyURI);
 	}
 	
+	/**
+	 * Answer the objectType for this AdJoin defaulting to RDFS.Resource.
+	 * @return The objectType.
+	 */
 	public String getObjectType() {
 		return getString(U4AdJoin.objectType, DEFAULT_OBJECT_TYPE);
 	}

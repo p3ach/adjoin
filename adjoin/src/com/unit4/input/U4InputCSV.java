@@ -72,15 +72,21 @@ public class U4InputCSV implements U4Input {
 			logger.error("Unable to read input headers due to [{}].", e);
 		}
     	
+    	getCallback().header();
+    	
 		try {
 			while (csvReader.readRecord()) {
 				getCommon().getRow().setIndex(csvReader.getCurrentRecord());
 				getCommon().getRow().setValues(csvReader.getValues());
+				getCallback().beforeRow();
 				getCallback().row();
+				getCallback().afterRow();
 			}
 		} catch (IOException e) {
 			logger.error("Unable to read input row due to [{}].", e);
 		}
+
+    	getCallback().footer();
 		
     	csvReader.close();
 	}

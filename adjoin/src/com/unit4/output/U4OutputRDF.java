@@ -61,8 +61,9 @@ public class U4OutputRDF implements U4Output {
 		return this.output;
 	}
 	
-	public void setLanguage(String language) {
+	public U4OutputRDF setLanguage(String language) {
 		this.language = language;
+		return this;
 	}
 	
 	public String getLanguage() {
@@ -135,6 +136,7 @@ public class U4OutputRDF implements U4Output {
         context.put("Org", new FieldMethodizer("com.unit4.vocabulary.U4Org"));
         context.put("RDF", new FieldMethodizer("com.unit4.vocabulary.U4RDF"));
         context.put("RDFS", new FieldMethodizer("com.unit4.vocabulary.U4RDFS"));
+        context.put("SKOS", new FieldMethodizer("com.unit4.vocabulary.U4SKOS"));
         context.put("XSD", new FieldMethodizer("com.unit4.vocabulary.U4XSD"));
         context.put("VoID", new FieldMethodizer("com.unit4.vocabulary.U4VoID"));
 
@@ -165,27 +167,34 @@ public class U4OutputRDF implements U4Output {
 
 	   	U4InputCallback inputCallback = new U4InputCallback() {
    			@Override
-			public void header() {
+			public U4InputCallback header() {
    				logger.trace("header()");
 		        for (U4AdJoin headerTemplate : headerTemplates) {
 	        		getModel().add(headerTemplate.getStatements(context));
 		        }
+		        return this;
 			}
 			
 			@Override
-			public void beforeRow() {
+			public U4InputCallback beforeRow() {
 				logger.trace("beforeRow()");
 			    for (U4AdJoin beforeRowtemplate : beforeRowTemplates) {
 		    		getModel().add(beforeRowtemplate.getStatements(context));
 			    }
+			    return this;
 			}
 			
 			@Override
-			public void row() {
+			public U4InputCallback row() {
 				logger.trace("row()");
 				final U4Columns columns = getColumns();
+//				final List<String> values = common.getRow().getValues();
+//				for (String value : values) {
+//					logger.trace("value={}",value);
+//				}
 				for (String value : common.getRow()) {
-					if (value == "") {
+					logger.trace("value={}",value);
+					if (value == null | value.equals("")) {
 					} else {
 						columns.setMatch(U4AdJoin.match(columnTemplates, columns.getName()));
 						if (columns.hasMatch()) {
@@ -198,22 +207,25 @@ public class U4OutputRDF implements U4Output {
 						}
 					}
 				}
+				return this;
 			}
 			
 			@Override
-			public void afterRow() {
+			public U4InputCallback afterRow() {
 				logger.trace("afterRow()");
 			    for (U4AdJoin afterRowtemplate : afterRowTemplates) {
 		    		getModel().add(afterRowtemplate.getStatements(context));
 			    }
+			    return this;
 			}
 			
 			@Override
-			public void footer() {
+			public U4InputCallback footer() {
 				logger.trace("footer()");
 		        for (U4AdJoin footerTemplate : footerTemplates) {
 	        		getModel().add(footerTemplate.getStatements(context));
 		        }
+		        return this;
 			}
 		};
 

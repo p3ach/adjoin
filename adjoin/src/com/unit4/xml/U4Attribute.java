@@ -1,6 +1,13 @@
 package com.unit4.xml;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.unit4.tabular.U4Row;
+
 public class U4Attribute {
+	private static Logger logger = LoggerFactory.getLogger(U4Attribute.class);
+	
 	private String qName;
 	private String value;
 	
@@ -14,6 +21,7 @@ public class U4Attribute {
 	}
 	
 	public void setQName(String qName) {
+		logger.trace("setQName({})", qName);
 		this.qName = qName;
 	}
 	
@@ -22,6 +30,7 @@ public class U4Attribute {
 	}
 	
 	public void setValue(String value) {
+		logger.trace("setValue({})", value);
 		this.value = value;
 	}
 	

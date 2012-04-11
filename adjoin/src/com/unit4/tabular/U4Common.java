@@ -8,6 +8,8 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.unit4.input.U4Input;
 import com.unit4.output.U4Output;
 import com.unit4.vocabulary.U4AdJoinTemplate;
@@ -82,7 +84,7 @@ public class U4Common {
 	public U4Row getRow() {
 		return this.row;
 	}
-
+	
 	public void common() {
 		setValue("commonUUID", UUID.randomUUID().toString());
 	    
@@ -145,6 +147,13 @@ public class U4Common {
 	public Long countValueIndirect(String key) {
 		logger.trace("countValueIndirect(key={})", key);
 		return countValue((String) getValue(key));
+	}
+	
+	public Resource getBlankNode(String key) {
+		if (!has(key)) {
+			setValue(key, ResourceFactory.createResource());
+		}
+		return (Resource) getValue(key);
 	}
 	
 	public String toString() {
