@@ -19,6 +19,8 @@ import com.hp.hpl.jena.datatypes.TypeMapper;
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.ontology.OntResource;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.NodeIterator;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
@@ -27,9 +29,12 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Seq;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.impl.LiteralImpl;
+import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 import com.hp.hpl.jena.vocabulary.XSD;
 import com.unit4.exception.Exception;
+import com.unit4.output.U4OutputRDF;
+import com.unit4.tabular.U4Common;
 
 /**
  * Provides the heavy lifting for converting an input into RDF output based on an AdJoin template.
@@ -41,6 +46,8 @@ public class U4AdJoin extends U4Vocabulary {
 //	Class.
 	
 	private static Logger logger = LoggerFactory.getLogger(U4AdJoin.class);
+	
+	private static final Model model = ModelFactory.createDefaultModel();
 	
 	public static final String PREFIX = "adjoin";
 	public static final String NS = "http://id.unit4.com/2011/11/01/adjoin-ns#";
@@ -150,6 +157,10 @@ public class U4AdJoin extends U4Vocabulary {
 		return getNS() + fragment;
 	}
 
+	public static void setNsPrefix(Model model) {
+		model.setNsPrefix(getPrefix(), getNS());
+	}
+	
 //	public static U4Convert create() {
 //		return new U4Convert(ModelFactory.createOntologyModel(OntModelSpec.RDFS_MEM_RDFS_INF).createOntResource("http://id.unit4.com/" + UUID.randomUUID().toString()));
 //	}
@@ -226,14 +237,16 @@ public class U4AdJoin extends U4Vocabulary {
 		return new U4AdJoin(getResource(U4AdJoin.statement));
 	}
 
-	public List<Statement> getStatements(VelocityContext context) {
-		logger.debug("getStatements(context={}) for {}", context.toString(), getSubject().toString());
-		
-		List<Statement> statements = new ArrayList<Statement>();
-
+	/**
+	 * Answer all the statements for this AdJoin.
+	 * For each statement callback with <code>this</code>.
+	 * This will wall the statement hierachy.
+	 * @param callback A U4AdJoinCallback instance.
+	 */
+	public void getStatements(U4AdJoinCallback callback) {
 		if (hasBefore()) {
 			for (U4AdJoin before : getBefore()) {
-				statements.addAll(before.getStatements(context));
+				before.getStatements(callback);
 			}
 		}
 		
@@ -241,105 +254,25 @@ public class U4AdJoin extends U4Vocabulary {
 			if (hasContainer()) { // i.e. RDF:Alt|Bag|Seq.
 				NodeIterator iterator = getContainer().iterator();
 				while (iterator.hasNext()) {
-					statements.addAll(new U4AdJoin(iterator.next().asResource()).getStatements(context));
+					new U4AdJoin(iterator.next().asResource()).getStatements(callback);
 				}
 			} else {
 				if (hasStatement()) {
-					statements.addAll(getStatement().getStatements(context));
+					getStatement().getStatements(callback);
 				} else {
-					if (hasValue()) {
-						evaluate(context, getString(U4AdJoin.value));
-					}
-					if (hasSubjectURI()) {
-						statements.add(getStatement(context));
-					}
+					callback.callback(this);
 				}
 			}
 		} else {
 			if (hasStatement()) {
-				statements.addAll(new U4AdJoin(getStatement().getSubject()).getStatements(context));
+				new U4AdJoin(getStatement().getSubject()).getStatements(callback);
 			}
 		}
 
 		if (hasAfter()) {
 			for (U4AdJoin after : getAfter()) {
-				statements.addAll(after.getStatements(context));
+				after.getStatements(callback);
 			}
-		}
-	
-		logger.trace("statements.size={}", statements.size());
-
-		return statements;
-	}
-	
-	/**
-	 * Answer the statement for this AdJoin.
-	 * subjectURI, propertyURI and objectType are mandatory.
-	 * Supported objectType(s) are RDFS.Resource|Literal anything else will throw an Exception.
-	 * objectDatatype is optional.
-	 * @param context
-	 * @return
-	 */
-	public Statement getStatement(VelocityContext context) {
-		final Object subjectURI = evaluate(context, getSubjectURI());
-		Resource subject;
-		if (subjectURI instanceof String) {
-			subject = ResourceFactory.createResource((String) subjectURI);
-		} else if (subjectURI instanceof Resource) {
-			subject = (Resource) subjectURI;
-		} else {
-			throw new Exception("subjectURI");
-		}
-		
-		Property property = ResourceFactory.createProperty(evaluate(context, getPropertyURI()));
-
-		Resource objectType = ResourceFactory.createResource(evaluate(context, getObjectType()));
-
-		if (objectType.equals(RDFS.Resource)) {
-			return ResourceFactory.createStatement(subject, property, ResourceFactory.createResource(evaluate(context, getObjectValue())));
-		}
-		
-		if (objectType.equals(RDFS.Literal)) {
-			if (hasObjectDatatype()) {
-				return ResourceFactory.createStatement(subject, property, ResourceFactory.createTypedLiteral(evaluate(context, getObjectValue()), TypeMapper.getInstance().getTypeByName(evaluate(context, getObjectDatatype()))));
-			} else {
-				if (hasObjectLanguage()) {
-					return ResourceFactory.createStatement(subject, property, new LiteralImpl( Node.createLiteral(evaluate(context, getObjectValue()), evaluate(context, getObjectLanguage()), null), null));
-				} else {
-					return ResourceFactory.createStatement(subject, property, ResourceFactory.createPlainLiteral(evaluate(context, getObjectValue())));
-				}
-			}
-		}
-		
-		throw new Exception(String.format("Unknown objectType [%s].", objectType));
-	}
-	
-	public String evaluate(VelocityContext context, String input) {
-		logger.trace("evaluate(context={}, input={}", context, input);
-		
-		if (context == null) {
-			throw new Exception("Context is null.");
-		}
-		
-		if (input == null) {
-			throw new Exception("Input is null.");
-		}
-		
-    	final StringWriter output = new StringWriter();
-		try {
-			if (Velocity.evaluate(context, output, "U4AdJoin.evaluate()", input)) {
-				final String evaluate = output.toString();
-				logger.trace("output={}",evaluate);
-				return evaluate;
-			} else {
-				throw new Exception("Velocity returned false.");
-			}
-		} catch (ParseErrorException e) {
-			throw new Exception("Velocity threw a ParseError.", e);
-		} catch (MethodInvocationException e) {
-			throw new Exception("Velocity threw a MethodInvocation.", e);
-		} catch (ResourceNotFoundException e) {
-			throw new Exception("Velocity threw a ResourceNotFound", e);
 		}
 	}
 

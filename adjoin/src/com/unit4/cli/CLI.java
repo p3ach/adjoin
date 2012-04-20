@@ -148,7 +148,7 @@ public class CLI {
         				if (declaration.getValidValues().contains(argument.getValue())) {
         					declaration.getHandler().go(argument);
         				} else {
-        					invalidValue(argument);
+        					invalidValue(declaration, argument);
         				}
         			} else {
         				missingValue(declaration);
@@ -185,20 +185,24 @@ public class CLI {
 	}
 	
 	protected void unknownArgument(Argument argument) {
+		autoHelp();
 		throw new Exception(String.format("Unknown argument [%s].", argument.toString()));
 	}
 	
 	protected void missingValue(Declaration declaration) {
+		autoHelp();
 		throw new Exception(String.format("Missing value for [%s].", declaration));
 	}
 
-	protected void invalidValue(Argument argument) {
-		throw new Exception(String.format("Invalid value for [%s].", argument));
+	protected void invalidValue(Declaration declaration, Argument argument) {
+		autoHelp();
+		throw new Exception(String.format("Invalid value for [%s] with [%s].", declaration, argument));
 	}
 
 	public void autoHelp() {
+		logger.info("autoHelp()");
 		for (Declaration declaration : getDeclarations()) {
-			System.out.println(String.format("%s", declaration.toString()));
+			logger.info("{}", declaration.toString());
 		}
 	}
 	

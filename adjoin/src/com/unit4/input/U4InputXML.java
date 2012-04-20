@@ -17,6 +17,7 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import com.hp.hpl.jena.graph.impl.Fragments.GetSlot;
 import com.hp.hpl.jena.util.FileManager;
+import com.unit4.cli.Options;
 import com.unit4.tabular.U4Common;
 import com.unit4.tabular.U4Row;
 import com.unit4.xml.U4Attribute;
@@ -35,6 +36,7 @@ public class U4InputXML extends DefaultHandler implements U4Input {
 	// Instance.
 	
 	private U4Common common;
+	private Options options;
 	private String uri;
 	private U4InputCallback callback;
 	
@@ -58,14 +60,13 @@ public class U4InputXML extends DefaultHandler implements U4Input {
 	}
 
 	@Override
-	public U4Input setURI(String uri) {
-		this.uri = uri;
-		return this;
+	public void setOptions(Options options) {
+		this.options = options;
 	}
-	
+
 	@Override
-	public String getURI() {
-		return this.uri;
+	public Options getOptions() {
+		return this.options;
 	}
 
 	@Override
@@ -101,7 +102,7 @@ public class U4InputXML extends DefaultHandler implements U4Input {
 	
 	@Override
 	public void parse() {
-		parse(getURI());
+		parse((String) getOptions().getOption("inputURI"));
 	}
 
 	public void parse(String uri) {
@@ -166,6 +167,10 @@ public class U4InputXML extends DefaultHandler implements U4Input {
 
 		final U4Element element = getElements().pop();
 
+		if (element.getIndex() > getMaxRows()) {
+			return;
+		}
+		
 		final List<U4Attribute> attributes = element.getAttributes();
 		
 		final List<String> columns = new ArrayList<String>(attributes.size() + 2); // Attributes size + 1 for characters + 1 for parent.
@@ -198,5 +203,14 @@ public class U4InputXML extends DefaultHandler implements U4Input {
 		callback.beforeRow();
 		callback.row();
 		callback.afterRow();
+	}
+	
+	protected Long getMaxRows() {
+		final Options options = getOptions();
+		if (options.hasOption("inputMaxRows")) {
+			return Long.valueOf((String) options.getOption("inputMaxRows"));
+		} else {
+			return Long.MAX_VALUE - 1;
+		}
 	}
 }

@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import com.csvreader.CsvReader;
 import com.hp.hpl.jena.util.FileManager;
+import com.unit4.cli.Options;
 import com.unit4.exception.Exception;
 import com.unit4.tabular.U4Common;
 
@@ -16,9 +17,13 @@ public class U4InputCSV implements U4Input {
 	private static Logger logger = LoggerFactory.getLogger(U4InputCSV.class);
 	
 	private U4Common common;
+	private Options options;
 	private String uri;
 	private U4InputCallback callback;
 
+	public U4InputCSV() {
+	}
+	
 	@Override
 	public U4Input setCommon(U4Common common) {
 		this.common = common;
@@ -29,16 +34,14 @@ public class U4InputCSV implements U4Input {
 	public U4Common getCommon() {
 		return this.common;
 	}
-
-	@Override
-	public U4Input setURI(String uri) {
-		this.uri = uri;
-		return this;
-	}
 	
 	@Override
-	public String getURI() {
-		return this.uri;
+	public void setOptions(Options options) {
+		this.options = options;
+	}
+	
+	public Options getOptions() {
+		return this.options;
 	}
 	
 	@Override
@@ -89,5 +92,9 @@ public class U4InputCSV implements U4Input {
     	getCallback().footer();
 		
     	csvReader.close();
+	}
+	
+	protected String getURI() {
+		return (String) getOptions().getOption("inputURI");
 	}
 }

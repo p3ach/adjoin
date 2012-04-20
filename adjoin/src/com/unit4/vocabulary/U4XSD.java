@@ -14,6 +14,7 @@ public class U4XSD extends U4Vocabulary {
 	
     public static final Resource string = XSD.xstring;
     public static final Resource date = XSD.date;
+    public static final Resource integer = XSD.integer;
 		
 	public static String getPrefix() {
 		return PREFIX;

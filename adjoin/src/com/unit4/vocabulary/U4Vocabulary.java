@@ -50,7 +50,6 @@ public class U4Vocabulary {
 	}
 	
 	public static void setNsPrefix(Model model) {
-		model.setNsPrefix(getPrefix(), getNS());
 	}
 
 	public static String getURI(String fragment) {

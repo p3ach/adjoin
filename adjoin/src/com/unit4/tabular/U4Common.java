@@ -8,6 +8,7 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.hp.hpl.jena.rdf.model.Container;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.unit4.input.U4Input;
@@ -115,7 +116,7 @@ public class U4Common {
 			logger.trace("getValue(key={}) value={}", key, value);
 			return value;
 		} else {
-			logger.trace("getValue(key={}) Key does not exist.", key);
+			logger.warn("getValue(key={}) Key does not exist.", key);
 			return null;
 		}
 	}
@@ -141,19 +142,12 @@ public class U4Common {
 	}
 	
 	public Long increment(Long value) {
-		return value++;
+		return (value == null ? null : value++);
 	}
 	
 	public Long countValueIndirect(String key) {
 		logger.trace("countValueIndirect(key={})", key);
 		return countValue((String) getValue(key));
-	}
-	
-	public Resource getBlankNode(String key) {
-		if (!has(key)) {
-			setValue(key, ResourceFactory.createResource());
-		}
-		return (Resource) getValue(key);
 	}
 	
 	public String toString() {

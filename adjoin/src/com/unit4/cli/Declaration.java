@@ -161,6 +161,6 @@ public class Declaration {
 	}
 	
 	public String toString() {
-		return String.format("%s requiresValue=%s (%s) lookFor=%s endCLI=%s", getNames(), getRequireValue(), getValidValues(), getLookFor(), getEndCLI());
+		return String.format("Declaration [%s] requiresValue[%s] validValues[%s] lookFor[%s] endCLI[%s]", getNames(), getRequireValue(), getValidValues(), getLookFor(), getEndCLI());
 	}
 }
