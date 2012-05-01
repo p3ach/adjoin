@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import com.hp.hpl.jena.rdf.model.Container;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
+import com.unit4.cli.Options;
 import com.unit4.input.U4Input;
 import com.unit4.output.U4Output;
 import com.unit4.vocabulary.U4AdJoinTemplate;
@@ -32,6 +33,7 @@ public class U4Common {
 	
 	private U4Input input;
 	private U4Output output;
+	private Options options;
 	private U4AdJoinTemplate template;
 	private U4Columns columns;
 	private U4Row row;
@@ -60,6 +62,14 @@ public class U4Common {
 		return this.output;
 	}
 
+	public void setOptions(Options options) {
+		this.options = options;
+	}
+	
+	public Options getOptions() {
+		return this.options;
+	}
+	
 	public void setTemplate(U4AdJoinTemplate template) {
 		this.template = template;
 	}
@@ -124,6 +134,15 @@ public class U4Common {
 	public Object getValueIndirect(String key) {
 		logger.trace("getValueIndirect(key={})", key);
 		return getValue((String) getValue(key));
+	}
+	
+	public void removeValue(String key) {
+		if (has(key)) {
+			Object value = getValues().remove(key);
+			logger.trace("removeValue(key={}) value={}", key, value);
+		} else {
+			logger.warn("removeValue(key={}) Key does not exist.", key);
+		}
 	}
 	
 	public Boolean has(String key) {

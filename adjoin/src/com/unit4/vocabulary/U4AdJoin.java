@@ -47,8 +47,6 @@ public class U4AdJoin extends U4Vocabulary {
 	
 	private static Logger logger = LoggerFactory.getLogger(U4AdJoin.class);
 	
-	private static final Model model = ModelFactory.createDefaultModel();
-	
 	public static final String PREFIX = "adjoin";
 	public static final String NS = "http://id.unit4.com/2011/11/01/adjoin-ns#";
 	

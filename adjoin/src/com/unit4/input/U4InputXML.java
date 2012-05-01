@@ -37,7 +37,6 @@ public class U4InputXML extends DefaultHandler implements U4Input {
 	
 	private U4Common common;
 	private Options options;
-	private String uri;
 	private U4InputCallback callback;
 	
 	private Stack<U4Element> elements = new Stack<U4Element>();
@@ -80,6 +79,10 @@ public class U4InputXML extends DefaultHandler implements U4Input {
 		return this.callback;
 	}
 	
+	public String getInputURI() {
+		return (String) getOptions().getOption("inputURI");
+	}
+	
 	public Stack<U4Element> getElements() {
 		return this.elements;
 	}
@@ -102,17 +105,13 @@ public class U4InputXML extends DefaultHandler implements U4Input {
 	
 	@Override
 	public void parse() {
-		parse((String) getOptions().getOption("inputURI"));
-	}
-
-	public void parse(String uri) {
 		SAXParserFactory spf = SAXParserFactory.newInstance();
 		try {
 			SAXParser sp = spf.newSAXParser();
 			setIndex((long) 0);
 			getCommon().getRow().setIndex((long) 0);
 			getCallback().header();
-			sp.parse(FileManager.get().open(uri), this);
+			sp.parse(FileManager.get().open(getInputURI()), this);
 			getCallback().footer();
 		}catch(SAXException se) {
 			se.printStackTrace();
@@ -212,5 +211,10 @@ public class U4InputXML extends DefaultHandler implements U4Input {
 		} else {
 			return Long.MAX_VALUE - 1;
 		}
+	}
+	
+	@Override
+	public String toString() {
+		return String.format("U4InputXML inputURI[%s]", getInputURI()); 
 	}
 }

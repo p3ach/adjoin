@@ -14,5 +14,4 @@ public interface U4Input {
 	public U4InputCallback getCallback();
 	
 	public void parse();
-	public void parse(String uri);
 }

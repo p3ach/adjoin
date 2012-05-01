@@ -49,4 +49,9 @@ public class Options {
 	public void removeOption(String key) {
 		getOptions().remove(key);
 	}
+	
+	@Override
+	public String toString() {
+		return String.format("U4Options [%s]", getOptions().toString());
+	}
 }

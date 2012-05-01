@@ -77,7 +77,7 @@ public class RDFCat {
 				setOption("outputURI", argument.getValue());
 			}
 		},
-		Arrays.asList("o", "output")
+		Arrays.asList("o", "outputURI")
 	);
     
     public final Declaration OUTPUT_LANGUAGE = new Declaration(
@@ -191,12 +191,13 @@ public class RDFCat {
     	final Options options = getOptions();
     	
     	options.setOption("inputURI", argument.getValue());
-    	input.setOptions(getOptions());
-    	output.setOptions(getOptions());
+    	input.setOptions(options);
+    	output.setOptions(options);
     	
     	common.setInput(input);
     	common.setOutput(output);
-		common.setTemplate(template);
+    	common.setOptions(options);
+		common.setTemplate(getTemplate());
     	common.setColumns(new U4Columns());
 		common.setRow(new U4Row());
 

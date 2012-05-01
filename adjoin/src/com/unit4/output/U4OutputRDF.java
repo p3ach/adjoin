@@ -90,7 +90,7 @@ public class U4OutputRDF implements U4Output {
 		U4AdJoin.setNsPrefix(model);
 	}
 	
-	protected Model getModel() {
+	public Model getModel() {
 		return this.model;
 	}
 
@@ -102,11 +102,15 @@ public class U4OutputRDF implements U4Output {
 		return (String) getOptions().getOption("outputLanguage", DEFAULT_LANGUAGE);
 	}
 	
+	public String getOutputURI() {
+		return (String) getOptions().getOption("outputURI");
+	}
+	
 	protected OutputStream getOutputStream() {
 		final Options options = getOptions();
 		if (options.hasOption("outputURI")) {
 			try {
-				return new FileOutputStream((String) options.getOption("outputURI"));
+				return new FileOutputStream(getOutputURI());
 			} catch (FileNotFoundException e) {
 				throw new Exception("Failed to create output file.", e);
 			}
@@ -179,6 +183,7 @@ public class U4OutputRDF implements U4Output {
    		final VelocityContext context = getContext();
         context.put("Input", getCommon().getInput());
 		context.put("Output", this);
+		context.put("Options", getCommon().getOptions());
 		context.put("Common", getCommon());
         context.put("Columns", getCommon().getColumns());
         context.put("Row", getCommon().getRow());
@@ -417,5 +422,10 @@ public class U4OutputRDF implements U4Output {
 		logger.info("Render to {} as {}.", getOutputStream().toString(), getLanguage());
 		getModel().write(getOutputStream(), getLanguage());
 		return true;
+	}
+	
+	@Override
+	public String toString() {
+		return String.format("U4OutputRDF outputURI[%s]", getOutputURI());
 	}
 }

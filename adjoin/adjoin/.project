@@ -16,6 +16,16 @@
 	</natures>
 	<linkedResources>
 		<link>
+			<name>data</name>
+			<type>2</type>
+			<location>/media/Data/home/dick/Git/adjoin/adjoin/data</location>
+		</link>
+		<link>
+			<name>examples</name>
+			<type>2</type>
+			<location>/media/Data/home/dick/Git/adjoin/adjoin/examples</location>
+		</link>
+		<link>
 			<name>git</name>
 			<type>2</type>
 			<location>/media/Data/home/dick/Git/adjoin/adjoin/src</location>
