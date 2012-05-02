@@ -1,0 +1,58 @@
+@prefix adjoin:  <http://id.unit4.com/2011/11/01/adjoin-ns#> .
+
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> . 
+@prefix void: <http://rdfs.org/ns/void#> .
+
+<http://id.unit4.com/template/AdJoin>
+	a void:Dataset ;
+	rdfs:comment "When merging templates lower priorities are processed first. Default template has a priority of 65536."@en ;
+	void:subset <http://id.unit4.com/template/AdJoin/XML> ;
+.
+
+<http://id.unit4.com/template/AdJoin/XML>
+	a void:Dataset ;
+	rdfs:comment "XML template for use with AdJoin. Handles the XML hierachy column []parentRow."@en ;
+.
+
+<http://id.unit4.com/template/AdJoin/XML/Column>
+	rdfs:comment "Column."@en ;
+    adjoin:priority "65535"^^xsd:integer ;
+	skos:narrower <http://id.unit4.com/template/AdJoin/XML/Column/parentRow>;
+.
+
+<http://id.unit4.com/template/AdJoin/XML/Column/parentRow>
+	rdfs:comment "Handle the []parentRow column created by the U4InputXML class."@en ;
+	rdfs:comment "The regex pattern for []parentRow need the [] to be escaped with a backslash which in itself needs to be escaped or the Jena parser throws an error."@en ;
+    adjoin:priority "65535"^^xsd:integer ;
+	adjoin:pattern "^\\[\\]parentRow$" ;
+	adjoin:statement [
+		a rdf:Seq ;
+		rdf:_1 [
+			adjoin:subjectURI "$Common.getValue(\"rowURI\")" ;
+			adjoin:propertyURI "$SKOS.broader" ;
+			adjoin:objectValue "$String.format(\"%s/row%s\", $Common.getValue(\"datasetURI\"), $Row.getValue())" ;
+		];
+	];
+.
+
+<http://id.unit4.com/template/AdJoin/XML/Row>
+	rdfs:comment "XML row regular expressions."@en;
+	skos:narrower <http://id.unit4.com/template/AdJoin/Default/Row/Default> ;
+.
+
+<http://id.unit4.com/template/AdJoin/XML/Row/Default>
+	rdfs:comment "Default i.e. match anything"@en ;
+    adjoin:priority "65535"^^xsd:integer ;
+	adjoin:pattern "(?s)^.*$" ;
+	adjoin:statement [
+		a rdf:Seq;
+		rdf:_1 [
+			adjoin:before <http://id.unit4.com/template/AdJoin/Default/Row/Default>;
+		];
+	];
+.

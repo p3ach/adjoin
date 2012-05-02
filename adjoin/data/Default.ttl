@@ -87,7 +87,9 @@
 		rdf:_4 [
 			adjoin:after <http://id.unit4.com/template/AdJoin/Default/Header/Entity> ;
 		] ;
-		
+		rdf:_5 [
+			adjoin:after <http://id.unit4.com/template/AdJoin/Default/Header/Template> ;
+		] ;
 	] ;
 .
 
@@ -249,6 +251,47 @@
 			adjoin:propertyURI "$FOAF.homepage" ;
 			adjoin:objectType "$RDFS.Resource" ;
 			adjoin:objectValue "$Common.getValue(\"entityHomepage\")" ;
+		] ;
+	] ;
+.
+
+<http://id.unit4.com/template/AdJoin/Default/Header/Template>
+	adjoin:statement [
+		a rdf:Seq ;
+		rdf:_1 [
+			adjoin:value "$Common.setValue(\"rootTemplateURI\", \"http://id.unit4.com/template/AdJoin\")";
+		];
+		rdf:_2 [
+			adjoin:value "$Common.setValue(\"datasetTemplateURI\", $String.format(\"%s/%s\", $Common.getValue(\"rootTemplateURI\"), $Common.getValue(\"randomUUID\")))";
+		];
+		rdf:_3 [
+			adjoin:value "$Common.setValue(\"columnTemplateURI\", $String.format(\"%s/Column\", $Common.getValue(\"datasetTemplateURI\")))";
+		];
+		rdf:_4 [
+			adjoin:subjectURI "$Common.getValue(\"rootTemplateURI\")";
+			adjoin:propertyURI "$RDF.type";
+			adjoin:objectValue "$VoID.Dataset";
+		] ;
+		rdf:_5 [
+			adjoin:subjectURI "$Common.getValue(\"rootTemplateURI\")";
+			adjoin:propertyURI "$VoID.subset";
+			adjoin:objectValue "$Common.getValue(\"datasetTemplateURI\")";
+		] ;
+		rdf:_6 [
+			adjoin:subjectURI "$Common.getValue(\"datasetTemplateURI\")";
+			adjoin:propertyURI "$RDF.type";
+			adjoin:objectValue "$VoID.Dataset";
+		] ;
+		rdf:_7 [
+			adjoin:subjectURI "$Common.getValue(\"datasetTemplateURI\")";
+			adjoin:propertyURI "$RDFS.comment";
+			adjoin:objectType "$RDFS.Literal";
+			adjoin:objectValue "AdJoin template created by AdJoin Default template.";
+		] ;
+		rdf:_8 [
+			adjoin:subjectURI "$Common.getValue(\"datasetTemplateURI\")";
+			adjoin:propertyURI "$SKOS.narrower";
+			adjoin:objectValue "$Common.getValue(\"columnTemplateURI\")";
 		] ;
 	] ;
 .

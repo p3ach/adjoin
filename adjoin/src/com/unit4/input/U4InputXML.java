@@ -140,7 +140,7 @@ public class U4InputXML extends DefaultHandler implements U4Input {
 	/**
 	 * SAX DefaultHandler characters(...).
 	 * Peek the top Element from the stack and append the characters to the current characters.
-	 * !!! Need to append as SAX may call characters multiple times per Element.   
+	 * !!! Need to append as SAX may call characters(...) multiple times per Element.   
 	 */
 	@Override
 	public void characters(char[] ch, int start, int length) throws SAXException {
@@ -187,9 +187,10 @@ public class U4InputXML extends DefaultHandler implements U4Input {
 			values.add(element.getCharacters());
 		}
 
+		// XML is hierachical so create a parentRow entry if required i.e. not root element.
 		final U4Element parent = element.getParent();
 		if (parent != null) {
-			columns.add("[]Parent");
+			columns.add("[]parentRow");
 			values.add(parent.getIndex().toString());
 		}
 
