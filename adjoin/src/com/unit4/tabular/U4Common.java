@@ -121,7 +121,7 @@ public class U4Common {
 	 * Object : The value associated with the key or Null if the key does not exist. 
 	 */
 	public Object getValue(String key) {
-		if (has(key)) {
+		if (hasKey(key)) {
 			Object value = getValues().get(key);
 			logger.trace("getValue(key={}) value={}", key, value);
 			return value;
@@ -137,7 +137,7 @@ public class U4Common {
 	}
 	
 	public void removeValue(String key) {
-		if (has(key)) {
+		if (hasKey(key)) {
 			Object value = getValues().remove(key);
 			logger.trace("removeValue(key={}) value={}", key, value);
 		} else {
@@ -145,22 +145,23 @@ public class U4Common {
 		}
 	}
 	
-	public Boolean has(String key) {
+	public Boolean hasKey(String key) {
 		return getValues().containsKey(key);
 	}
 	
 	public Long countValue(String key) {
 		Long count;
-		if (has(key)) {
+		if (hasKey(key)) {
 			count = (Long) getValue(key);
 		} else {
 			count = Long.valueOf(0);
 		}
-		setValue(key, count++);
+		count++;
+		setValue(key, count);
 		return count;
 	}
 	
-	public Long increment(Long value) {
+	public Long incrementValue(Long value) {
 		return (value == null ? null : value++);
 	}
 	

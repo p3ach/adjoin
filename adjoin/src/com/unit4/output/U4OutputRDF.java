@@ -188,6 +188,7 @@ public class U4OutputRDF implements U4Output {
         context.put("Columns", getCommon().getColumns());
         context.put("Row", getCommon().getRow());
         
+        context.put("Long", Long.class);
         context.put("Math", Math.class);
         context.put("String", String.class);
         context.put("UUID", UUID.class);
@@ -236,13 +237,13 @@ public class U4OutputRDF implements U4Output {
 	   				public U4Resource(final String uri) {
 	   					setURI(uri);
 	   					if (uri.startsWith("[Blank]")) {
-	   						if (getCommon().has(uri)) {
+	   						if (getCommon().hasKey(uri)) {
 	   							setResource((Resource) getCommon().getValue(uri));
 	   						} else {
 	   							setResource((Resource) getCommon().setValue(uri, getModel().createResource()));
 	   						}
 	   					} else if (uri.startsWith("[Seq]")) {
-	   						if (getCommon().has(uri)) {
+	   						if (getCommon().hasKey(uri)) {
 	   							setSeq((Seq) getCommon().getValue(uri));
 	   						} else {
 	   							setSeq((Seq) getCommon().setValue(uri, getModel().createSeq()));
@@ -340,10 +341,13 @@ public class U4OutputRDF implements U4Output {
 							throw new Exception("Velocity returned false.");
 						}
 					} catch (ParseErrorException e) {
+						logger.error("evaluate({}) error.", input);
 						throw new Exception("Velocity threw a ParseError.", e);
 					} catch (MethodInvocationException e) {
+						logger.error("evaluate({}) error.", input);
 						throw new Exception("Velocity threw a MethodInvocation.", e);
 					} catch (ResourceNotFoundException e) {
+						logger.error("evaluate({}) error.", input);
 						throw new Exception("Velocity threw a ResourceNotFound", e);
 					}
 				}

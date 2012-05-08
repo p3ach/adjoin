@@ -293,6 +293,9 @@
 			adjoin:propertyURI "$SKOS.narrower";
 			adjoin:objectValue "$Common.getValue(\"columnTemplateURI\")";
 		] ;
+		rdf:_9 [
+			adjoin:value "$Common.setValue(\"templateColumnIndex\", $Long.valueOf(\"0\"))";
+		];
 	] ;
 .
 
@@ -382,6 +385,23 @@
 		rdf:_4 [
 			adjoin:value "$Common.removeValue(\"[Blank]$Row.getIndex()/$Columns.getIndex()\")";
 		];
+		rdf:_5 [
+			adjoin:value "#if (!$Common.hasKey($Columns.getName())) $Common.setValue($Columns.getName(), $Common.countValue(\"templateColumnIndex\"))#end"
+		];
+		rdf:_6 [
+			adjoin:subjectURI "$Common.getValue($Columns.getName())";
+			adjoin:propertyURI "$AdJoin.priority";
+			adjoin:objectType "$RDFS.Literal" ;
+			adjoin:objectValue "65000" ;
+			adjoin:objectDatatype "$XSD.integer" ;
+		];
+		rdf:_7 [
+			adjoin:subjectURI "$Common.getValue($Columns.getName())";
+			adjoin:propertyURI "$AdJoin.pattern";
+			adjoin:objectType "$RDFS.Literal" ;
+			adjoin:objectValue "$String.format(\"^%s$\", $Columns.getName())" ;
+			adjoin:objectDatatype "$XSD.string" ;
+		]
 	];
 .
 

@@ -57,11 +57,6 @@ public class U4InputCSV implements U4Input {
 
 	@Override
 	public void parse() {
-		parse(getURI());
-	}
-	
-	@Override
-	public void parse(String uri) {
     	InputStream inputStream = FileManager.get().open(uri);
     	if (inputStream == null) {
     		throw new Exception(String.format("Unable to read [%s].", uri));

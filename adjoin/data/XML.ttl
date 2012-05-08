@@ -39,20 +39,3 @@
 		];
 	];
 .
-
-<http://id.unit4.com/template/AdJoin/XML/Row>
-	rdfs:comment "XML row regular expressions."@en;
-	skos:narrower <http://id.unit4.com/template/AdJoin/Default/Row/Default> ;
-.
-
-<http://id.unit4.com/template/AdJoin/XML/Row/Default>
-	rdfs:comment "Default i.e. match anything"@en ;
-    adjoin:priority "65535"^^xsd:integer ;
-	adjoin:pattern "(?s)^.*$" ;
-	adjoin:statement [
-		a rdf:Seq;
-		rdf:_1 [
-			adjoin:before <http://id.unit4.com/template/AdJoin/Default/Row/Default>;
-		];
-	];
-.
