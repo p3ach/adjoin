@@ -9,5 +9,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Jena 2.7.0"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JavaCSV 2.1"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Velocity 1.7"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Apache Common Net 3.1"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
