@@ -10,5 +10,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JavaCSV 2.1"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Velocity 1.7"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Apache Common Net 3.1"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Apache Commons Logging"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Apache Jena TDB"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

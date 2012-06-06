@@ -11,8 +11,8 @@ import org.slf4j.LoggerFactory;
 import com.hp.hpl.jena.rdf.model.Container;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
-import com.unit4.cli.Options;
-import com.unit4.input.U4Input;
+import com.unit4.cli.U4Options;
+import com.unit4.input.U4InputI;
 import com.unit4.output.U4Output;
 import com.unit4.vocabulary.U4AdJoinTemplate;
 
@@ -31,9 +31,9 @@ public class U4Common {
 
 	// Instance.
 	
-	private U4Input input;
+	private U4InputI input;
 	private U4Output output;
-	private Options options;
+	private U4Options options;
 	private U4AdJoinTemplate template;
 	private U4Columns columns;
 	private U4Row row;
@@ -44,12 +44,12 @@ public class U4Common {
 		common();
 	}
 	
-	public void setInput(U4Input input) {
+	public void setInput(U4InputI input) {
 		this.input = input;
 		input.setCommon(this);
 	}
 	
-	public U4Input getInput() {
+	public U4InputI getInput() {
 		return this.input;
 	}
 	
@@ -62,11 +62,11 @@ public class U4Common {
 		return this.output;
 	}
 
-	public void setOptions(Options options) {
+	public void setOptions(U4Options options) {
 		this.options = options;
 	}
 	
-	public Options getOptions() {
+	public U4Options getOptions() {
 		return this.options;
 	}
 	

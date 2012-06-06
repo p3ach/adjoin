@@ -1,6 +1,6 @@
 package com.unit4.cli;
 
-public class Argument {
+public class U4Argument {
 
 //	Class.
 	
@@ -10,15 +10,15 @@ public class Argument {
 	private String name = null;
 	private String value = null;
 
-	public Argument() {
+	public U4Argument() {
 		
 	}
 	
-	public Argument(String text) {
+	public U4Argument(String text) {
 		setText(text);
 	}
 	
-	public Argument setText(String text) {
+	public U4Argument setText(String text) {
 		this.text = text;
 
 		if (text.startsWith("--")) { // Long form argument i.e. --help

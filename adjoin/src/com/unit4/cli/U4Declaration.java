@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class Declaration {
+public class U4Declaration {
 	
 //	Class.
 	
@@ -15,7 +15,7 @@ public class Declaration {
 	
 	public static final List<String> EMPTY_VALID_VALUES = new ArrayList<String>();
 	
-	public static final Handler NULL_HANDLER = null;
+	public static final U4Handler NULL_HANDLER = null;
 	
 	public static final List<String> EMPTY_NAMES = new ArrayList<String>();
 	
@@ -29,14 +29,14 @@ public class Declaration {
 	
 	private Boolean requireValue;
 	private List<String> validValues;
-	private Handler handler;
+	private U4Handler handler;
 	private List<String> names;
 	private Boolean lookFor;
 	private Boolean endCLI;
 
 //	Constructors.
 	
-	public Declaration() {
+	public U4Declaration() {
 		this(NO_REQUIRE_VALUE, null, NULL_HANDLER, EMPTY_NAMES, NO_LOOK_FOR, NO_END_CLI);
 	}
 
@@ -44,23 +44,23 @@ public class Declaration {
 	 * Declare a value handler. 
 	 * @param handler
 	 */
-	public Declaration(Handler handler) {
+	public U4Declaration(U4Handler handler) {
 		this(NO_REQUIRE_VALUE, null, handler, null, NO_LOOK_FOR, NO_END_CLI);
 	}
 	
-	public Declaration(Handler handler, List<String> names) {
+	public U4Declaration(U4Handler handler, List<String> names) {
 		this(NO_REQUIRE_VALUE, null, handler, names, NO_LOOK_FOR, NO_END_CLI);
 	}
 	
-	public Declaration(Boolean requireValue, Handler handler, List<String> names) {
+	public U4Declaration(Boolean requireValue, U4Handler handler, List<String> names) {
 		this(requireValue, null, handler, names, NO_LOOK_FOR, NO_END_CLI);
 	}
 	
-	public Declaration(Handler handler, List<String> names, Boolean lookFor) {
+	public U4Declaration(U4Handler handler, List<String> names, Boolean lookFor) {
 		this(NO_REQUIRE_VALUE, null, handler, names, lookFor, NO_END_CLI);
 	}
 	
-	public Declaration(Boolean requireValue, List<String> validValues, Handler handler, List<String> names, Boolean lookFor, Boolean endCLI) {
+	public U4Declaration(Boolean requireValue, List<String> validValues, U4Handler handler, List<String> names, Boolean lookFor, Boolean endCLI) {
 		setRequireValue(requireValue);
 		setValidValues(validValues);
 		setHandler(handler);
@@ -71,7 +71,7 @@ public class Declaration {
 	
 //	Set/Get (Has).
 	
-	public Declaration setRequireValue(Boolean value) {
+	public U4Declaration setRequireValue(Boolean value) {
 		this.requireValue = value;
 		return this;
 	}
@@ -80,7 +80,7 @@ public class Declaration {
 		return this.requireValue;
 	}
 	
-	public Declaration setValidValues(List<String> validValues) {
+	public U4Declaration setValidValues(List<String> validValues) {
 		this.validValues = validValues;
 		return this;
 	}
@@ -93,12 +93,12 @@ public class Declaration {
 		return this.validValues;
 	}
 	
-	public Declaration setHandler(Handler handler) {
+	public U4Declaration setHandler(U4Handler handler) {
 		this.handler = handler;
 		return this;
 	}
 	
-	public Handler getHandler() {
+	public U4Handler getHandler() {
 		return this.handler;
 	}
 	
@@ -106,7 +106,7 @@ public class Declaration {
 		return (getHandler() != null);
 	}
 	
-	public Declaration setNames(List<String> names) {
+	public U4Declaration setNames(List<String> names) {
 		this.names = names;
 		return this;
 	}
@@ -127,7 +127,7 @@ public class Declaration {
 		}
 	}
 	
-	public Declaration setLookFor(Boolean lookFor) {
+	public U4Declaration setLookFor(Boolean lookFor) {
 		this.lookFor = lookFor;
 		return this;
 	}
@@ -136,7 +136,7 @@ public class Declaration {
 		return this.lookFor;
 	}
 	
-	public Declaration setEndCLI(Boolean endCLI) {
+	public U4Declaration setEndCLI(Boolean endCLI) {
 		this.endCLI = endCLI;
 		return this;
 	}
@@ -145,12 +145,12 @@ public class Declaration {
 		return this.endCLI;
 	}
 	
-	public Boolean equals(Argument argument) {
+	public Boolean equals(U4Argument argument) {
 		return hasName(argument.getName());
 	}
 	
-	public Boolean equals(List<Argument> arguments) {
-		for (Argument argument : arguments) {
+	public Boolean equals(List<U4Argument> arguments) {
+		for (U4Argument argument : arguments) {
 			if (hasName(argument.getName())) {
 				return true;
 			}

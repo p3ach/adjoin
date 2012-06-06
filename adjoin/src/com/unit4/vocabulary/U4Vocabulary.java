@@ -24,7 +24,7 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.JenaException;
 import com.hp.hpl.jena.util.FileManager;
 import com.hp.hpl.jena.vocabulary.RDF;
-import com.unit4.exception.Exception;
+import com.unit4.exception.U4Exception;
 
 /**
  * Provides the heavy lifting between a vocabulary and the underlying model.
@@ -87,10 +87,10 @@ public class U4Vocabulary {
 	public U4Vocabulary readModel(String uri) {
 		try {
 			if (FileManager.get().readModel(getModel(), uri) == null) {
-				throw new Exception(String.format("Unable to read %s.", uri));
+				throw new U4Exception(String.format("Unable to read %s.", uri));
 			}
 		} catch (JenaException e) {
-			throw new Exception(String.format("Unable to read %s.", uri), e);
+			throw new U4Exception(String.format("Unable to read %s.", uri), e);
 		}
 		return this;
 	}
@@ -160,7 +160,7 @@ public class U4Vocabulary {
 		} else if (hasSeq()) {
 			return getSeq();
 		} else {
-			throw new Exception(String.format("No container found for %s", getSubject().toString()));
+			throw new U4Exception(String.format("No container found for %s", getSubject().toString()));
 		}
 	}
 	
@@ -213,11 +213,11 @@ public class U4Vocabulary {
 	public Resource getResource(Property property) {
 		RDFNode node = getProperty(property);
 		if (node == null) {
-			throw new Exception("Node is null.");
+			throw new U4Exception("Node is null.");
 		} else if (node.isResource()) {
 			return node.asResource();
 		} else {
-			throw new Exception("Node is not a Resource.");
+			throw new U4Exception("Node is not a Resource.");
 		}
 	}
 	
@@ -233,11 +233,11 @@ public class U4Vocabulary {
 	public Integer getInteger(Property property) {
 		RDFNode node = getProperty(property);
 		if (node == null) {
-			throw new Exception("Node is null.");
+			throw new U4Exception("Node is null.");
 		} else if (node.isLiteral()) {
 			return node.asLiteral().getInt();
 		} else {
-			throw new Exception("Node is not a Literal.");
+			throw new U4Exception("Node is not a Literal.");
 		}
 	}
 	
@@ -245,13 +245,13 @@ public class U4Vocabulary {
 		logger.debug("getProperty({})", property);
 		final RDFNode node = getProperty(property);
 		if (node == null) {
-			throw new Exception(String.format("Node is null for %s %s.", getSubject(), property));
+			throw new U4Exception(String.format("Node is null for %s %s.", getSubject(), property));
 		} else if (node.isLiteral()) {
 			final String getString = node.asLiteral().getString();
 			logger.trace("={}", getString);
 			return getString;
 		} else {
-			throw new Exception("Node is not a Literal.");
+			throw new U4Exception("Node is not a Literal.");
 		}
 	}
 	
@@ -265,7 +265,7 @@ public class U4Vocabulary {
 			logger.trace("={}", getString);
 			return getString;
 		} else {
-			throw new Exception("Node is not a Literal.");
+			throw new U4Exception("Node is not a Literal.");
 		}
 	}
 	

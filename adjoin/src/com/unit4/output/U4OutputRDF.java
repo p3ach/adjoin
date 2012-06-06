@@ -4,6 +4,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.io.StringWriter;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,10 +36,10 @@ import com.hp.hpl.jena.rdf.model.Seq;
 import com.hp.hpl.jena.rdf.model.impl.LiteralImpl;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
-import com.unit4.cli.Options;
-import com.unit4.exception.Exception;
-import com.unit4.input.U4Input;
-import com.unit4.input.U4InputCallback;
+import com.unit4.cli.U4Options;
+import com.unit4.exception.U4Exception;
+import com.unit4.input.U4InputI;
+import com.unit4.input.U4InputCallbackI;
 import com.unit4.tabular.U4Columns;
 import com.unit4.tabular.U4Common;
 import com.unit4.tabular.U4Row;
@@ -75,7 +77,7 @@ public class U4OutputRDF implements U4Output {
 
 	private final VelocityContext context = new VelocityContext();
 	
-	private Options options;
+	private U4Options options;
 	
 	public U4OutputRDF() {
    		Velocity.init();
@@ -107,12 +109,12 @@ public class U4OutputRDF implements U4Output {
 	}
 	
 	protected OutputStream getOutputStream() {
-		final Options options = getOptions();
+		final U4Options options = getOptions();
 		if (options.hasOption("outputURI")) {
 			try {
 				return new FileOutputStream(getOutputURI());
 			} catch (FileNotFoundException e) {
-				throw new Exception("Failed to create output file.", e);
+				throw new U4Exception("Failed to create output file.", e);
 			}
 		} else {
 			return DEFAULT_OUTPUT_STREAM;
@@ -130,12 +132,12 @@ public class U4OutputRDF implements U4Output {
 	}
 	
 	@Override
-	public void setOptions(Options options) {
+	public void setOptions(U4Options options) {
 		this.options = options;
 	}
 
 	@Override
-	public Options getOptions() {
+	public U4Options getOptions() {
 		return this.options;
 	}
 	
@@ -143,7 +145,7 @@ public class U4OutputRDF implements U4Output {
 	 * Convenience method same as <code>getCommon().getInput()</code>.
 	 * @return
 	 */
-	protected U4Input getInput() {
+	protected U4InputI getInput() {
 		return getCommon().getInput();
 	}
 	
@@ -228,7 +230,7 @@ public class U4OutputRDF implements U4Output {
 			}
 		}
 
-	   	final U4InputCallback inputCallback = new U4InputCallback() {
+	   	final U4InputCallbackI inputCallback = new U4InputCallbackI() {
 	   		final U4AdJoinCallback adjoinCallback = new U4AdJoinCallback() {
 	   			class U4Resource {
 	   				private String uri;
@@ -249,6 +251,11 @@ public class U4OutputRDF implements U4Output {
 	   							setSeq((Seq) getCommon().setValue(uri, getModel().createSeq()));
 	   						}
 	   					} else {
+		   					try {
+								new URI(uri);
+							} catch (URISyntaxException e) {
+								throw new U4Exception(String.format("Failed to create valid URI from [%s].", uri), e);
+							}
 	   						setResource(getModel().createResource(uri));
 	   					}
 	   				}
@@ -319,7 +326,7 @@ public class U4OutputRDF implements U4Output {
 						}
 						return;
 					} else {
-						throw new Exception(String.format("Unknown objectType [%s].", objectType));
+						throw new U4Exception(String.format("Unknown objectType [%s].", objectType));
 					}
 				}
 
@@ -338,23 +345,23 @@ public class U4OutputRDF implements U4Output {
 							logger.trace("output={}", evaluate);
 							return evaluate;
 						} else {
-							throw new Exception("Velocity returned false.");
+							throw new U4Exception("Velocity returned false.");
 						}
 					} catch (ParseErrorException e) {
 						logger.error("evaluate({}) error.", input);
-						throw new Exception("Velocity threw a ParseError.", e);
+						throw new U4Exception("Velocity threw a ParseError.", e);
 					} catch (MethodInvocationException e) {
 						logger.error("evaluate({}) error.", input);
-						throw new Exception("Velocity threw a MethodInvocation.", e);
+						throw new U4Exception("Velocity threw a MethodInvocation.", e);
 					} catch (ResourceNotFoundException e) {
 						logger.error("evaluate({}) error.", input);
-						throw new Exception("Velocity threw a ResourceNotFound", e);
+						throw new U4Exception("Velocity threw a ResourceNotFound", e);
 					}
 				}
 			};
 			
    			@Override
-			public U4InputCallback header() {
+			public U4InputCallbackI header() {
    				logger.trace("header()");
 		        for (U4AdJoin headerTemplate : headerTemplates) {
 	        		headerTemplate.getStatements(adjoinCallback);
@@ -363,7 +370,7 @@ public class U4OutputRDF implements U4Output {
 			}
 			
 			@Override
-			public U4InputCallback beforeRow() {
+			public U4InputCallbackI beforeRow() {
 				logger.trace("beforeRow()");
 			    for (U4AdJoin beforeRowtemplate : beforeRowTemplates) {
 		    		beforeRowtemplate.getStatements(adjoinCallback);
@@ -372,7 +379,7 @@ public class U4OutputRDF implements U4Output {
 			}
 			
 			@Override
-			public U4InputCallback row() {
+			public U4InputCallbackI row() {
 				logger.trace("row()");
 				final U4Columns columns = getColumns();
 				for (String value : common.getRow()) {
@@ -396,7 +403,7 @@ public class U4OutputRDF implements U4Output {
 			}
 			
 			@Override
-			public U4InputCallback afterRow() {
+			public U4InputCallbackI afterRow() {
 				logger.trace("afterRow()");
 			    for (U4AdJoin afterRowtemplate : afterRowTemplates) {
 		    		afterRowtemplate.getStatements(adjoinCallback);
@@ -405,7 +412,7 @@ public class U4OutputRDF implements U4Output {
 			}
 			
 			@Override
-			public U4InputCallback footer() {
+			public U4InputCallbackI footer() {
 				logger.trace("footer()");
 		        for (U4AdJoin footerTemplate : footerTemplates) {
 	        		footerTemplate.getStatements(adjoinCallback);
@@ -430,6 +437,6 @@ public class U4OutputRDF implements U4Output {
 	
 	@Override
 	public String toString() {
-		return String.format("U4OutputRDF outputURI[%s]", getOutputURI());
+		return String.format("U4OutputRDF");
 	}
 }

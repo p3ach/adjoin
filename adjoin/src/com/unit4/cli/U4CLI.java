@@ -7,18 +7,18 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.unit4.exception.Exception;
+import com.unit4.exception.U4Exception;
 
 /**
  * 
  * @author dick
  *
  */
-public class CLI {
+public class U4CLI {
 	
 //	Class.
 
-	private static Logger logger = LoggerFactory.getLogger(CLI.class);
+	private static Logger logger = LoggerFactory.getLogger(U4CLI.class);
 
 	public static final Boolean AUTO_HELP = true;
 	public static final Boolean NO_AUTO_HELP = false;
@@ -27,42 +27,42 @@ public class CLI {
 	
 	private Boolean autoHelp;
 	
-	private List<Declaration> declarations;
+	private List<U4Declaration> declarations;
 
-	private List<Argument> arguments;
+	private List<U4Argument> arguments;
 
-	private final Declaration HELP = new Declaration(
-			Declaration.NO_REQUIRE_VALUE,
+	private final U4Declaration HELP = new U4Declaration(
+			U4Declaration.NO_REQUIRE_VALUE,
 			null,
-			new Handler() {
-				public void go(Argument argument) {
+			new U4Handler() {
+				public void go(U4Argument argument) {
 					autoHelp();
 				}
 			},
 			Arrays.asList("h", "help"),
-			Declaration.LOOK_FOR,
-			Declaration.END_CLI
+			U4Declaration.LOOK_FOR,
+			U4Declaration.END_CLI
 		);
 	
 	
 //	Constructors.
 	
-	public CLI() {
-		this(AUTO_HELP, new ArrayList<Declaration>());
+	public U4CLI() {
+		this(AUTO_HELP, new ArrayList<U4Declaration>());
 	}
 	
-	public CLI(List<Declaration> declarations) {
+	public U4CLI(List<U4Declaration> declarations) {
 		this(AUTO_HELP, declarations);
 	}
 	
-	public CLI(Boolean autoHelp, List<Declaration> declarations) {
+	public U4CLI(Boolean autoHelp, List<U4Declaration> declarations) {
 		setAutoHelp(autoHelp);
 		setDeclarations(declarations);
 	}
 	
 //	Set/Get (Has).
 	
-	public CLI setAutoHelp(Boolean autoHelp) {
+	public U4CLI setAutoHelp(Boolean autoHelp) {
 		this.autoHelp = autoHelp;
 		return this;
 	}
@@ -71,7 +71,7 @@ public class CLI {
 		return this.autoHelp;
 	}
 	
-	public CLI setDeclarations(List<Declaration> declarations) {
+	public U4CLI setDeclarations(List<U4Declaration> declarations) {
 		this.declarations = declarations;
 		if (getAutoHelp()) {
 			this.declarations.add(HELP);
@@ -79,12 +79,12 @@ public class CLI {
 		return this;
 	}
 	
-	public List<Declaration> getDeclarations() {
+	public List<U4Declaration> getDeclarations() {
 		return this.declarations;
 	}
 	
-	public Declaration getDeclaration(Argument argument) {
-		for (Declaration declaration : getDeclarations()) {
+	public U4Declaration getDeclaration(U4Argument argument) {
+		for (U4Declaration declaration : getDeclarations()) {
 			if (declaration.hasName(argument.getName())) {
 				return declaration;
 			}
@@ -92,16 +92,16 @@ public class CLI {
 		return null;
 	}
 
-	public CLI setArguments(String[] argv) {
-		List<Argument> arguments = new ArrayList<Argument>();
+	public U4CLI setArguments(String[] argv) {
+		List<U4Argument> arguments = new ArrayList<U4Argument>();
 		for (String text : argv) {
-			arguments.add(new Argument(text));
+			arguments.add(new U4Argument(text));
 		}
 		this.arguments = arguments;
 		return this;
 	}
 	
-	public List<Argument> getArguments() {
+	public List<U4Argument> getArguments() {
 		return this.arguments;
 	}
 	
@@ -118,9 +118,9 @@ public class CLI {
 	 * Run the CLI.
 	 */
 	public void go() {
-		for (Declaration declaration : getDeclarations()) {
+		for (U4Declaration declaration : getDeclarations()) {
 			if (declaration.getLookFor()) {
-				for (Argument argument : getArguments()) {
+				for (U4Argument argument : getArguments()) {
 					if (declaration.equals(argument)) {
 						declaration.getHandler().go(argument);
 						if (declaration.getEndCLI()) {
@@ -131,7 +131,7 @@ public class CLI {
 			}
 		}
 		
-        for (Argument argument : getArguments()) {
+        for (U4Argument argument : getArguments()) {
             if (endProcessing(argument)) {
                 break ;
             }
@@ -139,7 +139,7 @@ public class CLI {
                 continue ;
             }
             
-	        Declaration declaration = match(argument);
+	        U4Declaration declaration = match(argument);
 	        if (declaration == null) {
         		unknownArgument(argument);
 	        } else {
@@ -167,8 +167,8 @@ public class CLI {
 		}
 	}
 
-	public Declaration match(Argument argument) {
-		for (Declaration declaration : getDeclarations()) {
+	public U4Declaration match(U4Argument argument) {
+		for (U4Declaration declaration : getDeclarations()) {
 			if (declaration.hasName(argument.getName())) {
 				return declaration;
 			}
@@ -176,32 +176,32 @@ public class CLI {
 		return null;
 	}
 	
-	protected Boolean endProcessing(Argument argument) {
+	protected Boolean endProcessing(U4Argument argument) {
 		return false;
 	}
 	
-	protected Boolean ignoreArgument(Argument argument) {
+	protected Boolean ignoreArgument(U4Argument argument) {
 		return false;
 	}
 	
-	protected void unknownArgument(Argument argument) {
+	protected void unknownArgument(U4Argument argument) {
 		autoHelp();
-		throw new Exception(String.format("Unknown argument [%s].", argument.toString()));
+		throw new U4Exception(String.format("Unknown argument [%s].", argument.toString()));
 	}
 	
-	protected void missingValue(Declaration declaration) {
+	protected void missingValue(U4Declaration declaration) {
 		autoHelp();
-		throw new Exception(String.format("Missing value for [%s].", declaration));
+		throw new U4Exception(String.format("Missing value for [%s].", declaration));
 	}
 
-	protected void invalidValue(Declaration declaration, Argument argument) {
+	protected void invalidValue(U4Declaration declaration, U4Argument argument) {
 		autoHelp();
-		throw new Exception(String.format("Invalid value for [%s] with [%s].", declaration, argument));
+		throw new U4Exception(String.format("Invalid value for [%s] with [%s].", declaration, argument));
 	}
 
 	public void autoHelp() {
 		logger.info("autoHelp()");
-		for (Declaration declaration : getDeclarations()) {
+		for (U4Declaration declaration : getDeclarations()) {
 			logger.info("{}", declaration.toString());
 		}
 	}
@@ -212,7 +212,7 @@ public class CLI {
 	
 	public String renderAsText() {
 		StringBuilder sb = new StringBuilder();
-		for (Declaration declaration : getDeclarations()) {
+		for (U4Declaration declaration : getDeclarations()) {
 //			sb.append(ad.getNames() + ":" + ad.getValue() + "\n");
 		}
 		return sb.toString();

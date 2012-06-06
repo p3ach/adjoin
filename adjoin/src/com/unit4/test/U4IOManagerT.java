@@ -5,10 +5,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import com.unit4.file.U4FileManagerC;
-import com.unit4.file.U4FileManagerI;
+import com.unit4.io.U4IOManagerC;
 
-public class U4FileManagerT {
+public class U4IOManagerT {
 
 	private static String HTTP_FILE = "http://data.companieshouse.gov.uk/doc/company/06987288.rdf";
 
@@ -19,16 +18,17 @@ public class U4FileManagerT {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		final U4FileManagerI fileManager = U4FileManagerC.getInstance().open(FTP_FILE);
-		System.out.println(fileManager.toString());
-		final InputStream inputStream = fileManager.open();
+//		read(U4FileManagerC.getInstance().open(HTTP_FILE));
+		read(U4IOManagerC.getInstance().open(FTP_FILE));
+	}
+
+	private static void read(InputStream inputStream) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(inputStream, "US-ASCII"));
 	    String line;
 	    while ((line = br.readLine()) != null) {
 	    	System.out.println(line);
 	    }
 	    inputStream.close();
-		fileManager.close();
 	}
-
+	
 }

@@ -32,7 +32,7 @@ import com.hp.hpl.jena.rdf.model.impl.LiteralImpl;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 import com.hp.hpl.jena.vocabulary.XSD;
-import com.unit4.exception.Exception;
+import com.unit4.exception.U4Exception;
 import com.unit4.output.U4OutputRDF;
 import com.unit4.tabular.U4Common;
 
@@ -121,10 +121,10 @@ public class U4AdJoin extends U4Vocabulary {
 			} else if (datatype.equals(XSD.decimal)) {
 				return ResourceFactory.createTypedLiteral(object, XSDDatatype.XSDdecimal);
 			} else {
-				throw new Exception(String.format("Datatype %s is unknown.", datatype.toString()));
+				throw new U4Exception(String.format("Datatype %s is unknown.", datatype.toString()));
 			}
 		} else {
-			throw new Exception("Type is unknown.");
+			throw new U4Exception("Type is unknown.");
 		}
 	}
 	

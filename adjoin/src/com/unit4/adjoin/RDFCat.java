@@ -6,13 +6,13 @@ import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.unit4.cli.Argument;
-import com.unit4.cli.CLI;
-import com.unit4.cli.Declaration;
-import com.unit4.cli.Handler;
-import com.unit4.cli.Options;
-import com.unit4.input.U4Input;
-import com.unit4.input.U4InputFactory;
+import com.unit4.cli.U4Argument;
+import com.unit4.cli.U4CLI;
+import com.unit4.cli.U4Declaration;
+import com.unit4.cli.U4Handler;
+import com.unit4.cli.U4Options;
+import com.unit4.input.U4InputI;
+import com.unit4.input.U4InputF;
 import com.unit4.output.U4Output;
 import com.unit4.output.U4OutputFactory;
 import com.unit4.tabular.U4Columns;
@@ -42,93 +42,93 @@ public class RDFCat {
 
 //    Instance.
 
-    public final Declaration VALUE = new Declaration(
-		new Handler() {
-			public void go(Argument argument) {
+    public final U4Declaration VALUE = new U4Declaration(
+		new U4Handler() {
+			public void go(U4Argument argument) {
 				parse(argument);
 			}
 		}
     );
     
-    public final Declaration ADD_TEMPLATE = new Declaration(
-    	Declaration.REQUIRE_VALUE, 
-		new Handler() {
-			public void go(Argument argument) {
+    public final U4Declaration ADD_TEMPLATE = new U4Declaration(
+    	U4Declaration.REQUIRE_VALUE, 
+		new U4Handler() {
+			public void go(U4Argument argument) {
 				addTemplate(argument.getValue());
 			}
 		},
 		Arrays.asList("addTemplate")
 	);
    
-    public final Declaration ADD_GROUP = new Declaration(
-		Declaration.REQUIRE_VALUE, 
-		new Handler() {
-			public void go(Argument argument) {
+    public final U4Declaration ADD_GROUP = new U4Declaration(
+		U4Declaration.REQUIRE_VALUE, 
+		new U4Handler() {
+			public void go(U4Argument argument) {
 				addGroup(argument.getValue());
 			}
 		},
 		Arrays.asList("addGroup")
 	);
     
-    public final Declaration OUTPUT_URI = new Declaration(
-		Declaration.NO_REQUIRE_VALUE,
-		new Handler() {
-			public void go(Argument argument) {
+    public final U4Declaration OUTPUT_URI = new U4Declaration(
+		U4Declaration.NO_REQUIRE_VALUE,
+		new U4Handler() {
+			public void go(U4Argument argument) {
 				setOption("outputURI", argument.getValue());
 			}
 		},
 		Arrays.asList("o", "outputURI")
 	);
     
-    public final Declaration OUTPUT_LANGUAGE = new Declaration(
-		Declaration.REQUIRE_VALUE,
-		new Handler() {
-			public void go(Argument argument) {
+    public final U4Declaration OUTPUT_LANGUAGE = new U4Declaration(
+		U4Declaration.REQUIRE_VALUE,
+		new U4Handler() {
+			public void go(U4Argument argument) {
 				setOption("outputLanguage", argument.getValue());
 			}
 		},
 		Arrays.asList("outputLanguage")
 	);
     
-    public final Declaration INPUT_MAX_ROWS = new Declaration(
-    		Declaration.NO_REQUIRE_VALUE,
-    		new Handler() {
-				public void go(Argument argument) {
+    public final U4Declaration INPUT_MAX_ROWS = new U4Declaration(
+    		U4Declaration.NO_REQUIRE_VALUE,
+    		new U4Handler() {
+				public void go(U4Argument argument) {
 					setOption("inputMaxRows", argument.getValue());
 				}
 			},
 			Arrays.asList("inputMaxRows")
 	);
     
-    public final Declaration WIZARD = new Declaration(
-    		Declaration.REQUIRE_VALUE,
+    public final U4Declaration WIZARD = new U4Declaration(
+    		U4Declaration.REQUIRE_VALUE,
     		Arrays.asList("Example", "RDFS", "IATI", "CSV2Template"),
-    		new Handler() {
-				public void go(Argument argument) {
+    		new U4Handler() {
+				public void go(U4Argument argument) {
 					wizard(argument.getValue());
 				}
 			},
 			Arrays.asList("wizard"),
-			Declaration.NO_LOOK_FOR,
-			Declaration.NO_END_CLI
+			U4Declaration.NO_LOOK_FOR,
+			U4Declaration.NO_END_CLI
 	);
     
-    public final Declaration DEBUG = new Declaration(
-    		Declaration.REQUIRE_VALUE,
+    public final U4Declaration DEBUG = new U4Declaration(
+    		U4Declaration.REQUIRE_VALUE,
     		Arrays.asList("Common"),
-    		new Handler() {
-				public void go(Argument argument) {
+    		new U4Handler() {
+				public void go(U4Argument argument) {
 					setOption(argument.getText(), true);
 				}
 			},
 			Arrays.asList("debug"),
-			Declaration.NO_LOOK_FOR,
-			Declaration.NO_END_CLI
+			U4Declaration.NO_LOOK_FOR,
+			U4Declaration.NO_END_CLI
 	);
     
-    private CLI cli = new CLI(new ArrayList<Declaration>(Arrays.asList(VALUE, INPUT_MAX_ROWS, ADD_TEMPLATE, ADD_GROUP, OUTPUT_URI, OUTPUT_LANGUAGE, WIZARD, DEBUG)));
+    private U4CLI cli = new U4CLI(new ArrayList<U4Declaration>(Arrays.asList(VALUE, INPUT_MAX_ROWS, ADD_TEMPLATE, ADD_GROUP, OUTPUT_URI, OUTPUT_LANGUAGE, WIZARD, DEBUG)));
     
-    private Options options = new Options();
+    private U4Options options = new U4Options();
     
     private final U4AdJoinTemplate template = new U4AdJoinTemplate();
     
@@ -157,7 +157,7 @@ public class RDFCat {
     	getOptions().setOption(key, value);
     }
     
-    protected Options getOptions() {
+    protected U4Options getOptions() {
     	return this.options;
     }
 
@@ -182,13 +182,13 @@ public class RDFCat {
        	cli.go(args);
     }
     
-    protected void parse(Argument argument) {
+    protected void parse(U4Argument argument) {
     	logger.info("Parsing [{}].", argument.getValue());
 
     	final U4Common common = new U4Common();
-    	final U4Input input = U4InputFactory.getInstance().createInputByURI(argument.getValue());
+    	final U4InputI input = U4InputF.getInstance().createInputByURI(argument.getValue());
     	final U4Output output = U4OutputFactory.getInstance().createOutputByType("RDF");
-    	final Options options = getOptions();
+    	final U4Options options = getOptions();
     	
     	options.setOption("inputURI", argument.getValue());
     	input.setOptions(options);

@@ -17,7 +17,7 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import com.hp.hpl.jena.graph.impl.Fragments.GetSlot;
 import com.hp.hpl.jena.util.FileManager;
-import com.unit4.cli.Options;
+import com.unit4.cli.U4Options;
 import com.unit4.tabular.U4Common;
 import com.unit4.tabular.U4Row;
 import com.unit4.xml.U4Attribute;
@@ -28,7 +28,7 @@ import com.unit4.xml.U4Element;
  * @author dick
  *
  */
-public class U4InputXML extends DefaultHandler implements U4Input {
+public class U4InputXML extends DefaultHandler implements U4InputI {
 //	Class.
 	
 	private static Logger logger = LoggerFactory.getLogger(U4InputXML.class);
@@ -36,8 +36,8 @@ public class U4InputXML extends DefaultHandler implements U4Input {
 	// Instance.
 	
 	private U4Common common;
-	private Options options;
-	private U4InputCallback callback;
+	private U4Options options;
+	private U4InputCallbackI callback;
 	
 	private Stack<U4Element> elements = new Stack<U4Element>();
 	
@@ -48,7 +48,7 @@ public class U4InputXML extends DefaultHandler implements U4Input {
 	}
 	
 	@Override
-	public U4Input setCommon(U4Common common) {
+	public U4InputI setCommon(U4Common common) {
 		this.common = common;
 		return this;
 	}
@@ -59,23 +59,23 @@ public class U4InputXML extends DefaultHandler implements U4Input {
 	}
 
 	@Override
-	public void setOptions(Options options) {
+	public void setOptions(U4Options options) {
 		this.options = options;
 	}
 
 	@Override
-	public Options getOptions() {
+	public U4Options getOptions() {
 		return this.options;
 	}
 
 	@Override
-	public U4Input setCallback(U4InputCallback callback) {
+	public U4InputI setCallback(U4InputCallbackI callback) {
 		this.callback = callback;
 		return this;
 	}
 	
 	@Override
-	public U4InputCallback getCallback() {
+	public U4InputCallbackI getCallback() {
 		return this.callback;
 	}
 	
@@ -199,14 +199,14 @@ public class U4InputXML extends DefaultHandler implements U4Input {
 		common.getRow().setIndex(element.getIndex()); // Use the Element index to set the row index.
 		common.getRow().setValues(values);
 
-		final U4InputCallback callback = getCallback();
+		final U4InputCallbackI callback = getCallback();
 		callback.beforeRow();
 		callback.row();
 		callback.afterRow();
 	}
 	
 	protected Long getMaxRows() {
-		final Options options = getOptions();
+		final U4Options options = getOptions();
 		if (options.hasOption("inputMaxRows")) {
 			return Long.valueOf((String) options.getOption("inputMaxRows"));
 		} else {

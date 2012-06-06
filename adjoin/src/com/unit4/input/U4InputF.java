@@ -1,17 +1,17 @@
 package com.unit4.input;
 
 
-public class U4InputFactory {
+public class U4InputF {
 	
 	// Inner.
 	
 	private static class Holder { 
-        public static final U4InputFactory instance = new U4InputFactory();
+        public static final U4InputF instance = new U4InputF();
 	}
 
 	// Class.
 	
-	public static U4InputFactory getInstance() {
+	public static U4InputF getInstance() {
 	        return Holder.instance;
 	}
 	
@@ -20,10 +20,10 @@ public class U4InputFactory {
 	/**
 	 * Cannot be instantiated.
 	 */
-	private U4InputFactory() {
+	private U4InputF() {
 	}
 
-	public U4Input createInputByType(String type) {
+	public U4InputI createInputByType(String type) {
 		if (type == "csv") {
 			return new U4InputCSV();
 		} else if (type == "xml") {
@@ -33,7 +33,7 @@ public class U4InputFactory {
 		}
 	}
 	
-	public U4Input createInputByURI(String uri) {
+	public U4InputI createInputByURI(String uri) {
 		if (uri.endsWith(".csv")) {
 			return new U4InputCSV();
 		} else if (uri.endsWith(".xml")) {
