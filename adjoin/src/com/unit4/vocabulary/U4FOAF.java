@@ -14,6 +14,7 @@ public class U4FOAF extends U4Vocabulary {
 //    public static final Resource Alt = createResource(getURI("Alt"));
 
     public static final Property homepage = createProperty(getURI("homepage"));
+    public static final Property mbox = createProperty(getURI("mbox"));
 		
 	public static String getPrefix() {
 		return PREFIX;

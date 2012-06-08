@@ -191,12 +191,14 @@ public class RDFCat {
     	final U4Options options = getOptions();
     	
     	options.setOption("inputURI", argument.getValue());
+    	
     	input.setOptions(options);
     	output.setOptions(options);
     	
     	common.setInput(input);
     	common.setOutput(output);
     	common.setOptions(options);
+    	common.setValue("defaultTemplatePriority", getOptions().getOption("defaultTemplatePriority", 65000));
 		common.setTemplate(getTemplate());
     	common.setColumns(new U4Columns());
 		common.setRow(new U4Row());

@@ -50,6 +50,7 @@ public class U4Vocabulary {
 	}
 	
 	public static void setNsPrefix(Model model) {
+		model.setNsPrefix(getPrefix(), getNS());
 	}
 
 	public static String getURI(String fragment) {
@@ -233,11 +234,11 @@ public class U4Vocabulary {
 	public Integer getInteger(Property property) {
 		RDFNode node = getProperty(property);
 		if (node == null) {
-			throw new U4Exception("Node is null.");
+			throw new U4Exception(String.format("Node is null for %s %s.", getSubject().toString(), property.toString()));
 		} else if (node.isLiteral()) {
 			return node.asLiteral().getInt();
 		} else {
-			throw new U4Exception("Node is not a Literal.");
+			throw new U4Exception(String.format("Node is not Literal for %s %s.", getSubject().toString(), property.toString()));
 		}
 	}
 	

@@ -1,7 +1,9 @@
 package com.unit4.input;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Stack;
 
@@ -18,6 +20,7 @@ import org.xml.sax.helpers.DefaultHandler;
 import com.hp.hpl.jena.graph.impl.Fragments.GetSlot;
 import com.hp.hpl.jena.util.FileManager;
 import com.unit4.cli.U4Options;
+import com.unit4.exception.U4SAXMaxRows;
 import com.unit4.tabular.U4Common;
 import com.unit4.tabular.U4Row;
 import com.unit4.xml.U4Attribute;
@@ -29,7 +32,7 @@ import com.unit4.xml.U4Element;
  *
  */
 public class U4InputXML extends DefaultHandler implements U4InputI {
-//	Class.
+	//	Class.
 	
 	private static Logger logger = LoggerFactory.getLogger(U4InputXML.class);
 
@@ -105,6 +108,8 @@ public class U4InputXML extends DefaultHandler implements U4InputI {
 	
 	@Override
 	public void parse() {
+		logger.debug("parse()");
+		logger.info("Started at {}.", new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
 		SAXParserFactory spf = SAXParserFactory.newInstance();
 		try {
 			SAXParser sp = spf.newSAXParser();
@@ -113,13 +118,18 @@ public class U4InputXML extends DefaultHandler implements U4InputI {
 			getCallback().header();
 			sp.parse(FileManager.get().open(getInputURI()), this);
 			getCallback().footer();
+			logger.info("Parsed {} elements.", getIndex());
 		}catch(SAXException se) {
 			se.printStackTrace();
 		}catch(ParserConfigurationException pce) {
 			pce.printStackTrace();
 		}catch (IOException ie) {
 			ie.printStackTrace();
-		}		
+		} catch (U4SAXMaxRows u) {
+			logger.info("Parsed {} elements.", getIndex());
+			logger.info("maxRows reached.");
+		}
+		logger.info("Finished at {}.", new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
 	}
 	
 	/**
@@ -164,30 +174,28 @@ public class U4InputXML extends DefaultHandler implements U4InputI {
 	public void endElement(String uri, String localName, String qName) throws SAXException {
 		logger.trace("endElement({})", qName);
 
-		final U4Element element = getElements().pop();
+		final U4Element element = getElements().pop(); // Pop the current Element.
 
-		if (element.getIndex() > getMaxRows()) {
+		if (element.getIndex() > getMaxRows()) { // Just return as we need to unwind the child Elements.
+			System.out.println("return");
 			return;
 		}
 		
 		final List<U4Attribute> attributes = element.getAttributes();
 		
 		final List<String> columns = new ArrayList<String>(attributes.size() + 2); // Attributes size + 1 for characters + 1 for parent.
+		final List<String> values = new ArrayList<String>(attributes.size() + 2); // Attributes size + 1 for characters + 1 for parent.
+
 		for (U4Attribute attribute : attributes) {
 			columns.add("[" + qName + "]" + attribute.getQName());
-		}
-
-		final List<String> values = new ArrayList<String>(attributes.size() + 2); // Attributes size + 1 for characters + 1 for parent.
-		for (U4Attribute attribute : attributes) {
 			values.add(attribute.getValue());
 		}
 
-		if (element.hasCharacters()) {
-			columns.add("[" + qName + "]");
-			values.add(element.getCharacters());
-		}
+		// Add the Element. If the Element has no Characters or Attributes this will be the only entry.
+		columns.add("[" + qName + "]");
+		values.add(element.hasCharacters() ? element.getCharacters() : null);
 
-		// XML is hierachical so create a parentRow entry if required i.e. not root element.
+		// XML is hierachical so create a []parentRow entry if required i.e. not root element.
 		final U4Element parent = element.getParent();
 		if (parent != null) {
 			columns.add("[]parentRow");
@@ -203,6 +211,11 @@ public class U4InputXML extends DefaultHandler implements U4InputI {
 		callback.beforeRow();
 		callback.row();
 		callback.afterRow();
+
+		if (element.getIndex().equals(getMaxRows())) {
+			throw new U4SAXMaxRows("maxRows reached.");
+		}
+
 	}
 	
 	protected Long getMaxRows() {

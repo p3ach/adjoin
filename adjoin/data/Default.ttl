@@ -48,7 +48,7 @@
 			adjoin:value "$Common.setValue(\"vocabularyURI\", $String.format(\"%s/%s/vocabulary#\", $Common.getValue(\"baseURI\"), $Common.getValue(\"randomUUID\")))"^^xsd:string ;
 		] ;
 		rdf:_4 [
-			adjoin:value "$Common.setValue(\"datasetURI\", $String.format(\"%s/%s/dataset\", $Common.getValue(\"baseURI\"), $Common.getValue(\"randomUUID\")))"^^xsd:string ;
+			adjoin:value "$Common.setValue(\"datasetURI\", $String.format(\"%s/data/%s\", $Common.getValue(\"baseURI\"), $Common.getValue(\"randomUUID\")))"^^xsd:string ;
 		] ;
 		rdf:_5 [
 			adjoin:value "$Common.setValue(\"datasetLicence\", \"http://data.gov.uk/terms-and-conditions\")"^^xsd:string ;
@@ -319,6 +319,32 @@
 	] ;
 .
 
+<http://id.unit4.com/template/AdJoin/Default/Column>
+	rdfs:comment "Default Column."@en;
+	adjoin:priority 65536;
+	skos:narrower <http://id.unit4.com/template/AdJoin/Default/Column/parentRow>;
+.
+
+<http://id.unit4.com/template/AdJoin/Default/Column/parentRow>
+	rdfs:comment "Handle the []parentRow column created by the U4InputXML class."@en ;
+	rdfs:comment "The regex pattern for []parentRow needs the [] to be escaped with a backslash which in itself needs to be escaped or the Jena parser throws an error."@en ;
+    adjoin:priority "65536"^^xsd:integer ;
+	adjoin:pattern "^\\[\\]parentRow$" ;
+	adjoin:statement [
+		a rdf:Seq ;
+		rdf:_1 [
+			adjoin:subjectURI "$Common.getValue(\"rowURI\")";
+			adjoin:propertyURI "$SKOS.broader";
+			adjoin:objectValue "$String.format(\"%s/row%s\", $Common.getValue(\"datasetURI\"), $Row.getValue())";
+		];
+		rdf:_2 [
+			adjoin:subjectURI "$String.format(\"%s/row%s\", $Common.getValue(\"datasetURI\"), $Row.getValue())";
+			adjoin:propertyURI "$SKOS.narrower";
+			adjoin:objectValue "$Common.getValue(\"rowURI\")";
+		];
+	];
+.
+
 <http://id.unit4.com/template/AdJoin/Default/BeforeRow>
 	adjoin:statement [
 		a rdf:Seq ;
@@ -364,44 +390,79 @@
 	adjoin:statement [
 		a rdf:Seq ;
 		rdf:_1 [
+			adjoin:value "$Common.countValue(\"unknownColumnCount\")";
 			adjoin:subjectURI "$Common.getValue(\"rowURI\")" ;
-			adjoin:propertyURI "$String.format(\"%scolumn%s\", $Common.getValue(\"vocabularyURI\"), $Columns.getIndex())" ;
-			adjoin:objectValue "[Blank]$Row.getIndex()/$Columns.getIndex()";
+			adjoin:propertyURI "$RDF.type" ;
+			adjoin:objectValue "$AdJoin.Unknown";
 		];
 		rdf:_2 [
+			adjoin:subjectURI "$Common.getValue(\"rowURI\")" ;
+			adjoin:propertyURI "$String.format(\"%srow%scolumn%s\", $Common.getValue(\"vocabularyURI\"), $Row.getIndex(), $Columns.getIndex())" ;
+			adjoin:objectValue "[Blank]$Row.getIndex()/$Columns.getIndex()";
+		];
+		rdf:_3 [
 			adjoin:subjectURI "[Blank]$Row.getIndex()/$Columns.getIndex()";
 			adjoin:propertyURI "$RDFS.label";
 			adjoin:objectType "$RDFS.Literal" ;
 			adjoin:objectValue "$Columns.getName()" ;
 			adjoin:objectDatatype "$XSD.string" ;
 		] ;
-		rdf:_3 [
+		rdf:_4 [
 			adjoin:subjectURI "[Blank]$Row.getIndex()/$Columns.getIndex()";
 			adjoin:propertyURI "$RDF.value";
 			adjoin:objectType "$RDFS.Literal" ;
 			adjoin:objectValue "$Row.getValue()" ;
 			adjoin:objectDatatype "$XSD.string" ;
 		] ;
-		rdf:_4 [
+#		rdf:_5 [
+#			adjoin:subjectURI "[Blank]$Row.getIndex()/$Columns.getIndex()";
+#			adjoin:propertyURI "$SKOS.member";
+#			adjoin:objectValue "$Row.getValue()" ;
+#		];
+		rdf:_5 [
 			adjoin:value "$Common.removeValue(\"[Blank]$Row.getIndex()/$Columns.getIndex()\")";
 		];
-		rdf:_5 [
+		rdf:_6 [
+			adjoin:after <http://id.unit4.com/template/AdJoin/Default/Row/Default/_Template>;
+		];
+	];
+.
+
+<http://id.unit4.com/template/AdJoin/Default/Row/Default/_Template>
+	rdfs:comment "Handles writing the AdJoin Template Column entries e.g. http://example.org/data/{GUID}/Column/{Column}";
+	adjoin:statement [
+		a rdf:Seq;
+		rdf:_1 [
 			adjoin:value "#if (!$Common.hasKey($Columns.getName())) $Common.setValue($Columns.getName(), $Common.countValue(\"templateColumnIndex\"))#end"
 		];
-		rdf:_6 [
-			adjoin:subjectURI "$Common.getValue($Columns.getName())";
+		rdf:_2 [
+			adjoin:value "$Common.getValue(\"columnTemplateURI\")";		
+		];
+		rdf:_3 [
+			adjoin:subjectURI "$Common.getValue(\"columnTemplateURI\")";
+			adjoin:propertyURI "$SKOS.narrower";
+			adjoin:objectValue "$Common.getValue(\"columnTemplateURI\")/$Common.getValue($Columns.getName())";
+		];
+		rdf:_4 [
+			adjoin:subjectURI "$Common.getValue(\"columnTemplateURI\")/$Common.getValue($Columns.getName())";
 			adjoin:propertyURI "$AdJoin.priority";
 			adjoin:objectType "$RDFS.Literal" ;
-			adjoin:objectValue "65000" ;
+			adjoin:objectValue "$Common.getValue(\"defaultTemplatePriority\")" ;
 			adjoin:objectDatatype "$XSD.integer" ;
 		];
-		rdf:_7 [
-			adjoin:subjectURI "$Common.getValue($Columns.getName())";
+		rdf:_5 [
+			adjoin:subjectURI "$Common.getValue(\"columnTemplateURI\")/$Common.getValue($Columns.getName())";
 			adjoin:propertyURI "$AdJoin.pattern";
 			adjoin:objectType "$RDFS.Literal" ;
 			adjoin:objectValue "$String.format(\"^%s$\", $Columns.getName())" ;
 			adjoin:objectDatatype "$XSD.string" ;
-		]
+		];
+		rdf:_6 [
+			adjoin:subjectURI "$Common.getValue(\"columnTemplateURI\")/$Common.getValue($Columns.getName())";
+			adjoin:propertyURI "$SKOS.member";
+			adjoin:objectType "$RDFS.Literal" ;
+			adjoin:objectValue "$Common.getValue(\"rowURI\")" ;
+		];
 	];
 .
 
@@ -410,9 +471,15 @@
 	adjoin:statement [
 		a rdf:Seq ;
 		rdf:_1 [
+			adjoin:subjectURI "$Common.getValue(\"datasetURI\")" ;
+			adjoin:propertyURI "$RDF.value" ;
+			adjoin:objectType "$RDFS.Literal" ;
+			adjoin:objectValue "$Common.getValue(\"unknownColumnCount\")" ;
+		];
+		rdf:_2 [
 			adjoin:value "$Common.setValue(\"tripleCount\", $Output.getModel().size())" ;
 		] ;
-		rdf:_2 [
+		rdf:_3 [
 			adjoin:subjectURI "$Common.getValue(\"datasetURI\")" ;
 			adjoin:propertyURI "$DCTerms.triples" ;
 			adjoin:objectType "$RDFS.Literal" ;

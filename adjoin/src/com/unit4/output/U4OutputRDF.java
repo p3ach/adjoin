@@ -6,7 +6,9 @@ import java.io.OutputStream;
 import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,9 +50,11 @@ import com.unit4.vocabulary.U4AdJoinCallback;
 import com.unit4.vocabulary.U4AdJoinTemplate;
 import com.unit4.vocabulary.U4DCTerms;
 import com.unit4.vocabulary.U4FOAF;
+import com.unit4.vocabulary.U4IATI;
 import com.unit4.vocabulary.U4Org;
 import com.unit4.vocabulary.U4RDF;
 import com.unit4.vocabulary.U4RDFS;
+import com.unit4.vocabulary.U4SKOS;
 import com.unit4.vocabulary.U4VoID;
 import com.unit4.vocabulary.U4XSD;
 
@@ -87,8 +91,12 @@ public class U4OutputRDF implements U4Output {
 		U4Org.setNsPrefix(model);
 		U4RDF.setNsPrefix(model);
 		U4RDFS.setNsPrefix(model);
+		U4SKOS.setNsPrefix(model);
 		U4VoID.setNsPrefix(model);
 		U4XSD.setNsPrefix(model);
+
+		U4IATI.setNsPrefix(model);
+		
 		U4AdJoin.setNsPrefix(model);
 	}
 	
@@ -203,6 +211,7 @@ public class U4OutputRDF implements U4Output {
         context.put("SKOS", new FieldMethodizer("com.unit4.vocabulary.U4SKOS"));
         context.put("XSD", new FieldMethodizer("com.unit4.vocabulary.U4XSD"));
         context.put("VoID", new FieldMethodizer("com.unit4.vocabulary.U4VoID"));
+        context.put("IATI", new FieldMethodizer("com.unit4.vocabulary.U4IATI"));
         context.put("AdJoin", new FieldMethodizer("com.unit4.vocabulary.U4AdJoin"));
 
         final U4AdJoinTemplate template = getCommon().getTemplate();
@@ -236,6 +245,8 @@ public class U4OutputRDF implements U4Output {
 	   				private String uri;
 	   				private Resource resource;
 	   				private Seq seq;
+	   				private Boolean test;
+	   				private Boolean testValue;
 	   				public U4Resource(final String uri) {
 	   					setURI(uri);
 	   					if (uri.startsWith("[Blank]")) {
@@ -293,11 +304,18 @@ public class U4OutputRDF implements U4Output {
 						evaluate(item.getString(U4AdJoin.value));
 					}
 
+					if (item.hasTest()) {
+						final Boolean test = Boolean.valueOf(evaluate(item.getTest()));
+						if (!test) {
+							return;
+						}
+					}
+					
 					if (!item.hasSubjectURI()) {
 						return;
 					}
 					
-					final U4Resource subject = new U4Resource(evaluate(item.getSubjectURI())); 
+					final U4Resource subject = new U4Resource(evaluate(item.getSubjectURI()));
 					
 					final Resource objectType = getModel().createResource(evaluate(item.getObjectType()));
 
@@ -345,17 +363,17 @@ public class U4OutputRDF implements U4Output {
 							logger.trace("output={}", evaluate);
 							return evaluate;
 						} else {
-							throw new U4Exception("Velocity returned false.");
+							throw new U4Exception(String.format("Velocity returned false on input [%s].", input));
 						}
 					} catch (ParseErrorException e) {
 						logger.error("evaluate({}) error.", input);
-						throw new U4Exception("Velocity threw a ParseError.", e);
+						throw new U4Exception(String.format("Velocity threw a ParseError on input [%s].", input), e);
 					} catch (MethodInvocationException e) {
 						logger.error("evaluate({}) error.", input);
-						throw new U4Exception("Velocity threw a MethodInvocation.", e);
+						throw new U4Exception(String.format("Velocity threw a MethodInvocation on input [%s].", input), e);
 					} catch (ResourceNotFoundException e) {
 						logger.error("evaluate({}) error.", input);
-						throw new U4Exception("Velocity threw a ResourceNotFound", e);
+						throw new U4Exception(String.format("Velocity threw a ResourceNotFound on input [%s].", input), e);
 					}
 				}
 			};
@@ -384,8 +402,8 @@ public class U4OutputRDF implements U4Output {
 				final U4Columns columns = getColumns();
 				for (String value : common.getRow()) {
 					logger.trace("value={}",value);
-					if (value == null | value.equals("")) {
-					} else {
+//					if (value == null) { // | value.equals("")) {
+//					} else {
 						columns.setMatch(U4AdJoin.match(columnTemplates, columns.getName()));
 						if (columns.hasMatch()) {
 							columns.getMatch().getStatements(adjoinCallback);
@@ -397,7 +415,7 @@ public class U4OutputRDF implements U4Output {
 //								getModel().add(columns.getMatch().getStatements(context));
 							}
 						}
-					}
+//					}
 				}
 				return this;
 			}
@@ -421,17 +439,20 @@ public class U4OutputRDF implements U4Output {
 			}
 		};
 
+		logger.info("Started at {}.", new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
 		getCommon().getInput().setCallback(inputCallback).parse();
+		logger.info("Finished at {}", new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
 		
-		logger.info("Statements {}", getModel().size());
+		logger.info("Generated {} statements.", getModel().size());
 
 		return true;
 	}
 	
 	@Override
 	public Boolean render() {
-		logger.info("Render to {} as {}.", getOutputStream().toString(), getLanguage());
+		logger.info("Started render to {} as {} at {}.", new String[] {getOutputStream().toString(), getLanguage(), new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date())});
 		getModel().write(getOutputStream(), getLanguage());
+		logger.info("Finished render at {}.", new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
 		return true;
 	}
 	

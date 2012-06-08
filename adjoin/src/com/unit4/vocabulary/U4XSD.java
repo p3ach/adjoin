@@ -13,8 +13,13 @@ public class U4XSD extends U4Vocabulary {
 	public static final String NS = "http://www.w3.org/2001/XMLSchema#";
 	
     public static final Resource string = XSD.xstring;
+    
     public static final Resource date = XSD.date;
+    public static final Resource dateTime = XSD.dateTime;
+    
     public static final Resource integer = XSD.integer;
+
+    public static final Resource decimal = XSD.decimal;
 		
 	public static String getPrefix() {
 		return PREFIX;

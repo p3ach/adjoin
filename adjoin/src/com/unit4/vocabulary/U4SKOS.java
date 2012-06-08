@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.hp.hpl.jena.ontology.OntResource;
+import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 
@@ -15,6 +16,7 @@ public class U4SKOS extends U4Vocabulary {
 
 	public static final Property broader = createProperty(getURI("broader"));
 	public static final Property narrower = createProperty(getURI("narrower"));
+	public static final Property member = createProperty(getURI("member"));
 		
 	public static String getPrefix() {
 		return "skos";
@@ -22,6 +24,10 @@ public class U4SKOS extends U4Vocabulary {
 	
 	public static String getNS() {
 		return "http://www.w3.org/2004/02/skos/core#";
+	}
+	
+	public static void setNsPrefix(Model model) {
+		model.setNsPrefix(getPrefix(), getNS());
 	}
 
 	public static String getURI(String fragment) {

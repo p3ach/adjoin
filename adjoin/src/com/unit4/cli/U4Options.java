@@ -16,14 +16,23 @@ public class U4Options {
 			this.value = value;
 			this.groups.add(null);
 		}
+		public String getKey() {
+			return this.key;
+		}
 		public Object getValue() {
 			return this.value;
 		}
 		public Object getValue(String group) {
 			return (inGroup(group) ? this.value : null);
 		}
+		public Set<String> getGroups() {
+			return this.groups;
+		}
 		public Boolean inGroup(String group) {
 			return this.groups.contains(group);
+		}
+		public String toString() {
+			return String.format("U4Option [%s, %s, %s]", getKey(), getValue().toString(), getGroups());
 		}
 	}
 	

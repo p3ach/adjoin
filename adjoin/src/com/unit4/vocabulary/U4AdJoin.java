@@ -1,40 +1,25 @@
 package com.unit4.vocabulary;
 
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.Velocity;
-import org.apache.velocity.exception.MethodInvocationException;
-import org.apache.velocity.exception.ParseErrorException;
-import org.apache.velocity.exception.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hp.hpl.jena.datatypes.TypeMapper;
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
-import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.ontology.OntResource;
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.NodeIterator;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Seq;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.impl.LiteralImpl;
-import com.hp.hpl.jena.vocabulary.RDF;
-import com.hp.hpl.jena.vocabulary.RDFS;
 import com.hp.hpl.jena.vocabulary.XSD;
 import com.unit4.exception.U4Exception;
-import com.unit4.output.U4OutputRDF;
-import com.unit4.tabular.U4Common;
 
 /**
  * Provides the heavy lifting for converting an input into RDF output based on an AdJoin template.
@@ -59,9 +44,13 @@ public class U4AdJoin extends U4Vocabulary {
 	
 	public static final Resource Null = createResource(getURI("Null"));
 	
+	public static final Resource Unknown = createResource(getURI("Unknown"));
+	
 	public static final Property priority = createProperty(getURI("priority"));
 	
 	public static final Property pattern = createProperty(getURI("pattern"));
+	
+	public static final Property test = createProperty(getURI("test"));
 	
 	public static final Property subjectURI = createProperty(getURI("subjectURI"));
 	public static final Property propertyURI = createProperty(getURI("propertyURI"));
@@ -238,7 +227,7 @@ public class U4AdJoin extends U4Vocabulary {
 	/**
 	 * Answer all the statements for this AdJoin.
 	 * For each statement callback with <code>this</code>.
-	 * This will wall the statement hierachy.
+	 * This will walk the statement hierachy.
 	 * @param callback A U4AdJoinCallback instance.
 	 */
 	public void getStatements(U4AdJoinCallback callback) {
@@ -248,8 +237,8 @@ public class U4AdJoin extends U4Vocabulary {
 			}
 		}
 		
-		if (isAnonymous()) {
-			if (hasContainer()) { // i.e. RDF:Alt|Bag|Seq.
+		if (isAnonymous()) { // i.e. [...];
+			if (hasContainer()) { // i.e. rdf:Alt|Bag|Seq.
 				NodeIterator iterator = getContainer().iterator();
 				while (iterator.hasNext()) {
 					new U4AdJoin(iterator.next().asResource()).getStatements(callback);
@@ -321,6 +310,15 @@ public class U4AdJoin extends U4Vocabulary {
 	
 	public Integer getPriority() {
 		return getInteger(U4AdJoin.priority);
+	}
+
+	
+	public Boolean hasTest() {
+		return hasProperty(U4AdJoin.test);
+	}
+	
+	public String getTest() {
+		return getString(U4AdJoin.test);
 	}
 	
 	public Boolean hasSubjectURI() {
@@ -416,7 +414,11 @@ public class U4AdJoin extends U4Vocabulary {
 			if (pattern == null) {
 				match = false;
 			} else {
-				match = Pattern.matches(pattern, input);
+				if (input == null) {
+					match = false;
+				} else {
+					match =  Pattern.matches(pattern, input);
+				}
 			}
 		} else {
 			match = false;

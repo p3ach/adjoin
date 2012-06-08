@@ -94,6 +94,18 @@ public class U4Row implements Iterable<String>, Iterator<String> {
 		return this.values;
 	}
 	
+	public Boolean hasValue() {
+		final Boolean hasValue = hasValue(getColumns().getIndex());
+		logger.trace("hasValue()={}", hasValue); 
+		return hasValue;
+	}
+
+	public Boolean hasValue(Integer index) {
+		final Boolean hasValue = (getValues().get(index) != null);
+		logger.trace("hasValue({})={}", index, hasValue);
+		return hasValue;
+	}
+	
 	/**
 	 * Get the value for the current Columns index.
 	 * @return

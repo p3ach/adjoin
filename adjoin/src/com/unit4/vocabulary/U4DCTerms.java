@@ -3,7 +3,6 @@ package com.unit4.vocabulary;
 import com.hp.hpl.jena.ontology.OntResource;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.Resource;
 
 public class U4DCTerms extends U4Vocabulary {
 	
@@ -13,7 +12,10 @@ public class U4DCTerms extends U4Vocabulary {
 	
     public static final Property created = createProperty(getURI("created"));
     public static final Property creator = createProperty(getURI("creator"));
+    public static final Property date = createProperty(getURI("date"));
     public static final Property description = createProperty(getURI("description"));
+    public static final Property format = createProperty(getURI("format"));
+    public static final Property identifier = createProperty(getURI("identifier"));
     public static final Property license = createProperty(getURI("license"));
     public static final Property title = createProperty(getURI("title"));
     public static final Property triples = createProperty(getURI("triples"));

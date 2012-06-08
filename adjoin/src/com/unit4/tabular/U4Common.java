@@ -100,9 +100,9 @@ public class U4Common {
 		setValue("commonUUID", UUID.randomUUID().toString());
 	    
 	    Date timestamp = new Date();
+        setValue("commonTimestamp", new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(timestamp));
 	    setValue("commonDate", new SimpleDateFormat("dd/MM/yyyy").format(timestamp));
 	    setValue("commonTime", new SimpleDateFormat("HH:mm:ss").format(timestamp));
-        setValue("commonTimestamp", new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(timestamp));
 	}
 	
 	public HashMap<String,Object> getValues() {
